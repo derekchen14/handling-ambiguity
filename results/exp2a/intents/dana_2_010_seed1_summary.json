@@ -1,0 +1,26 @@
+{
+  "run_id": "exp2a_intent_dana_2_010_seed1",
+  "experiment": "exp2a_intent",
+  "domain": "dana",
+  "config_id": "2_010",
+  "seed": 1,
+  "timestamp": "2026-03-01T06:12:36.103948+00:00",
+  "summary": {
+    "accuracy_top1": 0.957,
+    "accuracy_by_category": {
+      "same_flow": 0.9531,
+      "switch_flow": 0.9531,
+      "ambiguous_first": 0.9375,
+      "ambiguous_second": 0.9844
+    },
+    "accuracy_by_turn": {
+      "turn_1": 0.9688,
+      "turn_3": 0.9453
+    },
+    "latency_p50_ms": 2698,
+    "latency_p95_ms": 3736,
+    "input_tokens_total": 463445,
+    "output_tokens_total": 14160,
+    "failure_rate": 0.0
+  }
+}

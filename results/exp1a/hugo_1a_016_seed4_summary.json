@@ -1,0 +1,27 @@
+{
+  "run_id": "exp1a_hugo_1a_016_seed4",
+  "experiment": "exp1a",
+  "domain": "hugo",
+  "config_id": "1a_016",
+  "seed": 4,
+  "timestamp": "2026-02-24T06:44:44.350666+00:00",
+  "summary": {
+    "accuracy_top1": 0.7695,
+    "accuracy_by_category": {
+      "same_flow": 0.9062,
+      "switch_flow": 0.8438,
+      "ambiguous_first": 0.4844,
+      "ambiguous_second": 0.8438
+    },
+    "accuracy_by_turn": {
+      "turn_1": 0.7188,
+      "turn_3": 0.8203
+    },
+    "latency_p50_ms": 1491,
+    "latency_p95_ms": 2093,
+    "input_tokens_total": 276020,
+    "output_tokens_total": 13236,
+    "failure_rate": 0.0
+  },
+  "migrated_from": "1d_008"
+}

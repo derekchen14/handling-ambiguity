@@ -1,0 +1,1799 @@
+[
+  {
+    "name": "search_posts",
+    "description": "Search posts, drafts, and topics by keyword, status, or category \u2014 returns matching titles, excerpts, and publication dates sorted by relevance",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search term: keyword, topic, or phrase to match against post titles and content"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "published",
+            "archived",
+            "all"
+          ],
+          "default": "all",
+          "description": "Filter by post status"
+        },
+        "category": {
+          "type": "string",
+          "description": "Filter by topic category"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum number of results to return"
+        }
+      },
+      "required": []
+    },
+    "_flows": [
+      "browse",
+      "check",
+      "find",
+      "suggest",
+      "scope"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "get_post",
+    "description": "Get post metadata \u2014 title, status, tags, section titles, word counts, dates. Returns metadata only, not content. Use when the user asks about a post's status, structure, or properties",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Unique identifier of the post or draft to retrieve"
+        },
+        "include_history": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include version history for the post"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "format",
+      "tidy",
+      "release",
+      "syndicate",
+      "preview"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "create_post",
+    "description": "Create a new draft post with title and optional topic \u2014 initializes a post record with empty sections. Does not generate content; use generate_outline or generate_prose to fill sections",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of the new post"
+        },
+        "topic": {
+          "type": "string",
+          "description": "Topic or theme for the post"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "_flows": [
+      "create"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "delete_post",
+    "description": "Permanently delete a post from the local database \u2014 removes all content, metadata, and version history",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Unique identifier of the post to delete"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [],
+    "internal_component": false
+  },
+  {
+    "name": "rollback_post",
+    "description": "Revert a post to a previous version \u2014 restores content and metadata from a specific point in the version history",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to revert"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version identifier to revert to (defaults to the immediately previous version)"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "undo"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "update_section",
+    "description": "Replace the content of a specific section in a post \u2014 the standard write operation after any content generation or revision",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post containing the section to update"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section title to update"
+        },
+        "content": {
+          "type": "string",
+          "description": "New content for the section"
+        }
+      },
+      "required": [
+        "post_id",
+        "section",
+        "content"
+      ]
+    },
+    "_flows": [
+      "refine",
+      "expand",
+      "write",
+      "rework",
+      "polish",
+      "tone",
+      "amend",
+      "tidy"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "insert_section",
+    "description": "Add a new section to a post at a specific position \u2014 creates an empty section placeholder with a heading",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to add the section to"
+        },
+        "title": {
+          "type": "string",
+          "description": "Heading for the new section"
+        },
+        "position": {
+          "type": "integer",
+          "description": "Insertion position (0-indexed; appends to end if omitted)"
+        }
+      },
+      "required": [
+        "post_id",
+        "title"
+      ]
+    },
+    "_flows": [
+      "add"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "delete_section",
+    "description": "Remove a section from a post \u2014 deletes the heading and all content within that section",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post containing the section to remove"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section title to delete"
+        }
+      },
+      "required": [
+        "post_id",
+        "section"
+      ]
+    },
+    "_flows": [
+      "rework"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "reorder_sections",
+    "description": "Rearrange the section order within a post \u2014 moves sections to new positions without changing their content",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to reorder"
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Section titles in the desired order"
+        }
+      },
+      "required": [
+        "post_id",
+        "order"
+      ]
+    },
+    "_flows": [
+      "rework"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "update_metadata",
+    "description": "Update post-level metadata \u2014 title, tags, status, excerpt, or featured image without modifying section content",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to update"
+        },
+        "title": {
+          "type": "string",
+          "description": "New title for the post"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Updated tag list"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "review",
+            "approved",
+            "published",
+            "archived"
+          ],
+          "description": "New workflow status"
+        },
+        "excerpt": {
+          "type": "string",
+          "description": "Post excerpt or summary for previews and SEO"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "create",
+      "format",
+      "tidy"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "generate_outline",
+    "description": "Generate outline options for a topic \u2014 section headings, key points per section, estimated word counts, and suggested reading order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic or theme to outline"
+        },
+        "depth": {
+          "type": "integer",
+          "default": 2,
+          "description": "Outline depth (1=sections only, 2=key points, 3=subpoints, 4=phrases)"
+        },
+        "angle": {
+          "type": "string",
+          "description": "Specific angle, perspective, or constraint to shape the outline"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "outline"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "generate_prose",
+    "description": "Write new content from scratch based on a topic and instructions \u2014 generates full prose paragraphs from a brief. For developing existing content, use expand_content instead",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic or subject to write about"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Specific instructions or brief to guide the writing"
+        },
+        "tone": {
+          "type": "string",
+          "description": "Target tone or voice (e.g., conversational, technical, formal)"
+        },
+        "length": {
+          "type": "string",
+          "enum": [
+            "short",
+            "medium",
+            "long"
+          ],
+          "default": "medium",
+          "description": "Target length \u2014 short (~200 words), medium (~500), long (~1000)"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "write"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "expand_content",
+    "description": "Develop existing content into fuller prose \u2014 takes bullet points, notes, or sparse sections and expands them into complete paragraphs. Requires existing content; use generate_prose for blank sections",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_content": {
+          "type": "string",
+          "description": "Existing content (bullets, notes, sparse text) to expand"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Specific guidance on how to expand (emphasis, examples to include)"
+        },
+        "tone": {
+          "type": "string",
+          "description": "Target tone or voice for the expanded content"
+        }
+      },
+      "required": [
+        "source_content"
+      ]
+    },
+    "_flows": [
+      "expand"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "revise_content",
+    "description": "Rewrite existing content incorporating feedback or revision instructions \u2014 can do heavy restructuring (rework), light editing (polish), or targeted changes (amend)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_content": {
+          "type": "string",
+          "description": "Existing content to revise"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Revision direction, feedback, or specific changes to incorporate"
+        },
+        "focus": {
+          "type": "string",
+          "enum": [
+            "structure",
+            "clarity",
+            "conciseness",
+            "flow",
+            "accuracy",
+            "general"
+          ],
+          "default": "general",
+          "description": "Primary revision focus \u2014 what aspect to prioritize"
+        },
+        "tone": {
+          "type": "string",
+          "description": "Target tone if the revision should shift voice"
+        }
+      },
+      "required": [
+        "source_content",
+        "instructions"
+      ]
+    },
+    "_flows": [
+      "refine",
+      "rework",
+      "polish",
+      "amend"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "brainstorm_ideas",
+    "description": "Generate a list of angles, hooks, opening lines, or perspectives for a topic \u2014 divergent thinking to explore creative options before committing to a direction",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic or subject to brainstorm around"
+        },
+        "count": {
+          "type": "integer",
+          "default": 5,
+          "description": "Number of ideas to generate"
+        },
+        "angle": {
+          "type": "string",
+          "description": "Constraint or direction to shape brainstorming (e.g., 'contrarian takes', 'beginner-friendly')"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "brainstorm",
+      "suggest"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "explain_action",
+    "description": "Explain what Hugo did or plans to do \u2014 provides transparency into the writing process, recent actions, or reasoning behind a suggestion",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "What to explain (e.g., 'last edit', 'revision plan', 'outline reasoning')"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "brief",
+            "detailed"
+          ],
+          "default": "brief",
+          "description": "Level of detail in the explanation"
+        }
+      },
+      "required": []
+    },
+    "_flows": [
+      "explain"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "adjust_tone",
+    "description": "Shift the tone or voice of content \u2014 changes register (formal, casual, technical, conversational), adjusts sentence length and vocabulary complexity without changing meaning",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_content": {
+          "type": "string",
+          "description": "Content to adjust"
+        },
+        "target_tone": {
+          "type": "string",
+          "description": "Desired tone (e.g., 'more conversational', 'more technical', 'formal but warm')"
+        },
+        "intensity": {
+          "type": "string",
+          "enum": [
+            "subtle",
+            "moderate",
+            "strong"
+          ],
+          "default": "moderate",
+          "description": "How much to shift \u2014 subtle preserves more of the original voice"
+        }
+      },
+      "required": [
+        "source_content",
+        "target_tone"
+      ]
+    },
+    "_flows": [
+      "tone"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "audit_style",
+    "description": "Compare a post's writing style against the user's published history \u2014 checks voice, vocabulary, sentence patterns, formatting conventions, and tonal consistency across the corpus",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to audit"
+        },
+        "reference_count": {
+          "type": "integer",
+          "default": 5,
+          "description": "Number of previous posts to compare against"
+        },
+        "aspects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "voice",
+              "vocabulary",
+              "sentence_length",
+              "tone",
+              "formatting",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which style aspects to analyze"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "audit"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "compare_posts",
+    "description": "Compare style or structure across two or more specific posts \u2014 sentence length, paragraph density, heading patterns, vocabulary overlap, and tonal differences",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of post IDs to compare (minimum 2)"
+        },
+        "aspects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "structure",
+              "vocabulary",
+              "sentence_length",
+              "tone",
+              "formatting",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which aspects to compare"
+        }
+      },
+      "required": [
+        "post_ids"
+      ]
+    },
+    "_flows": [
+      "compare"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "check_grammar",
+    "description": "Check grammar, spelling, and punctuation \u2014 returns a list of issues with line references, severity, and suggested corrections",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content to check"
+        },
+        "language": {
+          "type": "string",
+          "default": "en",
+          "description": "Language code for grammar rules (e.g., 'en', 'en-GB')"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "_flows": [
+      "polish",
+      "tidy"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "check_readability",
+    "description": "Compute readability metrics \u2014 Flesch-Kincaid grade, average sentence length, passive voice percentage, paragraph density, and vocabulary complexity score",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content to analyze"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "flesch_kincaid",
+              "sentence_length",
+              "passive_voice",
+              "paragraph_density",
+              "vocabulary",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which readability metrics to compute"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "triage"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "detect_issues",
+    "description": "Find writing quality issues \u2014 cliches, filler words, repetitive phrasing, weak transitions, adverb overuse, and hedging language",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content to check"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cliches",
+              "filler",
+              "repetition",
+              "transitions",
+              "adverbs",
+              "hedging",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which issue types to check for"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "_flows": [
+      "triage",
+      "polish"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "analyze_content",
+    "description": "Analyze content structure and completeness \u2014 word count, reading time, section count, missing images, empty sections, missing metadata (tags, excerpt, featured image)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to analyze"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "word_count",
+              "reading_time",
+              "sections",
+              "completeness",
+              "links",
+              "images",
+              "metadata",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which structural metrics to compute"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "triage"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "lookup_word",
+    "description": "Look up word definitions, synonyms, antonyms, or usage examples via dictionary and thesaurus \u2014 e.g., 'synonym for important', 'definition of ephemeral', 'formal alternatives to good'",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "word": {
+          "type": "string",
+          "description": "Word or phrase to look up"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "definition",
+            "synonym",
+            "antonym",
+            "usage",
+            "all"
+          ],
+          "default": "all",
+          "description": "Type of lookup to perform"
+        }
+      },
+      "required": [
+        "word"
+      ]
+    },
+    "_flows": [
+      "reference"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "search_reference",
+    "description": "Search vetted FAQs and curated editorial guidelines \u2014 the unstructured equivalent of a style manual. Returns relevant guidance on writing conventions, house style rules, and domain terminology",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search term or question about writing guidelines"
+        },
+        "category": {
+          "type": "string",
+          "description": "Filter by guideline category (e.g., 'style', 'formatting', 'terminology')"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "_flows": [
+      "search"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "analyze_seo",
+    "description": "Analyze SEO quality of a post \u2014 keyword density, meta description presence, title tag optimization, heading structure, internal link count, and image alt text coverage",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to analyze"
+        },
+        "target_keyword": {
+          "type": "string",
+          "description": "Primary keyword to check density and placement for"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "format"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "suggest_keywords",
+    "description": "Research keywords for a topic \u2014 suggests primary and secondary keywords with search volume estimates, competition level, and content angle recommendations",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic to research keywords for"
+        },
+        "count": {
+          "type": "integer",
+          "default": 10,
+          "description": "Number of keyword suggestions to return"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "outline",
+      "browse"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "format_content",
+    "description": "Format content for publication on a specific platform \u2014 adjusts heading levels, image placement, code blocks, pull quotes, and metadata fields for the target platform's conventions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to format"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "substack",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Target platform for formatting"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "html",
+            "plaintext"
+          ],
+          "default": "markdown",
+          "description": "Output format"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "format",
+      "syndicate"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "normalize_structure",
+    "description": "Normalize structural formatting across a post \u2014 consistent heading hierarchy, list indentation, paragraph spacing, and whitespace cleanup. Does not change wording",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to normalize"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "headings",
+              "lists",
+              "spacing",
+              "whitespace",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ],
+          "description": "Which normalization rules to apply"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "tidy"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "diff_versions",
+    "description": "Show side-by-side comparison of two content versions \u2014 additions, deletions, and modifications highlighted so the user can evaluate what changed between edits",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post containing the section to diff"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section title to compare versions of"
+        },
+        "version_a": {
+          "type": "string",
+          "description": "Version identifier for the left side (e.g., 'previous', 'v2')"
+        },
+        "version_b": {
+          "type": "string",
+          "description": "Version identifier for the right side (defaults to current)"
+        }
+      },
+      "required": [
+        "post_id",
+        "section"
+      ]
+    },
+    "_flows": [
+      "diff"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "insert_media",
+    "description": "Add an image or media element to a section \u2014 includes URL, alt text for accessibility, and optional caption. Validates the URL and image dimensions before inserting",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to add media to"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section to insert the media into"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the image or media file"
+        },
+        "alt_text": {
+          "type": "string",
+          "description": "Accessibility description of the image"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Display caption shown below the media"
+        }
+      },
+      "required": [
+        "post_id",
+        "section",
+        "url",
+        "alt_text"
+      ]
+    },
+    "_flows": [
+      "write",
+      "expand",
+      "format"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "check_links",
+    "description": "Validate all links in a post \u2014 checks for broken URLs, missing anchors, redirect chains, and external link health. Returns a report of issues with fix suggestions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to check links for"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "tidy"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "browse_topics",
+    "description": "Browse trending topics, saved ideas, and content gaps \u2014 filtered by category or source. Returns topic suggestions with relevance scores and content angle ideas",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Filter by topic category"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "trending",
+            "saved",
+            "gaps",
+            "all"
+          ],
+          "default": "all",
+          "description": "Source of topic ideas"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum number of ideas to return"
+        }
+      },
+      "required": []
+    },
+    "_flows": [
+      "browse",
+      "scope"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "publish_post",
+    "description": "Publish or unpublish a post on a platform \u2014 makes the post live immediately or removes it from the platform",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to publish"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "substack",
+            "twitter",
+            "linkedin"
+          ],
+          "description": "Target platform"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "publish",
+            "pin",
+            "blurb"
+          ],
+          "default": "publish",
+          "description": "Publication action to perform"
+        }
+      },
+      "required": [
+        "post_id",
+        "platform"
+      ]
+    },
+    "_flows": [
+      "release",
+      "syndicate",
+      "promote"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "check_platform",
+    "description": "Check the publication status of a post on a specific platform \u2014 returns published URL, publish date, view count, and sync status",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to check"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "substack",
+            "twitter",
+            "linkedin"
+          ],
+          "description": "Platform to check status on"
+        }
+      },
+      "required": [
+        "post_id",
+        "platform"
+      ]
+    },
+    "_flows": [
+      "survey",
+      "check"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "list_platforms",
+    "description": "List configured publishing platforms and their connection status \u2014 shows API health, credential validity, last sync date, and available features per platform",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "_flows": [
+      "survey",
+      "promote"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "render_preview",
+    "description": "Render a platform-specific preview of a post \u2014 shows exactly how the content will appear when published, including layout, images, and formatting",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to preview"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "substack",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Target platform for preview rendering"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "preview"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "manage_schedule",
+    "description": "View, reschedule, or cancel a scheduled publication \u2014 manages the queue of future-dated posts awaiting automatic publishing",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to manage schedule for"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "view",
+            "reschedule",
+            "cancel"
+          ],
+          "default": "view",
+          "description": "Schedule management action"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "substack",
+            "twitter",
+            "linkedin"
+          ],
+          "description": "Platform to manage schedule on"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "New datetime for reschedule action (ISO 8601)"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "schedule",
+      "cancel"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "plan_calendar",
+    "description": "Generate a content calendar with topics, target dates, and publishing cadence \u2014 lays out a schedule over weeks or months for consistent content production",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "timeframe": {
+          "type": "string",
+          "description": "Calendar span (e.g., '2 weeks', '1 month', 'Q1 2026')"
+        },
+        "count": {
+          "type": "integer",
+          "description": "Number of posts to plan"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Topic categories to include in the calendar"
+        },
+        "cadence": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "twice_weekly",
+            "weekly",
+            "biweekly",
+            "monthly"
+          ],
+          "default": "weekly",
+          "description": "Publishing frequency"
+        }
+      },
+      "required": []
+    },
+    "_flows": [
+      "calendar"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "plan_series",
+    "description": "Plan a multi-part blog series \u2014 splits a broad theme into installments, defines the narrative arc, assigns subtopics to each part, and sets a suggested publication sequence",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Overarching theme for the series"
+        },
+        "part_count": {
+          "type": "integer",
+          "default": 3,
+          "description": "Number of installments in the series"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "tutorial",
+            "deep_dive",
+            "listicle",
+            "narrative",
+            "mixed"
+          ],
+          "default": "mixed",
+          "description": "Content format for each installment"
+        },
+        "target_length": {
+          "type": "integer",
+          "description": "Target word count per installment"
+        }
+      },
+      "required": [
+        "theme"
+      ]
+    },
+    "_flows": [
+      "digest"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "search_by_time",
+    "description": "Search posts by date or date range \u2014 find posts published, created, or last edited within a specific period",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "start_date": {
+          "type": "string",
+          "description": "Start of date range (ISO 8601 date, e.g., '2026-01-01')"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "End of date range (defaults to today if omitted)"
+        },
+        "date_field": {
+          "type": "string",
+          "enum": [
+            "created",
+            "modified",
+            "published"
+          ],
+          "default": "modified",
+          "description": "Which date field to filter on"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum number of results to return"
+        }
+      },
+      "required": [
+        "start_date"
+      ]
+    },
+    "_flows": [
+      "find",
+      "check",
+      "calendar",
+      "browse"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "read_post",
+    "description": "Display post content for the user to review \u2014 use only when the user asks to see, read, or review content. Do NOT use as a precursor to editing; action tools like revise_content and expand_content already load content internally",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to load into context"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Load only these sections (loads all if omitted)"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "view",
+      "compare",
+      "expand",
+      "refine",
+      "rework",
+      "polish",
+      "tone",
+      "audit",
+      "amend",
+      "study"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "heads_or_tails",
+    "description": "Preview the first or last N paragraphs of a post \u2014 quick glance at content shape and quality without loading the full post into context",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to preview"
+        },
+        "end": {
+          "type": "string",
+          "enum": [
+            "head",
+            "tail"
+          ],
+          "default": "head",
+          "description": "Which end of the post to preview"
+        },
+        "n": {
+          "type": "integer",
+          "default": 3,
+          "description": "Number of paragraphs to return"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "inspect",
+      "triage"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "read_outline",
+    "description": "Display the structural outline of a post for the user to review \u2014 section headings, key points, and word counts. Use only when the user asks to see the outline or structure, not as a precursor to editing",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post to read outline from"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    },
+    "_flows": [
+      "refine",
+      "triage",
+      "scope",
+      "rework"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "write_section",
+    "description": "Write a brand-new section from scratch and insert it into a post \u2014 for creating sections that don't exist yet. To rewrite or edit an existing section, use revise_content instead. Post-aware writing, unlike generate_prose which writes standalone text",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "Post containing the section to write"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section to generate content for"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Guidance on what to write (key points to cover, angle to take)"
+        },
+        "tone": {
+          "type": "string",
+          "description": "Target tone or voice for the generated content"
+        }
+      },
+      "required": [
+        "post_id",
+        "section"
+      ]
+    },
+    "_flows": [
+      "write",
+      "rework"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "draft_content",
+    "description": "Generate a quick rough draft \u2014 faster and less polished than generate_prose. Gets ideas down on paper before committing to careful writing. Good for first passes and exploration",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic or subject to draft about"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Brief guidance on what to cover"
+        },
+        "length": {
+          "type": "string",
+          "enum": [
+            "short",
+            "medium",
+            "long"
+          ],
+          "default": "medium",
+          "description": "Target length \u2014 short (~150 words), medium (~400), long (~800)"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "write",
+      "expand"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "search_sources",
+    "description": "Search the web for original sources and citations \u2014 academic papers, official reports, authoritative pages that substantiate a claim or provide background for a topic",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Topic, claim, or question to find sources for"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Restrict to a specific domain (e.g., '.edu', '.gov', 'nature.com')"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5,
+          "description": "Maximum number of sources to return"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "_flows": [
+      "scope",
+      "write",
+      "expand"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "search_evidence",
+    "description": "Search the web for supporting evidence \u2014 statistics, data points, expert quotes, and research findings that strengthen an argument or back up a claim",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The claim or argument to find evidence for"
+        },
+        "evidence_type": {
+          "type": "string",
+          "enum": [
+            "statistic",
+            "quote",
+            "study",
+            "any"
+          ],
+          "default": "any",
+          "description": "Type of evidence to prioritize"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5,
+          "description": "Maximum number of evidence items to return"
+        }
+      },
+      "required": [
+        "claim"
+      ]
+    },
+    "_flows": [
+      "write",
+      "expand",
+      "rework"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "search_inspiration",
+    "description": "Search the web for similar articles and content \u2014 see how others approach a topic, what angles are trending, and where content gaps exist. Returns summaries with links",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic to find similar content for"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "blog",
+            "news",
+            "academic",
+            "any"
+          ],
+          "default": "any",
+          "description": "Type of source to search"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5,
+          "description": "Maximum number of results to return"
+        }
+      },
+      "required": [
+        "topic"
+      ]
+    },
+    "_flows": [
+      "browse",
+      "brainstorm",
+      "outline",
+      "scope"
+    ],
+    "internal_component": false
+  },
+  {
+    "name": "coordinate_context",
+    "description": "Read conversation history and contextual state \u2014 provides the skill with relevant prior turns, user intent, and session context",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "recent",
+            "full",
+            "summary"
+          ],
+          "default": "recent",
+          "description": "How much context to retrieve"
+        },
+        "turn_count": {
+          "type": "integer",
+          "default": 5,
+          "description": "Number of recent turns to include (when scope=recent)"
+        }
+      },
+      "required": [
+        "scope"
+      ]
+    },
+    "_flows": [
+      "*"
+    ],
+    "internal_component": true
+  },
+  {
+    "name": "manage_memory",
+    "description": "Read or write the agent's memory \u2014 L1 session scratchpad, L2 persistent user preferences, L3 unvetted business context from documents and domain knowledge",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "delete"
+          ],
+          "description": "Memory operation to perform"
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "description": "L1=session scratchpad, L2=persistent preferences, L3=business context"
+        },
+        "key": {
+          "type": "string",
+          "description": "Memory key to read, write, or delete"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value to store (when operation=write)"
+        }
+      },
+      "required": [
+        "operation",
+        "level"
+      ]
+    },
+    "_flows": [
+      "recap",
+      "store",
+      "recall",
+      "preference",
+      "retrieve"
+    ],
+    "internal_component": true
+  },
+  {
+    "name": "read_flow_stack",
+    "description": "Read the current flow stack \u2014 slot values, flow metadata, parent flows, and execution state for the active flow chain",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "current",
+            "parent",
+            "all"
+          ],
+          "default": "current",
+          "description": "Which flows to read from the stack"
+        },
+        "flow_id": {
+          "type": "string",
+          "description": "Specific flow ID to read (when scope=current or parent)"
+        }
+      },
+      "required": [
+        "scope"
+      ]
+    },
+    "_flows": [
+      "*"
+    ],
+    "internal_component": true
+  },
+  {
+    "name": "handle_ambiguity",
+    "description": "Call when the user's request is ambiguous and could map to multiple operations. Signal that clarification is needed before proceeding.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "clarification": {
+          "type": "string",
+          "description": "The clarifying question to ask the user to disambiguate their request"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of plausible tool names that could apply"
+        }
+      },
+      "required": [
+        "clarification"
+      ]
+    },
+    "internal_component": true,
+    "_flows": [
+      "*"
+    ]
+  },
+  {
+    "name": "conversational_response",
+    "description": "Call when the user's message is conversational, an acknowledgement, or does not require any data operation. Use this to respond naturally without invoking a domain tool.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Brief explanation of why a conversational response is appropriate"
+        }
+      },
+      "required": [
+        "reason"
+      ]
+    },
+    "internal_component": true,
+    "_flows": [
+      "*"
+    ]
+  }
+]

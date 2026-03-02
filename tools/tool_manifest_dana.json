@@ -1,0 +1,856 @@
+[
+  {
+    "name": "list_datasets",
+    "description": "List available datasets in the workspace with name, format, and source ID — used to decide which dataset to load",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "seed"], "description": "Filter by data format"},
+        "source": {"type": "string", "description": "Filter by source type or origin"}
+      },
+      "required": []
+    },
+    "internal_component": false,
+    "_flows": ["exist"]
+  },
+  {
+    "name": "load_dataset",
+    "description": "Load a dataset from file or seed data into the workspace",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_id": {"type": "string", "description": "Unique source identifier for the dataset"},
+        "name": {"type": "string", "description": "Display name for the dataset in the workspace"},
+        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "seed"], "description": "Data format"}
+      },
+      "required": ["source_id"]
+    },
+    "internal_component": false,
+    "_flows": ["pipeline", "insert"]
+  },
+  {
+    "name": "save_dataset",
+    "description": "Persist the current state of a dataset — saves all tables and mutations to durable storage",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "dataset": {"type": "string", "description": "Dataset (spreadsheet) to save"},
+        "name": {"type": "string", "description": "Save-as name (defaults to current name)"},
+        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet"], "description": "Output format"}
+      },
+      "required": ["dataset"]
+    },
+    "internal_component": false,
+    "_flows": ["export"]
+  },
+  {
+    "name": "execute_sql",
+    "description": "Execute a raw SQL query when no specialized tool fits \u2014 SELECT, aggregate, filter, or join using SQL syntax. Prefer specialized tools when available: render_chart for visualization, dimension_breakdown for metric decomposition, pivot_tables for reshaping, compare_metrics for statistical tests",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "SQL query to execute against loaded tables"},
+        "table": {"type": "string", "description": "Primary table name for the query context"}
+      },
+      "required": ["query"]
+    },
+    "internal_component": false,
+    "_flows": ["query", "describe", "exist", "segment", "pivot", "recommend", "plot"]
+  },
+  {
+    "name": "execute_python",
+    "description": "Execute arbitrary Python code against a loaded table (available as 'df') — for complex transformations, custom formulas, or operations that no specialized tool handles. Prefer format_column for standard formatting, flash_fill for filling nulls",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "code": {"type": "string", "description": "Python expression or statement to execute"},
+        "table": {"type": "string", "description": "Table name available as 'df' variable"}
+      },
+      "required": ["code"]
+    },
+    "internal_component": false,
+    "_flows": ["calculate", "query", "lookup", "pivot", "describe", "compare", "exist", "segment", "plot", "trend", "update", "dedupe", "fill", "interpolate", "replace"]
+  },
+  {
+    "name": "modify_column",
+    "description": "Change values across one or more entire columns — bulk column-level transformations like normalizing all emails, applying a multiplier to a price column, or zeroing out a field. Operates on every row in the column(s)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column name or comma-separated column names"},
+        "value": {"type": "string", "description": "New value or expression to apply"},
+        "condition": {"type": "string", "description": "Row filter — only update rows matching this condition"}
+      },
+      "required": ["table", "column", "value"]
+    },
+    "internal_component": false,
+    "_flows": ["update"]
+  },
+  {
+    "name": "modify_row",
+    "description": "Change values across one or more entire rows — fix specific records like correcting a customer's address in row 42 or updating all fields for a given ID. Operates on every column in the row(s)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "row": {"type": "string", "description": "Row selector — index, range ('3:7'), or condition ('name == \"Alice\"')"},
+        "values": {"type": "object", "description": "Column-to-value pairs to set (e.g., {\"city\": \"NYC\", \"state\": \"NY\"})"},
+        "is_header": {"type": "boolean", "default": false, "description": "When true, treats the row as a header row — renames column labels instead of modifying data values"}
+      },
+      "required": ["table", "row", "values"]
+    },
+    "internal_component": false,
+    "_flows": ["update"]
+  },
+  {
+    "name": "modify_cell",
+    "description": "Change one or more individual cells by (row, column) coordinate — precise, surgical corrections to specific data points like fixing a typo in row 5, column 'name'",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "row": {"type": "string", "description": "Row selector — index or condition"},
+        "column": {"type": "string", "description": "Column name"},
+        "value": {"type": "string", "description": "New cell value"}
+      },
+      "required": ["table", "row", "column", "value"]
+    },
+    "internal_component": false,
+    "_flows": ["update"]
+  },
+  {
+    "name": "modify_table",
+    "description": "Table-level structural changes — sort the entire table, reorder all columns, set a primary key, or clear data while keeping structure. Operates on the table as a whole, not individual rows or columns",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "operation": {"type": "string", "enum": ["sort", "reorder_columns", "set_index", "reset_index", "clear"], "description": "Table-level operation"},
+        "column": {"type": "string", "description": "Column for sort or index operations"},
+        "ascending": {"type": "boolean", "default": true, "description": "Sort direction (when operation=sort)"}
+      },
+      "required": ["table", "operation"]
+    },
+    "internal_component": false,
+    "_flows": ["update", "reshape"]
+  },
+  {
+    "name": "insert_rows",
+    "description": "Add new rows to a table — one row from a dict of values, or multiple rows from a list. Verification checks row-count limits, duplicate keys, and type compatibility",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "values": {"type": "object", "description": "Column-to-value pairs for one row, or array of such dicts for multiple rows"},
+        "position": {"type": "integer", "description": "Index to insert at (appends to end if omitted)"}
+      },
+      "required": ["table", "values"]
+    },
+    "internal_component": false,
+    "_flows": ["insert"]
+  },
+  {
+    "name": "insert_columns",
+    "description": "Add a new column to a table — computed from an expression, filled with a default, or empty. Verification checks column-name uniqueness and expression validity",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "New column name"},
+        "expression": {"type": "string", "description": "Python expression for computed column (e.g., 'price * quantity')"},
+        "default": {"type": "string", "description": "Default value for all rows (used when no expression)"},
+        "position": {"type": "integer", "description": "Column position index (appends to right if omitted)"}
+      },
+      "required": ["table", "column"]
+    },
+    "internal_component": false,
+    "_flows": ["insert"]
+  },
+  {
+    "name": "delete_rows",
+    "description": "Remove rows from a table by index, range, or condition — e.g., drop rows where revenue is null, delete rows 5-10. Requires confirmation",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "condition": {"type": "string", "description": "Row selector — index, range ('3:7'), or boolean condition ('revenue IS NULL')"},
+        "keep": {"type": "string", "enum": ["matching", "non_matching"], "default": "non_matching", "description": "Keep matching rows (filter) or remove them (delete)"}
+      },
+      "required": ["table", "condition"]
+    },
+    "internal_component": false,
+    "_flows": ["delete"]
+  },
+  {
+    "name": "delete_columns",
+    "description": "Remove one or more columns from a table by name or pattern — e.g., drop the temp_id column, remove all columns matching 'test_*'. Requires confirmation",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "columns": {"type": "array", "items": {"type": "string"}, "description": "Column names to remove"},
+        "pattern": {"type": "string", "description": "Regex pattern to match column names (alternative to explicit list)"}
+      },
+      "required": ["table"]
+    },
+    "internal_component": false,
+    "_flows": ["delete"]
+  },
+  {
+    "name": "rollback_dataset",
+    "description": "Undo the last dataset mutation and restore the previous state",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "dataset": {"type": "string", "description": "Dataset to roll back"},
+        "steps": {"type": "integer", "default": 1, "description": "Number of mutations to undo"}
+      },
+      "required": ["dataset"]
+    },
+    "internal_component": false,
+    "_flows": ["undo"]
+  },
+  {
+    "name": "cast_column",
+    "description": "Cast a column to a new data type — string to date, int to float, object to category. Auto-detects parse format when possible",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to cast"},
+        "target_type": {"type": "string", "enum": ["int", "float", "str", "bool", "datetime", "category"], "description": "Target data type"},
+        "format": {"type": "string", "description": "Parse format string (e.g., '%Y-%m-%d' for dates)"},
+        "errors": {"type": "string", "enum": ["raise", "coerce", "ignore"], "default": "coerce", "description": "How to handle values that cannot be cast"}
+      },
+      "required": ["table", "column", "target_type"]
+    },
+    "internal_component": false,
+    "_flows": ["datatype"]
+  },
+  {
+    "name": "dedupe_single_col",
+    "description": "Remove rows with duplicate values in a single column — checks one dimension of uniqueness. Use when you want unique values in one specific column regardless of what other columns contain (e.g., 'remove duplicate emails')",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to check for duplicate values"},
+        "keep": {"type": "string", "enum": ["first", "last", "none"], "default": "first", "description": "Which duplicate to keep"}
+      },
+      "required": ["table", "column"]
+    },
+    "internal_component": false,
+    "_flows": ["dedupe"]
+  },
+  {
+    "name": "dedupe_columns",
+    "description": "Remove rows that are duplicates across a combination of columns — checks multi-dimensional uniqueness. A row is a duplicate only if ALL specified columns match (e.g., 'remove rows where first_name AND last_name AND email all match')",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns that together define uniqueness"},
+        "keep": {"type": "string", "enum": ["first", "last", "none"], "default": "first", "description": "Which duplicate to keep"}
+      },
+      "required": ["table", "columns"]
+    },
+    "internal_component": false,
+    "_flows": ["dedupe"]
+  },
+  {
+    "name": "flash_fill",
+    "description": "Fill null or empty cells using neighboring values — forward fill, backward fill, rolling average, or constant. For pattern-based filling (like Excel Flash Fill), not arbitrary Python. Use run_interpolation for column-relationship inference",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to fill (all columns if omitted)"},
+        "strategy": {"type": "string", "enum": ["ffill", "bfill", "mean", "median", "mode", "constant"], "description": "Fill strategy"},
+        "value": {"type": "string", "description": "Constant value when strategy=constant"}
+      },
+      "required": ["table", "strategy"]
+    },
+    "internal_component": false,
+    "_flows": ["fill"]
+  },
+  {
+    "name": "run_interpolation",
+    "description": "Estimate missing values using model-based methods that look at relationships between columns — linear regression, spline curves, or nearest neighbor. Operates column-wise; use flash_fill when carrying values down from rows above",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to interpolate"},
+        "method": {"type": "string", "enum": ["linear", "spline", "nearest", "polynomial"], "default": "linear", "description": "Interpolation method"},
+        "order": {"type": "integer", "description": "Polynomial or spline order (when applicable)"},
+        "limit": {"type": "integer", "description": "Maximum consecutive NaN values to fill"}
+      },
+      "required": ["table", "column"]
+    },
+    "internal_component": false,
+    "_flows": ["interpolate"]
+  },
+  {
+    "name": "replace_values",
+    "description": "Find and replace values in a column — exact match, regex pattern, or case-insensitive substitution",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to search"},
+        "find": {"type": "string", "description": "Value or pattern to find"},
+        "replacement": {"type": "string", "description": "Value to replace with"},
+        "mode": {"type": "string", "enum": ["exact", "regex", "case_insensitive"], "default": "exact", "description": "Matching mode"}
+      },
+      "required": ["table", "column", "find", "replacement"]
+    },
+    "internal_component": false,
+    "_flows": ["replace"]
+  },
+  {
+    "name": "validate_column",
+    "description": "Check that values in a column belong to a valid set — enum constraints, allowed ranges, not-null checks, regex patterns. Flags violations; use format_column to fix formatting issues",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to validate"},
+        "check": {"type": "string", "enum": ["not_null", "unique", "in_range", "in_list", "regex", "min_length", "max_length"], "description": "Validation check type"},
+        "value": {"type": "string", "description": "Check parameter — range 'min,max', list 'a,b,c', regex pattern, or length limit"},
+        "action": {"type": "string", "enum": ["flag", "drop", "fill"], "default": "flag", "description": "What to do with failing rows"}
+      },
+      "required": ["table", "column", "check"]
+    },
+    "internal_component": false,
+    "_flows": ["validate", "issue", "datatype"]
+  },
+  {
+    "name": "format_column",
+    "description": "Normalize values into a standard form using built-in patterns — emails, phone numbers, dates, currency. Safe, well-tested transformations with known behavior. Use format_custom for user-defined patterns",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to format"},
+        "type": {"type": "string", "enum": ["email", "phone", "date", "currency", "percentage", "title_case", "lower", "upper", "trim"], "description": "Built-in format type"},
+        "locale": {"type": "string", "description": "Locale for formatting (e.g., 'en_US')"}
+      },
+      "required": ["table", "column", "type"]
+    },
+    "internal_component": false,
+    "_flows": ["format"]
+  },
+  {
+    "name": "format_custom",
+    "description": "Apply a user-defined formatting pattern — requires preview before applying and validates the pattern to prevent data corruption. Use format_column for standard types (email, phone, date)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to format"},
+        "pattern": {"type": "string", "description": "Custom format pattern or template string"},
+        "preview": {"type": "boolean", "default": true, "description": "Show preview of changes before applying (recommended: true)"},
+        "validation": {"type": "string", "description": "Regex to validate the pattern output — rejects if result does not match"}
+      },
+      "required": ["table", "column", "pattern"]
+    },
+    "internal_component": false,
+    "_flows": ["format"]
+  },
+  {
+    "name": "merge_tables",
+    "description": "Join two tables on shared key column(s) — left, inner, outer, or cross join. For complex multi-key or fuzzy joins. Use merge_by_key for simple foreign-key joins, append_tables for stacking rows",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "left": {"type": "string", "description": "Left table name"},
+        "right": {"type": "string", "description": "Right table name"},
+        "key": {"type": "string", "description": "Column name to join on"},
+        "how": {"type": "string", "enum": ["inner", "left", "right", "outer", "cross"], "description": "Join type"}
+      },
+      "required": ["left", "right", "key"]
+    },
+    "internal_component": false,
+    "_flows": ["join"]
+  },
+  {
+    "name": "merge_by_key",
+    "description": "Join two tables on a clear foreign key relationship — simpler than merge_tables, assumes a clean 1:many or 1:1 key. Use merge_tables for complex multi-key, cross, or fuzzy joins",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "left": {"type": "string", "description": "Left table name (the 'many' side)"},
+        "right": {"type": "string", "description": "Right table name (the 'one' side / lookup table)"},
+        "key": {"type": "string", "description": "Foreign key column name (must exist in both tables)"}
+      },
+      "required": ["left", "right", "key"]
+    },
+    "internal_component": false,
+    "_flows": ["join"]
+  },
+  {
+    "name": "pivot_tables",
+    "description": "Reshape table layout — pivot (rows to columns), unpivot/melt (columns to rows), or transpose. Changes structure, not data values. Use this instead of execute_sql when the user asks to pivot, unpivot, melt, or reshape",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "index": {"type": "string", "description": "Column for row labels"},
+        "columns": {"type": "string", "description": "Column for column headers"},
+        "values": {"type": "string", "description": "Column for cell values"},
+        "aggfunc": {"type": "string", "enum": ["sum", "mean", "count", "min", "max", "first"], "description": "Aggregation function for duplicate entries"}
+      },
+      "required": ["table", "index", "columns", "values"]
+    },
+    "internal_component": false,
+    "_flows": ["pivot", "reshape"]
+  },
+  {
+    "name": "append_tables",
+    "description": "Stack rows from one table onto another vertically (UNION) — use when combining datasets with the same columns. Different from merge_tables which joins columns side-by-side",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source": {"type": "string", "description": "Table to append rows from"},
+        "target": {"type": "string", "description": "Table to append rows to"},
+        "align_by": {"type": "string", "enum": ["name", "position"], "default": "name", "description": "How to align columns between tables"}
+      },
+      "required": ["source", "target"]
+    },
+    "internal_component": false,
+    "_flows": ["append"]
+  },
+  {
+    "name": "split_column",
+    "description": "Split one column into multiple new columns by delimiter or regex pattern — e.g., 'full_name' on space becomes first_name and last_name",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to split"},
+        "delimiter": {"type": "string", "description": "Delimiter string (e.g., ',', ' ', '-')"},
+        "pattern": {"type": "string", "description": "Regex pattern with capture groups (alternative to delimiter)"},
+        "names": {"type": "array", "items": {"type": "string"}, "description": "Names for resulting columns (auto-generated if omitted)"}
+      },
+      "required": ["table", "column"]
+    },
+    "internal_component": false,
+    "_flows": ["split"]
+  },
+  {
+    "name": "merge_columns",
+    "description": "Combine multiple columns into one — concatenate with separator or apply a custom expression (e.g., first_name + ' ' + last_name → full_name)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns to combine"},
+        "name": {"type": "string", "description": "Name for the resulting column"},
+        "separator": {"type": "string", "default": " ", "description": "Separator between values"},
+        "expression": {"type": "string", "description": "Python expression for custom combination (overrides separator)"}
+      },
+      "required": ["table", "columns", "name"]
+    },
+    "internal_component": false,
+    "_flows": ["merge"]
+  },
+  {
+    "name": "cut_n_paste",
+    "description": "Move data from one location to another — cuts from source and inserts at target. Works within or across tables",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_table": {"type": "string", "description": "Table to cut from"},
+        "source_ref": {"type": "string", "description": "What to cut — 'column:name', 'row:5', or 'A5:B10' range"},
+        "target_table": {"type": "string", "description": "Table to paste into"},
+        "target_ref": {"type": "string", "description": "Where to paste — 'column:name', 'row:5', or cell reference"}
+      },
+      "required": ["source_table", "source_ref", "target_table", "target_ref"]
+    },
+    "internal_component": false,
+    "_flows": ["reshape", "replace"]
+  },
+  {
+    "name": "define_metric",
+    "description": "Save a named, reusable formula to the semantic layer — referenced by lookup_metric and execute_sql",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string", "description": "Metric name (snake_case identifier)"},
+        "formula": {"type": "string", "description": "Formula expression using column names"},
+        "description": {"type": "string", "description": "What the metric measures"},
+        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns referenced in the formula"},
+        "unit": {"type": "string", "description": "Unit of measurement (e.g., 'USD', 'percent', 'count')"}
+      },
+      "required": ["name", "formula"]
+    },
+    "internal_component": false,
+    "_flows": ["define"]
+  },
+  {
+    "name": "lookup_metric",
+    "description": "Look up a metric definition, formula, and source columns from the semantic layer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "term": {"type": "string", "description": "Metric name or search term"},
+        "source": {"type": "string", "description": "Filter by dataset or data source"}
+      },
+      "required": ["term"]
+    },
+    "internal_component": false,
+    "_flows": ["lookup"]
+  },
+  {
+    "name": "apply_formula",
+    "description": "Compute a new or existing column from a formula expression — evaluates the expression row-by-row and writes the result",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column name for the result"},
+        "formula": {"type": "string", "description": "Python expression using column names (e.g., 'price * quantity')"}
+      },
+      "required": ["table", "column", "formula"]
+    },
+    "internal_component": false,
+    "_flows": ["define"]
+  },
+  {
+    "name": "semantic_layer",
+    "description": "Describe the schema of columns within a table, all tables in a dataset, or all datasets — column names, types, descriptions, relationships, and sample values.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scope": {"type": "string", "enum": ["columns", "tables", "datasets"], "description": "Level of schema to describe — columns within a table, tables within a dataset, or all datasets"},
+        "name": {"type": "string", "description": "Specific table or dataset name (returns all at scope level if omitted)"}
+      },
+      "required": ["scope"]
+    },
+    "internal_component": false,
+    "_flows": ["query", "lookup", "pivot", "describe", "compare", "exist", "segment", "update", "datatype", "dedupe", "fill", "interpolate", "replace", "validate", "format", "insert", "delete", "join", "append", "reshape", "merge", "split", "define", "summarize"]
+  },
+  {
+    "name": "heads_or_tails",
+    "description": "Preview the first or last N rows of a table — quick glance at data shape and content without full profiling",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "end": {"type": "string", "enum": ["head", "tail"], "default": "head", "description": "Which end of the table to preview"},
+        "n": {"type": "integer", "default": 5, "description": "Number of rows to return"}
+      },
+      "required": ["table"]
+    },
+    "internal_component": false,
+    "_flows": ["peek"]
+  },
+  {
+    "name": "describe_stats",
+    "description": "Profile a table or column — row count, data types, null counts, unique values, summary statistics (mean, median, min, max, std)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to analyze (profiles full table if omitted)"},
+        "metrics": {"type": "array", "items": {"type": "string"}, "description": "Metrics to compute: min, max, mean, median, std, nulls, unique, dtype"}
+      },
+      "required": ["table"]
+    },
+    "internal_component": false,
+    "_flows": ["query", "lookup", "pivot", "describe", "compare", "exist", "segment", "recommend", "blank", "issue", "peek", "update", "datatype", "dedupe", "fill", "interpolate", "replace", "validate", "format", "insert", "delete", "join", "append", "reshape", "merge", "split", "define", "plot", "trend", "summarize", "style"]
+  },
+  {
+    "name": "compare_metrics",
+    "description": "Run statistical comparisons between groups or variables — chi-square, ANOVA, Mann-Whitney, t-test, or distribution analysis. Use when the user asks to compare, test significance, or check if differences are meaningful. Use ab_split_test for controlled experiments",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column_a": {"type": "string", "description": "First column or group for comparison"},
+        "column_b": {"type": "string", "description": "Second column or group for comparison"},
+        "method": {"type": "string", "enum": ["chi_square", "anova", "mann_whitney", "distribution", "summary"], "description": "Statistical method"},
+        "group_by": {"type": "string", "description": "Column to segment by for group-level comparisons"}
+      },
+      "required": ["table", "column_a", "column_b", "method"]
+    },
+    "internal_component": false,
+    "_flows": ["compare", "trend"]
+  },
+  {
+    "name": "root_cause_analysis",
+    "description": "Identify which dimensions or factors most explain a change in a metric — decomposes the change across segments and ranks contributing factors by impact. E.g., why did revenue drop last quarter?",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "metric": {"type": "string", "description": "Metric column to analyze"},
+        "dimensions": {"type": "array", "items": {"type": "string"}, "description": "Dimension columns to decompose by"},
+        "baseline": {"type": "string", "description": "Baseline period or condition for comparison (e.g., 'quarter == Q1')"},
+        "current": {"type": "string", "description": "Current period or condition to compare against baseline"}
+      },
+      "required": ["table", "metric", "dimensions"]
+    },
+    "internal_component": false,
+    "_flows": ["segment"]
+  },
+  {
+    "name": "dimension_breakdown",
+    "description": "Decompose a metric across dimensions — contribution, share, and ranking per segment. E.g., 'break down revenue by region', 'show churn by cohort'. Use this instead of execute_sql GROUP BY when the user asks to break down, decompose, or segment a metric",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "metric": {"type": "string", "description": "Metric column to break down"},
+        "dimension": {"type": "string", "description": "Dimension column to segment by"},
+        "aggregation": {"type": "string", "enum": ["sum", "mean", "count", "median", "min", "max"], "default": "sum", "description": "How to aggregate the metric per segment"},
+        "top_n": {"type": "integer", "description": "Limit to top N segments by value"}
+      },
+      "required": ["table", "metric", "dimension"]
+    },
+    "internal_component": false,
+    "_flows": ["segment"]
+  },
+  {
+    "name": "compute_correlation",
+    "description": "Compute the correlation between two columns — Pearson for linear, Spearman for monotonic, Kendall for ordinal. Returns coefficient, p-value, and scatter context",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column_a": {"type": "string", "description": "First column"},
+        "column_b": {"type": "string", "description": "Second column"},
+        "method": {"type": "string", "enum": ["pearson", "spearman", "kendall"], "default": "pearson", "description": "Correlation method"}
+      },
+      "required": ["table", "column_a", "column_b"]
+    },
+    "internal_component": false,
+    "_flows": ["compare"]
+  },
+  {
+    "name": "render_chart",
+    "description": "Create a visualization from table data — bar, line, pie, scatter, histogram, or heatmap. Use this whenever the user asks to chart, plot, graph, or visualize data, instead of execute_sql",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Source table"},
+        "chart_type": {"type": "string", "enum": ["bar", "line", "pie", "scatter", "histogram", "heatmap"], "description": "Type of chart"},
+        "x": {"type": "string", "description": "Column for x-axis"},
+        "y": {"type": "string", "description": "Column for y-axis"},
+        "color": {"type": "string", "description": "Column for color grouping"}
+      },
+      "required": ["table", "chart_type"]
+    },
+    "internal_component": false,
+    "_flows": ["plot", "trend", "dashboard"]
+  },
+  {
+    "name": "modify_chart",
+    "description": "Adjust chart labels and structure — title, axis labels, chart type. Use style_chart for visual properties (colors, legend, gridlines)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "chart_id": {"type": "string", "description": "Identifier of the chart to modify"},
+        "title": {"type": "string", "description": "New chart title"},
+        "x_label": {"type": "string", "description": "X-axis label"},
+        "y_label": {"type": "string", "description": "Y-axis label"},
+        "chart_type": {"type": "string", "enum": ["bar", "line", "pie", "scatter", "histogram", "heatmap"], "description": "Change chart type"}
+      },
+      "required": ["chart_id"]
+    },
+    "internal_component": false,
+    "_flows": ["design", "dashboard"]
+  },
+  {
+    "name": "style_chart",
+    "description": "Adjust chart visual properties — color palette, legend position, gridline visibility. Use modify_chart for labels and chart type",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "chart_id": {"type": "string", "description": "Identifier of the chart to style"},
+        "colors": {"type": "array", "items": {"type": "string"}, "description": "Color palette (hex codes)"},
+        "legend": {"type": "string", "enum": ["top", "bottom", "left", "right", "none"], "description": "Legend position"},
+        "gridlines": {"type": "boolean", "description": "Show or hide gridlines"}
+      },
+      "required": ["chart_id"]
+    },
+    "internal_component": false,
+    "_flows": ["design"]
+  },
+  {
+    "name": "compose_dashboard",
+    "description": "Combine multiple charts and tables into a multi-panel layout",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Primary source table"},
+        "panels": {"type": "array", "items": {"type": "object", "properties": {"type": {"type": "string", "enum": ["chart", "table", "metric"]}, "config": {"type": "object"}}, "required": ["type", "config"]}, "description": "Panel definitions"},
+        "title": {"type": "string", "description": "Dashboard title"},
+        "layout": {"type": "string", "enum": ["grid", "vertical", "horizontal"], "default": "grid", "description": "Layout arrangement"},
+        "grid_columns": {"type": "integer", "default": 2, "description": "Number of columns in grid layout"}
+      },
+      "required": ["table", "panels"]
+    },
+    "internal_component": false,
+    "_flows": ["dashboard"]
+  },
+  {
+    "name": "apply_style",
+    "description": "Apply conditional formatting to a table display — color scales, highlights, number formatting. Visual only; does not change underlying data",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Target table"},
+        "column": {"type": "string", "description": "Column to style (all columns if omitted)"},
+        "condition": {"type": "string", "description": "Condition expression (e.g., 'value < 0', 'value == max')"},
+        "format": {"type": "string", "enum": ["highlight", "color_scale", "data_bar", "icon_set", "number_format"], "description": "Formatting type"},
+        "color": {"type": "string", "description": "Color for highlight or scale endpoint (hex code)"}
+      },
+      "required": ["table", "condition", "format"]
+    },
+    "internal_component": false,
+    "_flows": ["style"]
+  },
+  {
+    "name": "export_dataset",
+    "description": "Export a dataset to a downloadable file — CSV, Excel, JSON, or Parquet",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "dataset": {"type": "string", "description": "Dataset to export"},
+        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "clipboard"], "description": "Export format"},
+        "path": {"type": "string", "description": "Output file path (optional for clipboard)"}
+      },
+      "required": ["dataset", "format"]
+    },
+    "internal_component": false,
+    "_flows": ["export"]
+  },
+  {
+    "name": "summarize_content",
+    "description": "Summarize a chart or table in plain language — grounded to a concrete artifact, extracts key takeaways, patterns, and implications",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "table": {"type": "string", "description": "Source table for context"},
+        "artifact_type": {"type": "string", "enum": ["chart", "table", "query_result"], "description": "Type of artifact to summarize"},
+        "artifact_id": {"type": "string", "description": "Identifier of the specific chart or query result"},
+        "focus": {"type": "string", "description": "Aspect to focus on (e.g., 'trends', 'outliers', 'distribution')"}
+      },
+      "required": ["table"]
+    },
+    "internal_component": false,
+    "_flows": ["summarize"]
+  },
+  {
+    "name": "explain_content",
+    "description": "Explain the analysis process, methodology, or reasoning behind a recent action — about process, not data",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topic": {"type": "string", "description": "What to explain — a method, a result, a decision, or a process step"},
+        "scope": {"type": "string", "enum": ["last_action", "full_session", "methodology"], "default": "last_action", "description": "Scope of the explanation"}
+      },
+      "required": []
+    },
+    "internal_component": false,
+    "_flows": ["explain"]
+  },
+  {
+    "name": "search_reference",
+    "description": "Search vetted FAQs and curated data analysis reference content — the unstructured equivalent of lookup_metric",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "Search term or question"},
+        "category": {"type": "string", "enum": ["sql", "statistics", "visualization", "cleaning", "general"], "description": "Filter by topic category"},
+        "limit": {"type": "integer", "default": 5, "description": "Maximum number of results"}
+      },
+      "required": ["query"]
+    },
+    "internal_component": false,
+    "_flows": ["search", "summarize"]
+  },
+  {
+    "name": "coordinate_context",
+    "description": "Read conversation history and current turn context — provides grounding for the agent's response",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scope": {"type": "string", "enum": ["last_turn", "last_n", "full", "summary"], "default": "last_turn", "description": "How much context to retrieve"},
+        "turns": {"type": "integer", "default": 3, "description": "Number of turns when scope=last_n"}
+      },
+      "required": []
+    },
+    "internal_component": true,
+    "_flows": ["*"]
+  },
+  {
+    "name": "manage_memory",
+    "description": "Read or write the agent's memory — L1 session scratchpad, L2 persistent user preferences, L3 unvetted business context from documents and domain knowledge",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {"type": "string", "enum": ["read", "write", "delete"], "description": "Memory operation"},
+        "level": {"type": "string", "enum": ["L1", "L2", "L3"], "description": "L1=session scratchpad, L2=persistent preferences, L3=business context (documents, reports, domain knowledge)"},
+        "key": {"type": "string", "description": "Memory key to read, write, or delete"},
+        "value": {"type": "string", "description": "Value to store (when operation=write)"}
+      },
+      "required": ["operation", "level"]
+    },
+    "internal_component": true,
+    "_flows": ["recap", "recall", "preference", "retrieve"]
+  },
+  {
+    "name": "read_flow_stack",
+    "description": "Read the current flow stack — active flow name, slot values, flow metadata, and pending flows",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {"type": "string", "enum": ["get_slots", "get_flow", "list_active"], "description": "What to read from the flow stack"},
+        "flow_name": {"type": "string", "description": "Specific flow to query (current flow if omitted)"}
+      },
+      "required": ["operation"]
+    },
+    "internal_component": true,
+    "_flows": ["*"]
+  },
+  {
+    "name": "handle_ambiguity",
+    "description": "Call when the user's request is ambiguous and could map to multiple operations. Signal that clarification is needed before proceeding.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "clarification": {
+          "type": "string",
+          "description": "The clarifying question to ask the user to disambiguate their request"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of plausible tool names that could apply"
+        }
+      },
+      "required": ["clarification"]
+    },
+    "internal_component": true,
+    "_flows": ["*"]
+  },
+  {
+    "name": "conversational_response",
+    "description": "Call when the user's message is conversational, an acknowledgement, or does not require any data operation. Use this to respond naturally without invoking a domain tool.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Brief explanation of why a conversational response is appropriate"
+        }
+      },
+      "required": ["reason"]
+    },
+    "internal_component": true,
+    "_flows": ["*"]
+  }
+]

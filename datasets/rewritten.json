@@ -1,0 +1,722 @@
+[
+  {
+    "convo_id": "dana_005",
+    "domain": "dana",
+    "category": "same_flow",
+    "scenario": "Healthcare -- patient outcomes dataset from 3 hospital sites",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "update",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Can you change 'ER' to 'Emergency' in the headers so it's more readable."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "No problem. I noticed the headers are mostly lowercase except for Admission Type and Discharge Date. Should I fix those as well?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "update",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Yeah, lowercase those too while you're at it."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_012",
+    "domain": "dana",
+    "category": "switch_flow",
+    "scenario": "Financial reporting -- monthly P&L across 4 business units",
+    "rerun_turns": [
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "trend",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Show me how operating expenses have moved MoM across the business units."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "CA and WA are flat, but Florida spiked 18% in October. All four units on one chart."
+      },
+      {
+        "turn_num": 3,
+        "flow": "insert",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "What's the percent change per state? I want to see it next to the expenses."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_020",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Social media -- engagement metrics for Instagram and TikTok",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "compare",
+          "trend"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Report"
+        ],
+        "speaker": "user",
+        "utterance": "How have Instagram and TikTok been doing lately?",
+        "rationale": "'Been doing lately' could mean a statistical side-by-side comparison ('compare') or a time-series showing how each platform has evolved ('trend')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Side-by-side stats, or a timeline showing how they've changed?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "compare",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Side by side. Just the key metrics."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_022",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Customer churn -- SaaS subscription data with usage metrics",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "style",
+          "design"
+        ],
+        "candidate_intents": [
+          "Report",
+          "Report"
+        ],
+        "speaker": "user",
+        "utterance": "The customer churn results needs to stand out more.",
+        "rationale": "'Stand out more' could mean applying conditional formatting like color scales and highlights ('style') or redesigning the visualization layout ('design')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "The table's plain right now. I can add color scales to flag high-churn segments. That what you're after?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "style",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Conditional formatting. Red for high churn, green for low."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_024",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Social media -- engagement metrics for Instagram and TikTok",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "merge",
+          "join"
+        ],
+        "candidate_intents": [
+          "Transform",
+          "Transform"
+        ],
+        "speaker": "user",
+        "utterance": "Can you combine the platform and handle data?",
+        "rationale": "'Combine data' could mean concatenating two columns into one string ('merge') or joining data from a separate table ('join'). The word 'combine' is inherently ambiguous."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Both columns are in the same table, so I'll concatenate them with an underscore. Like 'Instagram_user123'. Sound right?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "merge",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Exactly."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_085",
+    "domain": "dana",
+    "category": "switch_flow",
+    "scenario": "Marketing campaigns -- email campaign performance across 12 segments",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "exist",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Do we have bounce rate in the email campaign data?"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Yes, the bounce rate for email campaign is 12.8%."
+      },
+      {
+        "turn_num": 3,
+        "flow": "query",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "OK, but what about just the Coding Agents campaign?"
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_086",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Financial reporting -- monthly P&L across 4 business units",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "lookup",
+          "define"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Transform"
+        ],
+        "speaker": "user",
+        "utterance": "The gross margin formula in our P&L \u2014 is it set up right, or should I redo it?"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Are you looking to see how gross margin is currently defined in the semantic layer, or do you want to create/save a new formula for it?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "lookup",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Just need to see what's there. Can't remember which columns feed into it."
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_087",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Healthcare -- patient outcomes dataset from 3 hospital sites",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "describe",
+          "datatype"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Clean"
+        ],
+        "speaker": "user",
+        "utterance": "Can you check the columns in the patient outcomes table? Some of them might be the wrong type."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Are you looking for a full profile of the dataset (stats, nulls, distributions), or do you want me to check whether the column types are correct and flag any mismatches?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "describe",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Full profile, yeah. How many rows, what's missing, summary stats, all that"
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_091",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Product analytics -- feature usage telemetry from 100K users",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "dashboard",
+          "export"
+        ],
+        "candidate_intents": [
+          "Report",
+          "Report"
+        ],
+        "speaker": "user",
+        "utterance": "I need to pull together the feature usage charts and the engagement table for the team to take a look at."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want a recurring report that refreshes automatically each week, or a one-time file you can download and send out?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "dashboard",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Recurring, so it just updates on its own and they can check it whenever"
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_092",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Survey/research -- customer satisfaction survey with 5,000 responses",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "describe",
+          "segment"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Analyze"
+        ],
+        "speaker": "user",
+        "utterance": "Give me a rundown of the satisfaction scores in the survey data across each user group"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want summary stats on the satisfaction score column (mean, median, distribution), or do you want to break satisfaction scores down by a dimension like region or age group?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "describe",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Just the stats, wanna see the spread and if there are missing values"
+      }
+    ]
+  },
+  {
+    "convo_id": "dana_096",
+    "domain": "dana",
+    "category": "ambiguous_first",
+    "scenario": "Financial reporting -- monthly P&L across 4 business units",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "insert",
+          "fill"
+        ],
+        "candidate_intents": [
+          "Transform",
+          "Clean"
+        ],
+        "speaker": "user",
+        "utterance": "There should be a column for the weekly rolling average based on the contracted_spend column. Can you add that?",
+        "rationale": "'Add a column for the rolling average' could mean creating a new calculated column ('insert') or filling in missing values using a rolling average imputation ('fill')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Are you looking to add a new calculated column with the rolling average, or fill in missing values in the existing column using rolling averages?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "insert",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "New column. I want to see the rolling average next to the raw numbers."
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_022",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Newsletter (Substack) -- weekly AI research roundup",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "promote",
+          "release"
+        ],
+        "candidate_intents": [
+          "Publish",
+          "Publish"
+        ],
+        "speaker": "user",
+        "utterance": "The AI roundup is ready. Time to get it out there.",
+        "rationale": "'Get it out there' could mean amplifying reach across platforms ('promote') or triggering immediate publication ('release')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "It's queued for Friday 8am. Move it to final review, or push it live right now?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "release",
+        "intent": "Publish",
+        "speaker": "user",
+        "utterance": "Now. The news cycle won't wait."
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_023",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Creative writing / essays -- personal essays on urban living",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "syndicate",
+          "schedule"
+        ],
+        "candidate_intents": [
+          "Publish",
+          "Publish"
+        ],
+        "speaker": "user",
+        "utterance": "Can you get the urban living essay queued for Medium?",
+        "rationale": "'Queued for Medium' could mean adapting and cross-posting to Medium now ('syndicate') or scheduling it for future publication ('schedule')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "It's live on your main blog already. Want me to adapt it for Medium, or is Medium the primary?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "syndicate",
+        "intent": "Publish",
+        "speaker": "user",
+        "utterance": "Adapt it. It's a cross-post."
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_082",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Creative writing / essays -- personal essays on urban living",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "tone",
+          "audit"
+        ],
+        "candidate_intents": [
+          "Revise",
+          "Revise"
+        ],
+        "speaker": "user",
+        "utterance": "Hey the voice in my Urban Living essay feels off, can you fix it to follow the tone and structure from the Rural Living post?"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want me to shift the voice to a different style, or check whether it matches how your other published posts sound?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "tone",
+        "intent": "Revise",
+        "speaker": "user",
+        "utterance": "Shift it, make it way more conversational and loose"
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_083",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Technical ML/AI blog -- writing about transformer architectures",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "rework",
+          "tidy"
+        ],
+        "candidate_intents": [
+          "Revise",
+          "Revise"
+        ],
+        "speaker": "user",
+        "utterance": "The attention mechanism post needs a lot of work before it goes out."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you mean the content itself needs restructuring, or is it more about getting the code blocks and headings publication-ready?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "rework",
+        "intent": "Revise",
+        "speaker": "user",
+        "utterance": "The content. The argument doesn't build on the self-attention part."
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_085",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Personal finance -- investment strategies for beginners",
+    "rerun_turns": [
+      1
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "syndicate",
+          "schedule"
+        ],
+        "candidate_intents": [
+          "Publish",
+          "Publish"
+        ],
+        "speaker": "user",
+        "utterance": "Can you push the investment strategies post to Medium too. The whitepaper goes out on Friday."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want it live on Medium now, or scheduled for a specific date and time?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "syndicate",
+        "intent": "Publish",
+        "speaker": "user",
+        "utterance": "Now is fine, just reformat it for Medium's layout"
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_098",
+    "domain": "hugo",
+    "category": "switch_flow",
+    "scenario": "Product review site -- reviewing developer tools and IDEs",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "rework",
+        "intent": "Revise",
+        "speaker": "user",
+        "utterance": "the VS Code section reads kinda rough, it needs some major revision"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "You got it, please provide some details about how you'd like me to rework or restructure the arguments?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "polish",
+        "intent": "Revise",
+        "speaker": "user",
+        "utterance": "nah the structure is fine, just make the sentences read better by making them more concise"
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_099",
+    "domain": "hugo",
+    "category": "switch_flow",
+    "scenario": "Thought leadership -- future of remote work in tech",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "release",
+        "intent": "Publish",
+        "speaker": "user",
+        "utterance": "Hey can you push the remote work piece live"
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "No problem, it's pushed now, and you should be able to see it on the site shortly."
+      },
+      {
+        "turn_num": 3,
+        "flow": "inspect",
+        "intent": "Research",
+        "speaker": "user",
+        "utterance": "Oh wait, how long is it again? Like 7 paragraphs?"
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_100",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Tutorial/how-to -- step-by-step guide to building a REST API",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "release",
+          "chat"
+        ],
+        "candidate_intents": [
+          "Publish",
+          "Converse"
+        ],
+        "speaker": "user",
+        "utterance": "Oh my gosh, it's already Tuesday, we really should have gotten the post out yesterday! Jane is gonna be so mad!",
+        "rationale": "The urgency could mean the user wants to publish the post immediately ('release') or is just venting about a missed deadline ('chat')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "That's stressful! Do you want me to push the post live right now, or do you just need a moment?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "release",
+        "intent": "Publish",
+        "speaker": "user",
+        "utterance": "Just publish it. Better late than never."
+      }
+    ]
+  },
+  {
+    "convo_id": "hugo_103",
+    "domain": "hugo",
+    "category": "ambiguous_first",
+    "scenario": "Technical ML/AI blog -- writing about transformer architectures",
+    "rerun_turns": [
+      1,
+      3
+    ],
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "expand",
+          "rework"
+        ],
+        "candidate_intents": [
+          "Draft",
+          "Revise"
+        ],
+        "speaker": "user",
+        "utterance": "Can you fill in the details on all the sections? It's just a skeleton right now.",
+        "rationale": "'Fill in the details' on a skeleton could mean developing bullet points into full paragraphs ('expand') or restructuring weak sections that need more than just fleshing out ('rework')."
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Are you looking to develop each section into full prose, or do some of them need a bigger structural overhaul?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "expand",
+        "intent": "Draft",
+        "speaker": "user",
+        "utterance": "Just flesh them out. The structure is fine, I just need actual content."
+      }
+    ]
+  }
+]

@@ -1,0 +1,124 @@
+[
+  {
+    "config_id": "1a_001",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "low",
+    "model_id": "claude-haiku-4-5-20251001",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_002",
+    "provider": "google",
+    "model_type": "gemini",
+    "model_level": "medium",
+    "model_id": "gemini-3-flash-preview",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_003",
+    "provider": "openai",
+    "model_type": "gpt",
+    "model_level": "low",
+    "model_id": "gpt-5-nano",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_004",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "medium",
+    "model_id": "claude-sonnet-4-6",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_006",
+    "provider": "google",
+    "model_type": "gemini",
+    "model_level": "high",
+    "model_id": "gemini-3.1-pro-preview",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_008",
+    "provider": "openai",
+    "model_type": "gpt",
+    "model_level": "medium",
+    "model_id": "gpt-5-mini",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_010",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "high",
+    "model_id": "claude-opus-4-6",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_016",
+    "provider": "openai",
+    "model_type": "gpt",
+    "model_level": "high",
+    "model_id": "gpt-5.2",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_019",
+    "provider": "qwen",
+    "model_type": "qwen",
+    "model_level": "low",
+    "model_id": "Qwen/Qwen2.5-7B-Instruct-Turbo",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_020",
+    "provider": "qwen",
+    "model_type": "qwen",
+    "model_level": "medium",
+    "model_id": "Qwen/Qwen3-Next-80B-A3B-Instruct",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_021",
+    "provider": "qwen",
+    "model_type": "qwen",
+    "model_level": "high",
+    "model_id": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+    "temperature": 0.0,
+    "max_tokens": 8192
+  },
+  {
+    "config_id": "1a_022",
+    "provider": "deepseek",
+    "model_type": "deepseek",
+    "model_level": "low",
+    "model_id": "deepseek-chat",
+    "temperature": 0.1
+  },
+  {
+    "config_id": "1a_023",
+    "provider": "deepseek",
+    "model_type": "deepseek",
+    "model_level": "medium",
+    "model_id": "deepseek-chat",
+    "temperature": 0.0
+  },
+  {
+    "config_id": "1a_024",
+    "provider": "deepseek",
+    "model_type": "deepseek",
+    "model_level": "high",
+    "model_id": "deepseek-reasoner",
+    "temperature": 0.0,
+    "max_tokens": 8192
+  },
+  {
+    "config_id": "1a_026",
+    "provider": "gemma",
+    "model_type": "gemma",
+    "model_level": "low",
+    "model_id": "gemma-3-27b-it",
+    "temperature": 0.0
+  }
+]

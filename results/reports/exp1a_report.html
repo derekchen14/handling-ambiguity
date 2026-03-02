@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 1A — Flow Detection Results</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de;
+    --text: #1f2328; --muted: #656d76; --accent: #0969da;
+    --green: #1a7f37; --yellow: #9a6700; --red: #cf222e;
+    --purple: #8250df; --orange: #bc4c00; --cyan: #0550ae;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+  .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.5rem; min-width: 140px; text-align: center; flex: 1;
+  }
+  .stat-box .value { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-box .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem; overflow-x: auto;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h3 { margin-top: 0; }
+  .chart-container { width: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+  td { white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(9,105,218,0.04); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem; font-style: italic; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+  .badge-green { background: rgba(26,127,55,0.1); color: var(--green); }
+  .badge-yellow { background: rgba(154,103,0,0.1); color: var(--yellow); }
+  .badge-red { background: rgba(207,34,46,0.1); color: var(--red); }
+  .legend { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>Experiment 1A — Single-Model Flow Detection</h1>
+<p class="subtitle" id="subtitle">Loading results...</p>
+
+<div class="stat-row" id="top-stats"></div>
+
+<h2>Overall Accuracy Ranking</h2>
+<div class="card full">
+  <div class="chart-container" id="ranking-chart"></div>
+  <div class="legend" id="ranking-legend"></div>
+</div>
+
+<h2>Accuracy by Category</h2>
+<div class="card full">
+  <div class="chart-container" id="category-chart"></div>
+  <div class="legend" id="category-legend"></div>
+  <p class="note">Grouped by category. Darker shade = higher tier. Error bars = 1 STD across seeds.</p>
+</div>
+
+<h2>Accuracy by Turn</h2>
+<div class="card full">
+  <div class="chart-container" id="turn-chart"></div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#93c5fd"></span> Turn 1 (cold start)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span> Turn 3 (with context)</div>
+    <div class="legend-item" style="margin-left:1rem; border-left: 1px solid #d0d7de; padding-left:1rem;">Error bars = 1 STD | Averaged across both domains</div>
+  </div>
+</div>
+
+<h2>Domain & Family Comparisons</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Family Comparisons</h3>
+    <div class="chart-container" id="family-chart"></div>
+    <div class="legend" id="family-legend"></div>
+    <p class="note">Combined accuracy (Hugo + Dana avg) by model tier</p>
+  </div>
+  <div class="card">
+    <h3>Hugo vs Dana (Google / OpenAI / Qwen)</h3>
+    <div class="chart-container" id="domain-chart"></div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> Hugo (blog writing)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span> Dana (data analysis)</div>
+    </div>
+    <p class="note">Error bars = 1 STD across seeds</p>
+  </div>
+</div>
+
+<h2>Error Analysis — Top Confusions</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Hugo</h3>
+    <table id="confusion-hugo-table"></table>
+  </div>
+  <div class="card">
+    <h3>Dana</h3>
+    <table id="confusion-dana-table"></table>
+  </div>
+</div>
+
+<h2>Key Findings</h2>
+<div id="summary-section"></div>
+
+<h2>Run Completion Status</h2>
+<div class="card full">
+  <table id="status-table"></table>
+</div>
+
+<footer>
+  <p>Generated from 1A experiment JSONL data. You can regenerate with: <code>python3 experiments/results/build_report.py</code></p>
+</footer>
+
+<script>
+const DATA = {"generated": "2026-02-26 16:44", "total_runs": 143, "unique_configs": 15, "domains": ["Hugo", "Dana"], "best_accuracy": 0.83125, "best_model": "Sonnet 4.6", "total_cost": 116.90589176, "ranking": [{"config_id": "1a_004", "model_short": "Sonnet 4.6", "provider": "anthropic", "tier": "medium", "seed_count": 5, "accuracy": 0.83125, "std": 0.008792678654236528, "hugo_acc": 0.83203125, "hugo_std": 0.012657696676577852, "dana_acc": 0.83046875, "dana_std": 0.0034938562148434213, "cost_per_run": 1.1678601, "latency_p50": 2474, "cat_same_flow": 0.9359375, "cat_same_flow_std": 0.020104436526686233, "cat_switch_flow": 0.921875, "cat_switch_flow_std": 0.028527216536727403, "cat_ambiguous_first": 0.584375, "cat_ambiguous_first_std": 0.021092142428454776, "cat_ambiguous_second": 0.8828125, "cat_ambiguous_second_std": 0.02876396098225849, "turn_1": 0.775, "turn_1_std": 0.01596844762162072, "turn_3": 0.8875, "turn_3_std": 0.015273831561057478}, {"config_id": "1a_010", "model_short": "Opus 4.6", "provider": "anthropic", "tier": "high", "seed_count": 5, "accuracy": 0.81953125, "std": 0.015273831561057478, "hugo_acc": 0.82734375, "hugo_std": 0.012165946486247997, "dana_acc": 0.81171875, "dana_std": 0.014976788681781886, "cost_per_run": 6.007269, "latency_p50": 3046, "cat_same_flow": 0.8859375, "cat_same_flow_std": 0.02335053309527072, "cat_switch_flow": 0.9171875, "cat_switch_flow_std": 0.03458741190809165, "cat_ambiguous_first": 0.625, "cat_ambiguous_first_std": 0.03210632293213009, "cat_ambiguous_second": 0.85, "cat_ambiguous_second_std": 0.03623443152276268, "turn_1": 0.7828125, "turn_1_std": 0.027013130166437374, "turn_3": 0.85625, "turn_3_std": 0.010546071214227388}, {"config_id": "1a_006", "model_short": "Gemini 3 Pro", "provider": "google", "tier": "high", "seed_count": 2, "accuracy": 0.815843186936937, "std": 0.01811033090867552, "hugo_acc": 0.8359375, "hugo_std": 0.0, "dana_acc": 0.8057960304054055, "dana_std": 0.007091970461647204, "cost_per_run": 0.5018445833333334, "latency_p50": 5380, "cat_same_flow": 0.875, "cat_same_flow_std": 0.04133986423538423, "cat_switch_flow": 0.890625, "cat_switch_flow_std": 0.05412658773652741, "cat_ambiguous_first": 0.6458333333333334, "cat_ambiguous_first_std": 0.023867581744561665, "cat_ambiguous_second": 0.8559027777777778, "cat_ambiguous_second_std": 0.021049228564205085, "turn_1": 0.7674784159159159, "turn_1_std": 0.01752807002594048, "turn_3": 0.8642079579579579, "turn_3_std": 0.03235173794203593}, {"config_id": "1a_024", "model_short": "DeepSeek R1", "provider": "deepseek", "tier": "high", "seed_count": 5, "accuracy": 0.810546875, "std": 0.020608322644979707, "hugo_acc": 0.828125, "hugo_std": 0.009568319307746789, "dana_acc": 0.79296875, "dana_std": 0.009568319307746789, "cost_per_run": 0.733076029, "latency_p50": 19873, "cat_same_flow": 0.85, "cat_same_flow_std": 0.029646353064078555, "cat_switch_flow": 0.8890625, "cat_switch_flow_std": 0.03411358936211003, "cat_ambiguous_first": 0.634375, "cat_ambiguous_first_std": 0.05855612217731332, "cat_ambiguous_second": 0.86875, "cat_ambiguous_second_std": 0.029646353064078555, "turn_1": 0.77734375, "turn_1_std": 0.023365050058497865, "turn_3": 0.84375, "turn_3_std": 0.02780489128133154}, {"config_id": "1a_023", "model_short": "DeepSeek V3", "provider": "deepseek", "tier": "medium", "seed_count": 5, "accuracy": 0.80703125, "std": 0.015428451295415235, "hugo_acc": 0.79921875, "hugo_std": 0.015770804092333085, "dana_acc": 0.81484375, "dana_std": 0.011587810136086972, "cost_per_run": 0.09590289, "latency_p50": 2995, "cat_same_flow": 0.9125, "cat_same_flow_std": 0.01976423537605237, "cat_switch_flow": 0.909375, "cat_switch_flow_std": 0.014358384116760648, "cat_ambiguous_first": 0.5609375, "cat_ambiguous_first_std": 0.03163821364268216, "cat_ambiguous_second": 0.8453125, "cat_ambiguous_second_std": 0.05126968625968631, "turn_1": 0.759375, "turn_1_std": 0.023524145397158785, "turn_3": 0.8546875, "turn_3_std": 0.022158382693940257}, {"config_id": "1a_022", "model_short": "DeepSeek V3", "provider": "deepseek", "tier": "low", "seed_count": 5, "accuracy": 0.80625, "std": 0.009778637164332598, "hugo_acc": 0.809375, "hugo_std": 0.011848242881330547, "dana_acc": 0.803125, "dana_std": 0.007096055517415996, "cost_per_run": 0.09595451, "latency_p50": 2939, "cat_same_flow": 0.896875, "cat_same_flow_std": 0.02775606790515464, "cat_switch_flow": 0.9125, "cat_switch_flow_std": 0.018340434230894802, "cat_ambiguous_first": 0.590625, "cat_ambiguous_first_std": 0.03193689524324144, "cat_ambiguous_second": 0.825, "cat_ambiguous_second_std": 0.04468252206151503, "turn_1": 0.7703125, "turn_1_std": 0.011170630515378758, "turn_3": 0.8421875, "turn_3_std": 0.01796686282360452}, {"config_id": "1a_002", "model_short": "Gemini 3 Flash", "provider": "google", "tier": "medium", "seed_count": 5, "accuracy": 0.8015625, "std": 0.013124586633702242, "hugo_acc": 0.80625, "hugo_std": 0.009804609685946198, "dana_acc": 0.796875, "dana_std": 0.015378921628929319, "cost_per_run": 0.05245782, "latency_p50": 1299, "cat_same_flow": 0.834375, "cat_same_flow_std": 0.026760901205552353, "cat_switch_flow": 0.915625, "cat_switch_flow_std": 0.02352414539715878, "cat_ambiguous_first": 0.596875, "cat_ambiguous_first_std": 0.03593372564720904, "cat_ambiguous_second": 0.859375, "cat_ambiguous_second_std": 0.03294039229342062, "turn_1": 0.7625, "turn_1_std": 0.014823176532039278, "turn_3": 0.840625, "turn_3_std": 0.024760134008343152}, {"config_id": "1a_021", "model_short": "Qwen3 235B", "provider": "qwen", "tier": "high", "seed_count": 5, "accuracy": 0.798828125, "std": 0.010932848713376735, "hugo_acc": 0.803125, "hugo_std": 0.00810017240364364, "dana_acc": 0.79453125, "dana_std": 0.012536567606157196, "cost_per_run": 1.69559705, "latency_p50": 7397, "cat_same_flow": 0.9375, "cat_same_flow_std": 0.02551551815399144, "cat_switch_flow": 0.9234375, "cat_switch_flow_std": 0.044469529596117836, "cat_ambiguous_first": 0.5, "cat_ambiguous_first_std": 0.018042195912175804, "cat_ambiguous_second": 0.834375, "cat_ambiguous_second_std": 0.018340434230894802, "turn_1": 0.73359375, "turn_1_std": 0.008597694801676655, "turn_3": 0.8640625, "turn_3_std": 0.022158382693940257}, {"config_id": "1a_001", "model_short": "Haiku 4.5", "provider": "anthropic", "tier": "low", "seed_count": 5, "accuracy": 0.79765625, "std": 0.00546254608421954, "hugo_acc": 0.79609375, "hugo_std": 0.006418623720763666, "dana_acc": 0.79921875, "dana_std": 0.004453810254293508, "cost_per_run": 0.31980256, "latency_p50": 1209, "cat_same_flow": 0.89375, "cat_same_flow_std": 0.01920738428602685, "cat_switch_flow": 0.928125, "cat_switch_flow_std": 0.028716768233521296, "cat_ambiguous_first": 0.521875, "cat_ambiguous_first_std": 0.025727268823392643, "cat_ambiguous_second": 0.846875, "cat_ambiguous_second_std": 0.03359274061791063, "turn_1": 0.74453125, "turn_1_std": 0.00905860788069067, "turn_3": 0.85078125, "turn_3_std": 0.012994765572786093}, {"config_id": "1a_008", "model_short": "GPT-5 mini", "provider": "openai", "tier": "medium", "seed_count": 5, "accuracy": 0.779296875, "std": 0.012657696676577852, "hugo_acc": 0.7703125, "hugo_std": 0.008468548198702656, "dana_acc": 0.78828125, "dana_std": 0.009326044051807283, "cost_per_run": 0.20944812000000002, "latency_p50": 3904, "cat_same_flow": 0.834375, "cat_same_flow_std": 0.03911454865733039, "cat_switch_flow": 0.865625, "cat_switch_flow_std": 0.021092142428454776, "cat_ambiguous_first": 0.5875, "cat_ambiguous_first_std": 0.04552452788210866, "cat_ambiguous_second": 0.8296875, "cat_ambiguous_second_std": 0.027999333449407523, "turn_1": 0.76484375, "turn_1_std": 0.026925118803255897, "turn_3": 0.79375, "turn_3_std": 0.013380450602776175}, {"config_id": "1a_016", "model_short": "GPT-5.2", "provider": "openai", "tier": "high", "seed_count": 5, "accuracy": 0.772265625, "std": 0.014150237486351205, "hugo_acc": 0.7765625, "hugo_std": 0.014192111034831992, "dana_acc": 0.76796875, "dana_std": 0.014245767600633178, "cost_per_run": 0.8451259999999999, "latency_p50": 1476, "cat_same_flow": 0.865625, "cat_same_flow_std": 0.026760901205552353, "cat_switch_flow": 0.8234375, "cat_switch_flow_std": 0.031293372678749584, "cat_ambiguous_first": 0.5453125, "cat_ambiguous_first_std": 0.044469529596117836, "cat_ambiguous_second": 0.8546875, "cat_ambiguous_second_std": 0.03536301082659991, "turn_1": 0.73671875, "turn_1_std": 0.023306927953400464, "turn_3": 0.8078125, "turn_3_std": 0.017738944131173332}, {"config_id": "1a_026", "model_short": "Gemma 27B", "provider": "gemma", "tier": "low", "seed_count": 5, "accuracy": 0.7609375, "std": 0.006840586216960259, "hugo_acc": 0.76015625, "hugo_std": 0.009407495764681481, "dana_acc": 0.76171875, "dana_std": 0.00390625, "cost_per_run": 0.02935739, "latency_p50": 1784, "cat_same_flow": 0.88125, "cat_same_flow_std": 0.05006506183624132, "cat_switch_flow": 0.8875, "cat_switch_flow_std": 0.027362344867841035, "cat_ambiguous_first": 0.5, "cat_ambiguous_first_std": 0.02551551815399144, "cat_ambiguous_second": 0.775, "cat_ambiguous_second_std": 0.04784868365773272, "turn_1": 0.69140625, "turn_1_std": 0.006639348324990605, "turn_3": 0.83046875, "turn_3_std": 0.009778637164332598}, {"config_id": "1a_020", "model_short": "Qwen3 80B", "provider": "qwen", "tier": "medium", "seed_count": 5, "accuracy": 0.758203125, "std": 0.011997551562280669, "hugo_acc": 0.7515625, "hugo_std": 0.013131043995290321, "dana_acc": 0.76484375, "dana_std": 0.006418623720763666, "cost_per_run": 0.152722, "latency_p50": 1214, "cat_same_flow": 0.8828125, "cat_same_flow_std": 0.01518477055949297, "cat_switch_flow": 0.8890625, "cat_switch_flow_std": 0.015537951968933645, "cat_ambiguous_first": 0.4890625, "cat_ambiguous_first_std": 0.023350533095270725, "cat_ambiguous_second": 0.771875, "cat_ambiguous_second_std": 0.05901756447589706, "turn_1": 0.71328125, "turn_1_std": 0.015646686339374792, "turn_3": 0.803125, "turn_3_std": 0.015095184110613998}, {"config_id": "1a_003", "model_short": "GPT-5 nano", "provider": "openai", "tier": "low", "seed_count": 5, "accuracy": 0.715625, "std": 0.014823176532039278, "hugo_acc": 0.72109375, "hugo_std": 0.010554106317270544, "dana_acc": 0.71015625, "dana_std": 0.017556410198628306, "cost_per_run": 0.08198345, "latency_p50": 4809, "cat_same_flow": 0.83125, "cat_same_flow_std": 0.04153625424453518, "cat_switch_flow": 0.8328125, "cat_switch_flow_std": 0.030414169418034237, "cat_ambiguous_first": 0.4890625, "cat_ambiguous_first_std": 0.031293372678749584, "cat_ambiguous_second": 0.709375, "cat_ambiguous_second_std": 0.03623443152276268, "turn_1": 0.73046875, "turn_1_std": 0.023938510821419578, "turn_3": 0.70078125, "turn_3_std": 0.026054684246418255}, {"config_id": "1a_019", "model_short": "Qwen 7B", "provider": "qwen", "tier": "low", "seed_count": 5, "accuracy": 0.59453125, "std": 0.018760847556591537, "hugo_acc": 0.61171875, "hugo_std": 0.004453810254293508, "dana_acc": 0.57734375, "dana_std": 0.005793905068043487, "cost_per_run": 0.05347888199999999, "latency_p50": 655, "cat_same_flow": 0.634375, "cat_same_flow_std": 0.04114253678777396, "cat_switch_flow": 0.6609375, "cat_switch_flow_std": 0.020898336091394666, "cat_ambiguous_first": 0.4390625, "cat_ambiguous_first_std": 0.03715845621195202, "cat_ambiguous_second": 0.64375, "cat_ambiguous_second_std": 0.030190368221227996, "turn_1": 0.62421875, "turn_1_std": 0.02161615205150743, "turn_3": 0.56484375, "turn_3_std": 0.05788635485263345}], "confusions_hugo": [{"expected": "ambiguous", "predicted": "view", "count": 172, "models": "DeepSeek V3(26), Opus 4.6(21), Haiku 4.5(17)"}, {"expected": "ambiguous", "predicted": "rework", "count": 160, "models": "DeepSeek V3(31), Gemma 27B(18), Sonnet 4.6(12)"}, {"expected": "ambiguous", "predicted": "release", "count": 151, "models": "DeepSeek V3(19), Gemma 27B(16), GPT-5 nano(14)"}, {"expected": "ambiguous", "predicted": "find", "count": 143, "models": "Qwen3 80B(16), Gemma 27B(15), DeepSeek V3(14)"}, {"expected": "ambiguous", "predicted": "syndicate", "count": 143, "models": "DeepSeek V3(20), Haiku 4.5(15), Qwen3 80B(15)"}, {"expected": "ambiguous", "predicted": "tidy", "count": 132, "models": "DeepSeek V3(29), Qwen3 80B(18), Haiku 4.5(13)"}, {"expected": "blueprint", "predicted": "inspect", "count": 126, "models": "DeepSeek V3(23), Sonnet 4.6(10), GPT-5 mini(10)"}, {"expected": "compare", "predicted": "compare", "count": 118, "models": "DeepSeek V3(27), GPT-5 nano(16), GPT-5 mini(13)"}, {"expected": "ambiguous", "predicted": "expand", "count": 117, "models": "Gemini 3 Flash(13), DeepSeek V3(13), DeepSeek R1(11)"}, {"expected": "ambiguous", "predicted": "suggest", "count": 108, "models": "Gemini 3 Flash(14), DeepSeek V3(13), Sonnet 4.6(10)"}, {"expected": "schedule", "predicted": "schedule", "count": 102, "models": "DeepSeek V3(18), GPT-5 mini(10), Qwen 7B(10)"}, {"expected": "schedule", "predicted": "syndicate", "count": 102, "models": "DeepSeek V3(18), GPT-5 mini(10), Qwen 7B(10)"}, {"expected": "ambiguous", "predicted": "tone", "count": 94, "models": "DeepSeek V3(15), Sonnet 4.6(10), Gemini 3 Flash(8)"}, {"expected": "format", "predicted": "format", "count": 93, "models": "GPT-5 mini(20), Qwen 7B(20), GPT-5 nano(15)"}, {"expected": "blueprint", "predicted": "preview", "count": 93, "models": "DeepSeek V3(13), Qwen 7B(10), Qwen3 80B(10)"}], "confusions_dana": [{"expected": "reshape", "predicted": "pivot", "count": 176, "models": "GPT-5.2(30), Gemini 3 Flash(23), GPT-5 nano(20)"}, {"expected": "query", "predicted": "segment", "count": 171, "models": "GPT-5 mini(30), DeepSeek V3(19), DeepSeek R1(19)"}, {"expected": "plot", "predicted": "plot", "count": 163, "models": "Gemini 3 Flash(19), Opus 4.6(18), GPT-5.2(18)"}, {"expected": "outline", "predicted": "trend", "count": 159, "models": "Qwen 7B(20), DeepSeek V3(17), Haiku 4.5(15)"}, {"expected": "ambiguous", "predicted": "trend", "count": 143, "models": "Qwen3 235B(15), DeepSeek V3(13), Haiku 4.5(12)"}, {"expected": "ambiguous", "predicted": "segment", "count": 142, "models": "Qwen 7B(30), DeepSeek V3(23), Haiku 4.5(15)"}, {"expected": "ambiguous", "predicted": "query", "count": 136, "models": "DeepSeek V3(17), Gemini 3 Flash(14), Opus 4.6(13)"}, {"expected": "pivot", "predicted": "compare", "count": 117, "models": "DeepSeek V3(17), Gemini 3 Flash(10), Sonnet 4.6(10)"}, {"expected": "pivot", "predicted": "pivot", "count": 112, "models": "Opus 4.6(15), Gemini 3 Flash(12), GPT-5.2(11)"}, {"expected": "ambiguous", "predicted": "describe", "count": 108, "models": "DeepSeek V3(15), Haiku 4.5(10), Sonnet 4.6(10)"}, {"expected": "ambiguous", "predicted": "datatype", "count": 103, "models": "DeepSeek V3(16), Sonnet 4.6(10), Qwen3 235B(10)"}, {"expected": "outline", "predicted": "format", "count": 98, "models": "DeepSeek V3(15), Qwen3 80B(14), DeepSeek R1(12)"}, {"expected": "ambiguous", "predicted": "compare", "count": 92, "models": "DeepSeek V3(15), GPT-5.2(11), Qwen3 80B(10)"}, {"expected": "reshape", "predicted": "reshape", "count": 92, "models": "GPT-5.2(30), Gemini 3 Flash(21), GPT-5 mini(11)"}, {"expected": "plot", "predicted": "compare", "count": 90, "models": "DeepSeek V3(19), DeepSeek R1(18), GPT-5 mini(10)"}], "status": [{"config_id": "1a_001", "model_short": "Haiku 4.5", "tier": "low", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_002", "model_short": "Gemini 3 Flash", "tier": "medium", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_003", "model_short": "GPT-5 nano", "tier": "low", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_004", "model_short": "Sonnet 4.6", "tier": "medium", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_006", "model_short": "Gemini 3 Pro", "tier": "high", "hugo_seeds": 1, "dana_seeds": 2, "complete": false, "partial": true}, {"config_id": "1a_008", "model_short": "GPT-5 mini", "tier": "medium", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_010", "model_short": "Opus 4.6", "tier": "high", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_016", "model_short": "GPT-5.2", "tier": "high", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_019", "model_short": "Qwen 7B", "tier": "low", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_020", "model_short": "Qwen3 80B", "tier": "medium", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_021", "model_short": "Qwen3 235B", "tier": "high", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_022", "model_short": "DeepSeek V3", "tier": "low", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_023", "model_short": "DeepSeek V3", "tier": "medium", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_024", "model_short": "DeepSeek R1", "tier": "high", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}, {"config_id": "1a_026", "model_short": "Gemma 27B", "tier": "low", "hugo_seeds": 5, "dana_seeds": 5, "complete": true, "partial": false}]};
+
+// ── SVG helpers ──────────────────────────────────────────────────
+const TIER_COLORS = { low: '#57a0d3', medium: '#2563eb', high: '#1e40af' };
+
+// Provider colors: lighter = low, medium = mid, darker = high tier
+const PROVIDER_COLORS = {
+  anthropic: { low: '#86efac', medium: '#16a34a', high: '#0d5c26' },
+  google:    { low: '#93c5fd', medium: '#2563eb', high: '#1e3a8a' },
+  openai:    { low: '#fca5a5', medium: '#dc2626', high: '#991b1b' },
+  deepseek:  { low: '#fcd34d', medium: '#ca8a04', high: '#854d0e' },
+  qwen:      { low: '#c4b5fd', medium: '#7c3aed', high: '#5b21b6' },
+  gemma:     { low: '#67e8f9', medium: '#0891b2', high: '#155e75' },
+};
+
+function getProviderColor(provider, tier) {
+  const p = PROVIDER_COLORS[provider];
+  return p ? (p[tier] || p.medium) : '#94a3b8';
+}
+
+function svgEl(tag, attrs = {}, children = '') {
+  const a = Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ');
+  return `<${tag} ${a}>${children}</${tag}>`;
+}
+
+function fmtPct(v) { return v == null ? '—' : (v * 100).toFixed(1) + '%'; }
+
+// ── Horizontal bar chart with error bars ─────────────────────────
+function renderHBarChart(containerId, items, {
+  valueKey = 'accuracy', stdKey = 'std', labelKey = 'label', colorKey = 'color',
+  xMin = 0.5, xMax = 0.85, width = 900, barH = 28, gap = 6,
+} = {}) {
+  const container = document.getElementById(containerId);
+  const pad = { top: 30, right: 80, bottom: 35, left: 160 };
+  const h = pad.top + items.length * (barH + gap) + pad.bottom;
+  const plotW = width - pad.left - pad.right;
+
+  function sx(v) { return pad.left + (v - xMin) / (xMax - xMin) * plotW; }
+
+  let svg = `<svg width="${width}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid lines
+  const gridSteps = 7;
+  for (let i = 0; i <= gridSteps; i++) {
+    const v = xMin + (xMax - xMin) * i / gridSteps;
+    const x = sx(v);
+    svg += svgEl('line', { x1: x, y1: pad.top - 5, x2: x, y2: h - pad.bottom, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x, y: pad.top - 10, fill: '#656d76', 'font-size': 11, 'text-anchor': 'middle' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Bars
+  items.forEach((item, i) => {
+    const y = pad.top + i * (barH + gap);
+    const val = item[valueKey];
+    const std = item[stdKey] || 0;
+    const col = item[colorKey] || '#2563eb';
+    const barW = Math.max(0, sx(val) - pad.left);
+
+    // Label
+    svg += svgEl('text', { x: pad.left - 8, y: y + barH / 2 + 4, fill: '#1f2328', 'font-size': 12, 'text-anchor': 'end' }, item[labelKey]);
+
+    // Bar
+    svg += svgEl('rect', { x: pad.left, y: y + 2, width: barW, height: barH - 4, rx: 3, fill: col, opacity: 0.85 });
+
+    // Value label (rendered BEFORE error bar so it's on top visually — placed at bar end)
+    const labelX = sx(val) + 8;
+    const labelY = y + barH / 2 + 4;
+
+    // Error bar (1 STD) — gray, behind label
+    if (std > 0) {
+      const x1 = sx(Math.max(xMin, val - std));
+      const x2 = sx(Math.min(xMax, val + std));
+      const cy = y + barH / 2;
+      svg += svgEl('line', { x1, y1: cy, x2, y2: cy, stroke: '#9ca3af', 'stroke-width': 1.5 });
+      svg += svgEl('line', { x1, y1: cy - 5, x2: x1, y2: cy + 5, stroke: '#9ca3af', 'stroke-width': 1.5 });
+      svg += svgEl('line', { x1: x2, y1: cy - 5, x2, y2: cy + 5, stroke: '#9ca3af', 'stroke-width': 1.5 });
+    }
+
+    // Value label on top of error bar
+    svg += svgEl('text', { x: labelX, y: labelY, fill: '#1f2328', 'font-size': 11, 'font-weight': 600 },
+      (val * 100).toFixed(1) + '%');
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Grouped vertical bar chart (provider-grouped) ────────────────
+const PROVIDER_ORDER = ['anthropic', 'google', 'gemma', 'openai', 'deepseek', 'qwen'];
+const PROVIDER_LABELS = { anthropic: 'Anthropic', google: 'Google', gemma: 'Gemma', openai: 'OpenAI', deepseek: 'DeepSeek', qwen: 'Qwen' };
+
+function renderGroupedVBarChart(containerId, items, groups, { yMin = 0.3, yMax = 1.0 } = {}) {
+  const container = document.getElementById(containerId);
+  const w = container.clientWidth || 1100;
+  const h = 320;
+  const pad = { top: 20, right: 15, bottom: 75, left: 45 };
+  const plotH = h - pad.top - pad.bottom;
+  const plotW = w - pad.left - pad.right;
+
+  // Sort by provider, then alphabetically within provider
+  const sorted = [...items].sort((a, b) => {
+    const pa = PROVIDER_ORDER.indexOf(a.provider);
+    const pb = PROVIDER_ORDER.indexOf(b.provider);
+    if (pa !== pb) return pa - pb;
+    return a.label.localeCompare(b.label);
+  });
+
+  const n = sorted.length;
+  const g = groups.length;
+  const barGap = 1;       // between bars within a cluster
+  const clusterGap = 8;   // between clusters in same provider
+  const interGap = 22;    // between providers
+
+  // Count provider transitions
+  let transitions = 0;
+  for (let i = 1; i < n; i++) {
+    if (sorted[i].provider !== sorted[i - 1].provider) transitions++;
+  }
+
+  // Calculate bar width to fill available space
+  const clusterW_fixed = (g - 1) * barGap;  // fixed gaps within cluster
+  const totalFixed = n * clusterW_fixed + (n - 1 - transitions) * clusterGap + transitions * interGap;
+  const barW = Math.min(22, Math.max(8, (plotW - totalFixed) / (n * g)));
+  const clusterW = g * barW + clusterW_fixed;
+
+  // Compute cluster positions
+  let positions = [];
+  let x = 0;
+  let prevProvider = null;
+  let providerBounds = [];
+  let providerStart = 0;
+
+  sorted.forEach((item, i) => {
+    if (prevProvider && item.provider !== prevProvider) {
+      providerBounds.push({ start: providerStart, end: x - clusterGap, provider: prevProvider });
+      x += interGap - clusterGap;
+      providerStart = x;
+    }
+    positions.push(x);
+    x += clusterW + clusterGap;
+    prevProvider = item.provider;
+  });
+  if (prevProvider) {
+    providerBounds.push({ start: providerStart, end: x - clusterGap, provider: prevProvider });
+  }
+
+  const totalW = x - clusterGap;
+  const offsetX = pad.left + (plotW - totalW) / 2;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Horizontal grid lines
+  const steps = 5;
+  for (let i = 0; i <= steps; i++) {
+    const v = yMin + (yMax - yMin) * i / steps;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: w - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Bars
+  const barBottom = sy(yMin);
+  sorted.forEach((item, i) => {
+    const cx = offsetX + positions[i];
+
+    groups.forEach((grp, gi) => {
+      const bx = cx + gi * (barW + barGap);
+      const val = item[grp.key];
+      const std = item[grp.stdKey] || 0;
+      if (val == null) return;
+
+      const barTop = sy(Math.min(yMax, Math.max(yMin, val)));
+      svg += svgEl('rect', { x: bx, y: barTop, width: barW, height: Math.max(0, barBottom - barTop), rx: 1, fill: grp.color, opacity: 0.8 });
+
+      // Error bar
+      if (std > 0) {
+        const mx = bx + barW / 2;
+        const y1 = sy(Math.min(yMax, val + std));
+        const y2 = sy(Math.max(yMin, val - std));
+        svg += svgEl('line', { x1: mx, y1, x2: mx, y2, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+        svg += svgEl('line', { x1: mx - 3, y1, x2: mx + 3, y2: y1, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+        svg += svgEl('line', { x1: mx - 3, y1: y2, x2: mx + 3, y2, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+      }
+    });
+
+    // Model label (rotated)
+    const labelX = cx + clusterW / 2;
+    const shortLabel = item.label.replace(' +think', '+T');
+    svg += `<text x="${labelX}" y="${barBottom + 8}" fill="#656d76" font-size="9" text-anchor="end" transform="rotate(-40, ${labelX}, ${barBottom + 8})">${shortLabel}</text>`;
+  });
+
+  // Provider group labels
+  providerBounds.forEach(pb => {
+    const cx = offsetX + (pb.start + pb.end) / 2 + clusterW / 2;
+    const label = PROVIDER_LABELS[pb.provider] || pb.provider;
+    svg += svgEl('text', { x: cx, y: h - 4, fill: '#0969da', 'font-size': 10, 'text-anchor': 'middle', 'font-weight': 600 }, label);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Scatter plot ─────────────────────────────────────────────────
+function renderScatter(containerId, data, xKey, yKey, { xLabel = '', yLabel = 'Accuracy', xFmt = v => v.toFixed(2), logX = false } = {}) {
+  const container = document.getElementById(containerId);
+  const w = container.clientWidth || 400;
+  const h = 300;
+  const pad = { top: 20, right: 20, bottom: 50, left: 60 };
+
+  const rawXs = data.map(d => d[xKey]);
+  const xs = data.map(d => logX ? Math.log10(d[xKey] + 0.001) : d[xKey]);
+  const ys = data.map(d => d.accuracy);
+  const xMinV = Math.min(...xs) * 0.9, xMaxV = Math.max(...xs) * 1.1;
+  const yMinV = Math.min(...ys) * 0.95, yMaxV = Math.max(...ys) * 1.02;
+
+  function sx(v) { return pad.left + (v - xMinV) / (xMaxV - xMinV) * (w - pad.left - pad.right); }
+  function sy(v) { return h - pad.bottom - (v - yMinV) / (yMaxV - yMinV) * (h - pad.top - pad.bottom); }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Y-axis grid + labels
+  for (let i = 0; i <= 4; i++) {
+    const yv = yMinV + (yMaxV - yMinV) * i / 4;
+    const y = sy(yv);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: w - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (yv * 100).toFixed(1) + '%');
+  }
+
+  // X-axis tick labels
+  const xTickCount = 5;
+  for (let i = 0; i <= xTickCount; i++) {
+    const xv = xMinV + (xMaxV - xMinV) * i / xTickCount;
+    const x = sx(xv);
+    const rawVal = logX ? Math.pow(10, xv) : xv;
+    const label = logX ? '$' + rawVal.toFixed(2) : rawVal.toFixed(0);
+    svg += svgEl('line', { x1: x, y1: h - pad.bottom, x2: x, y2: h - pad.bottom + 4, stroke: '#d0d7de' });
+    svg += svgEl('text', { x, y: h - pad.bottom + 16, fill: '#656d76', 'font-size': 10, 'text-anchor': 'middle' }, label);
+  }
+
+  // Points with STD error bars
+  data.forEach(d => {
+    const xv = logX ? Math.log10(d[xKey] + 0.001) : d[xKey];
+    const cx = sx(xv);
+    const cy = sy(d.accuracy);
+    const col = getProviderColor(d.provider, d.tier);
+
+    // Vertical error bar
+    if (d.std) {
+      const y1 = sy(d.accuracy + d.std);
+      const y2 = sy(d.accuracy - d.std);
+      svg += svgEl('line', { x1: cx, y1, x2: cx, y2, stroke: col, 'stroke-width': 1, opacity: 0.5 });
+    }
+
+    svg += svgEl('circle', { cx, cy, r: 7, fill: col, opacity: 0.9, stroke: '#fff', 'stroke-width': 1.5 });
+    svg += svgEl('text', { x: cx + 11, y: cy + 4, fill: '#1f2328', 'font-size': 10 }, d.model_short);
+  });
+
+  // Y-axis label
+  svg += svgEl('text', { x: 15, y: (h - pad.top - pad.bottom) / 2 + pad.top, fill: '#656d76', 'font-size': 11, 'text-anchor': 'middle', transform: `rotate(-90, 15, ${(h - pad.top - pad.bottom) / 2 + pad.top})` }, yLabel);
+  // X-axis label
+  svg += svgEl('text', { x: w / 2, y: h - 5, fill: '#656d76', 'font-size': 11, 'text-anchor': 'middle' }, xLabel);
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Category chart grouped by category, colored by provider ──────
+function renderCatByProviderChart(chartId, legendId, ranking) {
+  const container = document.getElementById(chartId);
+  const w = container.clientWidth || 1100;
+  const h = 360;
+  const pad = { top: 20, right: 15, bottom: 30, left: 45 };
+  const plotH = h - pad.top - pad.bottom;
+  const plotW = w - pad.left - pad.right;
+  const yMin = 0.3, yMax = 1.0;
+
+  const categories = [
+    { key: 'cat_same_flow', stdKey: 'cat_same_flow_std', label: 'Same Flow' },
+    { key: 'cat_switch_flow', stdKey: 'cat_switch_flow_std', label: 'Switch Flow' },
+    { key: 'cat_ambiguous_first', stdKey: 'cat_ambiguous_first_std', label: 'Ambiguous 1st' },
+    { key: 'cat_ambiguous_second', stdKey: 'cat_ambiguous_second_std', label: 'Ambiguous 2nd' },
+  ];
+
+  // Sort models by provider order
+  const models = [...ranking].sort((a, b) => {
+    const pa = PROVIDER_ORDER.indexOf(a.provider);
+    const pb = PROVIDER_ORDER.indexOf(b.provider);
+    if (pa !== pb) return pa - pb;
+    return a.model_short.localeCompare(b.model_short);
+  });
+
+  const nModels = models.length;
+  const nCats = categories.length;
+  const barW = Math.min(18, Math.max(8, (plotW - nCats * 30 - (nCats - 1) * 40) / (nCats * nModels)));
+  const barGap = 1;
+  const groupW = nModels * (barW + barGap) - barGap;
+  const catGap = 40;
+  const totalW = nCats * groupW + (nCats - 1) * catGap;
+  const offsetX = pad.left + (plotW - totalW) / 2;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid lines
+  for (let i = 0; i <= 7; i++) {
+    const v = yMin + (yMax - yMin) * i / 7;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: w - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  const barBottom = sy(yMin);
+
+  categories.forEach((cat, ci) => {
+    const groupX = offsetX + ci * (groupW + catGap);
+
+    // Category label
+    svg += svgEl('text', { x: groupX + groupW / 2, y: h - 8, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 600 }, cat.label);
+
+    // Bars for each model
+    models.forEach((m, mi) => {
+      const bx = groupX + mi * (barW + barGap);
+      const val = m[cat.key];
+      const std = m[cat.stdKey] || 0;
+      if (val == null) return;
+      const col = getProviderColor(m.provider, m.tier);
+      const barTop = sy(Math.min(yMax, Math.max(yMin, val)));
+
+      svg += svgEl('rect', { x: bx, y: barTop, width: barW, height: Math.max(0, barBottom - barTop), rx: 1, fill: col, opacity: 0.85 });
+
+      // Error bar
+      if (std > 0 && std < 0.15) {  // skip unreliable huge STDs
+        const mx = bx + barW / 2;
+        const y1 = sy(Math.min(yMax, val + std));
+        const y2 = sy(Math.max(yMin, val - std));
+        svg += svgEl('line', { x1: mx, y1, x2: mx, y2, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.4 });
+      }
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Build legend (by provider)
+  const legendEl = document.getElementById(legendId);
+  let legendHtml = '';
+  for (const prov of PROVIDER_ORDER) {
+    const provModels = models.filter(m => m.provider === prov);
+    if (!provModels.length) continue;
+    for (const m of provModels) {
+      const col = getProviderColor(m.provider, m.tier);
+      legendHtml += `<div class="legend-item"><span class="legend-dot" style="background:${col}"></span> ${m.model_short}</div>`;
+    }
+  }
+  legendEl.innerHTML = legendHtml;
+}
+
+// ── Family Comparisons Line Chart ─────────────────────────────────
+function renderFamilyChart(containerId, legendId, ranking) {
+  const FAMILIES = [
+    { name: 'Anthropic', providers: ['anthropic'], color: '#16a34a' },
+    { name: 'Google',    providers: ['google', 'gemma'], color: '#2563eb' },
+    { name: 'OpenAI',    providers: ['openai'], color: '#dc2626' },
+    { name: 'Alibaba',   providers: ['qwen'], color: '#7c3aed' },
+    { name: 'DeepSeek',  providers: ['deepseek'], color: '#ca8a04' },
+  ];
+  const TIER_ORDER = ['low', 'medium', 'high'];
+  const TIER_LABELS = ['Low', 'Medium', 'High'];
+
+  const container = document.getElementById(containerId);
+  const width = container.clientWidth || 500;
+  const h = 280;
+  const pad = { top: 20, right: 55, bottom: 40, left: 45 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const yMin = 0.55, yMax = 0.85;
+
+  function sx(i) { return pad.left + (i / 2) * plotW; }
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+
+  let svg = `<svg width="${width}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Horizontal grid
+  for (let i = 0; i <= 4; i++) {
+    const v = yMin + (yMax - yMin) * i / 4;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: width - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // X-axis tier labels
+  TIER_LABELS.forEach((label, i) => {
+    const x = sx(i);
+    svg += svgEl('line', { x1: x, y1: pad.top, x2: x, y2: h - pad.bottom, stroke: '#f0f0f0' });
+    svg += svgEl('text', { x, y: h - pad.bottom + 16, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 500 }, label);
+  });
+
+  // Draw each family line
+  FAMILIES.forEach(family => {
+    const models = TIER_ORDER.map(tier =>
+      ranking.find(r => family.providers.includes(r.provider) && r.tier === tier)
+    ).filter(Boolean);
+    if (models.length < 2) return;
+
+    // Polyline
+    const pts = models.map(m => `${sx(TIER_ORDER.indexOf(m.tier))},${sy(m.accuracy)}`);
+    svg += svgEl('polyline', { points: pts.join(' '), fill: 'none', stroke: family.color, 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+
+    // Dots + endpoint labels
+    models.forEach((m, i) => {
+      const x = sx(TIER_ORDER.indexOf(m.tier));
+      const y = sy(m.accuracy);
+      svg += svgEl('circle', { cx: x, cy: y, r: 4, fill: family.color, stroke: '#fff', 'stroke-width': 1.5 });
+      // Value label at rightmost point
+      if (i === models.length - 1) {
+        svg += svgEl('text', { x: x + 8, y: y + 4, fill: family.color, 'font-size': 10, 'font-weight': 600, 'text-anchor': 'start' },
+          (m.accuracy * 100).toFixed(1) + '%');
+      }
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Legend
+  document.getElementById(legendId).innerHTML = FAMILIES.map(f =>
+    `<div class="legend-item"><span class="legend-dot" style="background:${f.color}"></span> ${f.name}</div>`
+  ).join('');
+}
+
+// ── Key Findings ─────────────────────────────────────────────────
+function renderSummary(data) {
+  const el = document.getElementById('summary-section');
+  if (!data.ranking.length) { el.innerHTML = '<p class="note">No results yet.</p>'; return; }
+
+  const r = data.ranking;
+  const top3 = r.slice(0, 3);
+  const avgAcc = r.reduce((s, x) => s + x.accuracy, 0) / r.length;
+
+  const avgAmb1 = r.reduce((s, x) => s + x.cat_ambiguous_first, 0) / r.length;
+  const avgAmb2 = r.reduce((s, x) => s + x.cat_ambiguous_second, 0) / r.length;
+  const avgSame = r.reduce((s, x) => s + x.cat_same_flow, 0) / r.length;
+  const avgSwitch = r.reduce((s, x) => s + x.cat_switch_flow, 0) / r.length;
+  const avgT1 = r.reduce((s, x) => s + x.turn_1, 0) / r.length;
+  const avgT3 = r.reduce((s, x) => s + x.turn_3, 0) / r.length;
+
+  let html = `<div class="card full">
+    <ul style="font-size:0.85rem; line-height:1.8; padding-left:1.2rem; color: var(--text);">
+      <li><strong>Top performer:</strong> ${top3[0].model_short} at ${fmtPct(top3[0].accuracy)}, followed by ${top3[1].model_short} (${fmtPct(top3[1].accuracy)}) and ${top3[2].model_short} (${fmtPct(top3[2].accuracy)})</li>
+      <li><strong>Mean accuracy:</strong> ${fmtPct(avgAcc)} across ${r.length} models (range: ${fmtPct(r[r.length-1].accuracy)} &ndash; ${fmtPct(r[0].accuracy)})</li>
+      <li><strong>Same-flow</strong> and <strong>switch-flow</strong> detection are strong across all models (avg ${fmtPct(avgSame)} and ${fmtPct(avgSwitch)})</li>
+      <li><strong>Turn 3</strong> (with context) averages ${fmtPct(avgT3)} vs <strong>Turn 1</strong> (cold start) at ${fmtPct(avgT1)} &mdash; context consistently helps</li>
+      <li><strong>Ambiguity detection</strong> is the weakest area: ambiguous-first avg ${fmtPct(avgAmb1)}, ambiguous-second avg ${fmtPct(avgAmb2)}. When models pick 1 flow, it is usually one of the correct candidates (80-86%), suggesting they identify the right semantic space but rarely return multiple flows.</li>
+    </ul>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+// ── Render everything ────────────────────────────────────────────
+function render(data) {
+  if (!data) { document.getElementById('subtitle').textContent = 'No data loaded'; return; }
+
+  document.getElementById('subtitle').textContent =
+    `${data.total_runs} runs across ${data.unique_configs} configs | ${data.domains.join(' + ')} | Generated ${data.generated}`;
+
+  // Top stats
+  document.getElementById('top-stats').innerHTML = [
+    { value: data.total_runs, label: 'Completed Runs' },
+    { value: data.unique_configs, label: 'Models Tested' },
+    { value: (data.best_accuracy * 100).toFixed(1) + '%', label: 'Best Accuracy' },
+    { value: data.best_model, label: 'Top Model' },
+  ].map(s => `<div class="stat-box"><div class="value">${s.value}</div><div class="label">${s.label}</div></div>`).join('');
+
+  // 1. Ranking chart (colored by provider, numbered)
+  const rankItems = data.ranking.map((r, i) => ({
+    label: `#${i + 1}  ${r.model_short}`,
+    accuracy: r.accuracy,
+    std: r.std,
+    color: getProviderColor(r.provider, r.tier),
+  }));
+  renderHBarChart('ranking-chart', rankItems, { valueKey: 'accuracy', stdKey: 'std', xMin: 0.55, xMax: 0.85 });
+
+  // Ranking legend (by provider)
+  const rlEl = document.getElementById('ranking-legend');
+  let rlHtml = '';
+  const seen = new Set();
+  for (const r of data.ranking) {
+    const key = r.provider + '_' + r.tier;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const col = getProviderColor(r.provider, r.tier);
+    const provLabel = PROVIDER_LABELS[r.provider] || r.provider;
+    rlHtml += `<div class="legend-item"><span class="legend-dot" style="background:${col}"></span> ${provLabel} (${r.tier})</div>`;
+  }
+  rlHtml += `<div class="legend-item" style="margin-left:1rem; border-left: 1px solid #d0d7de; padding-left:1rem;">Error bars = 1 STD</div>`;
+  rlEl.innerHTML = rlHtml;
+
+  // 2. Category chart (grouped by category, colored by provider)
+  renderCatByProviderChart('category-chart', 'category-legend', data.ranking);
+
+  // 3. Turn chart
+  const turnItems = data.ranking.map(r => ({
+    label: r.model_short,
+    provider: r.provider || 'unknown',
+    turn_1: r.turn_1, turn_1_std: r.turn_1_std,
+    turn_3: r.turn_3, turn_3_std: r.turn_3_std,
+  }));
+  renderGroupedVBarChart('turn-chart', turnItems, [
+    { key: 'turn_1', stdKey: 'turn_1_std', color: '#93c5fd' },
+    { key: 'turn_3', stdKey: 'turn_3_std', color: '#16a34a' },
+  ], { yMin: 0.55, yMax: 0.95 });
+
+  // 4. Domain chart — Google, OpenAI, Qwen only (Gemma grouped under Google)
+  const domainProviders = new Set(['google', 'gemma', 'openai', 'qwen']);
+  const domainItems = data.ranking
+    .filter(r => domainProviders.has(r.provider))
+    .map(r => ({
+      label: r.model_short,
+      provider: r.provider === 'gemma' ? 'google' : r.provider,
+      hugo: r.hugo_acc, hugo_std: r.hugo_std,
+      dana: r.dana_acc, dana_std: r.dana_std,
+    }));
+  renderGroupedVBarChart('domain-chart', domainItems, [
+    { key: 'hugo', stdKey: 'hugo_std', color: '#2563eb' },
+    { key: 'dana', stdKey: 'dana_std', color: '#16a34a' },
+  ], { yMin: 0.55, yMax: 0.85 });
+
+  // 5. Family comparisons line chart
+  renderFamilyChart('family-chart', 'family-legend', data.ranking);
+
+  // 6. Confusion tables
+  renderConfusionTable('confusion-hugo-table', data.confusions_hugo);
+  renderConfusionTable('confusion-dana-table', data.confusions_dana);
+
+  // 7. Key findings
+  renderSummary(data);
+
+  // 8. Status table
+  renderStatusTable('status-table', data.status);
+}
+
+function renderConfusionTable(id, confusions) {
+  const el = document.getElementById(id);
+  let html = `<thead><tr><th>Expected</th><th>Predicted</th><th>Count</th><th>Top Models</th></tr></thead><tbody>`;
+  for (const r of confusions.slice(0, 12)) {
+    html += `<tr><td><code>${r.expected}</code></td><td><code>${r.predicted}</code></td><td class="num">${r.count}</td><td style="font-size:0.75rem">${r.models}</td></tr>`;
+  }
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+function renderStatusTable(id, status) {
+  const el = document.getElementById(id);
+  let html = `<thead><tr><th>Config</th><th>Model</th><th>Tier</th><th>Hugo</th><th>Dana</th><th>Status</th></tr></thead><tbody>`;
+  for (const r of status) {
+    const badge = r.complete ? 'badge-green' : r.partial ? 'badge-yellow' : 'badge-red';
+    const label = r.complete ? 'Complete' : r.partial ? 'Partial' : 'Missing';
+    html += `<tr><td><code>${r.config_id}</code></td><td>${r.model_short}</td><td>${r.tier}</td><td class="num">${r.hugo_seeds}/5</td><td class="num">${r.dana_seeds}/5</td><td><span class="badge ${badge}">${label}</span></td></tr>`;
+  }
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+render(DATA);
+</script>
+</body>
+</html>

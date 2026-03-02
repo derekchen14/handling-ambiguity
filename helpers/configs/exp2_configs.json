@@ -1,0 +1,77 @@
+[
+  {
+    "config_id": "2_001",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "low",
+    "model_id": "claude-haiku-4-5-20251001",
+    "temperature": 0.0,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_002",
+    "provider": "google",
+    "model_type": "gemini",
+    "model_level": "medium",
+    "model_id": "gemini-3-flash-preview",
+    "temperature": 0.0,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_004",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "medium",
+    "model_id": "claude-sonnet-4-6",
+    "temperature": 0.0,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_006",
+    "provider": "openrouter",
+    "model_type": "gemini",
+    "model_level": "high",
+    "model_id": "google/gemini-3.1-pro-preview",
+    "temperature": 0.0,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_008",
+    "provider": "openai",
+    "model_type": "gpt",
+    "model_level": "medium",
+    "model_id": "gpt-5-mini",
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_010",
+    "provider": "anthropic",
+    "model_type": "claude",
+    "model_level": "high",
+    "model_id": "claude-opus-4-6",
+    "temperature": 0.0,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_021",
+    "provider": "qwen",
+    "model_type": "qwen",
+    "model_level": "high",
+    "model_id": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+    "temperature": 0.0,
+    "max_tokens": 8192,
+    "mode": "tool_calling"
+  },
+  {
+    "config_id": "2_024",
+    "provider": "deepseek",
+    "model_type": "deepseek",
+    "model_level": "high",
+    "model_id": "deepseek-reasoner",
+    "temperature": 0.0,
+    "max_tokens": 8192,
+    "mode": "tool_calling"
+  }
+]

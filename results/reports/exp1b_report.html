@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 1B — Ensemble Results</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de;
+    --text: #1f2328; --muted: #656d76; --accent: #0969da;
+    --green: #1a7f37; --yellow: #9a6700; --red: #cf222e;
+    --purple: #8250df; --orange: #bc4c00; --cyan: #0550ae;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+  .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.5rem; min-width: 140px; text-align: center; flex: 1;
+  }
+  .stat-box .value { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-box .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem; overflow-x: auto;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h3 { margin-top: 0; }
+  .chart-container { width: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+  td { white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(9,105,218,0.04); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem; font-style: italic; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+  .badge-green { background: rgba(26,127,55,0.1); color: var(--green); }
+  .badge-yellow { background: rgba(154,103,0,0.1); color: var(--yellow); }
+  .badge-red { background: rgba(207,34,46,0.1); color: var(--red); }
+  .badge-purple { background: rgba(130,80,223,0.1); color: var(--purple); }
+  .badge-orange { background: rgba(188,76,0,0.1); color: var(--orange); }
+  .badge-blue { background: rgba(9,105,218,0.1); color: var(--accent); }
+  .legend { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>Experiment 1B — Ensemble Flow Detection</h1>
+<p class="subtitle" id="subtitle">Loading results...</p>
+
+<div class="stat-row" id="top-stats"></div>
+
+<h2>Overall Ensemble Ranking</h2>
+<div class="card full">
+  <div class="chart-container" id="ranking-chart"></div>
+  <div class="legend" id="ranking-legend"></div>
+  <p class="note">Accuracy averaged across seeds and both domains. Baselines (single-model, from Exp 1A) shown in gray for comparison.</p>
+</div>
+
+<div class="grid" style="margin-top: 2.5rem;">
+  <div class="card">
+    <h3>Self-Consistency Results</h3>
+    <div class="chart-container" id="sc-chart"></div>
+    <div class="legend" id="sc-legend"></div>
+    <p class="note">Same model x3 at temp=0.3, majority vote.</p>
+  </div>
+  <div class="card">
+    <h3>Ambiguity Detection</h3>
+    <div class="chart-container" id="ambiguity-chart"></div>
+    <div class="legend" id="ambiguity-legend"></div>
+    <p class="note">Recognition = model output 2+ flows or voters disagreed.<br>Selection = predicted flow in candidate set.</p>
+  </div>
+</div>
+
+<h2>Category Breakdown</h2>
+<div class="card full">
+  <div class="chart-container" id="category-chart"></div>
+  <div class="legend" id="category-legend"></div>
+  <p class="note">Top 12 ensembles + top 2 single-model baselines (gray). Grouped by category.</p>
+</div>
+
+<h2>Cost vs. Accuracy</h2>
+<div class="card full">
+  <div class="chart-container" id="cost-chart"></div>
+  <div class="legend" id="cost-legend"></div>
+  <p class="note">Relative cost normalized to Sonnet 4.6 = 1.0 (based on $/M input tokens). Dashed line = log fit. Points show top 12 ensembles + top 2 baselines.</p>
+</div>
+
+<h2>Full Results Table</h2>
+<div class="card full">
+  <table id="results-table"></table>
+</div>
+
+<h2>Key Findings</h2>
+<div id="findings-section"></div>
+
+<footer>
+  <p>Generated from 1B ensemble summaries. Regenerate with: <code>python3 experiments/results/build_report_1b.py</code></p>
+</footer>
+
+<script>
+const DATA = {"generated": "2026-02-27 00:26", "n_ensembles": 26, "best_ensemble_acc": 0.91289, "best_ensemble_id": "10v-1", "best_baseline_acc": 0.83123, "best_baseline_model": "Sonnet 4.6", "ranking": [{"id": "10v-1", "n_voters": 10, "type": "cross-model", "description": "Provider-balanced 10-voter majority (2 per provider, high+mid tiers)", "relative_cost": 8.88, "metric_value": 0.91289, "metric_std": 0.00355, "same_flow": 0.92969, "switch_flow": 0.92656, "ambiguous_first": 0.85781, "ambiguous_second": 0.9375, "ambiguous_overall": 0.89766, "ambiguous_recognized": 0.90388, "ambiguous_selected": 0.95539, "same_flow_std": 0.00552, "switch_flow_std": 0.00428, "ambiguous_first_std": 0.00654, "ambiguous_second_std": 0.00781, "ambiguous_overall_std": 0.00579, "ambiguous_recognized_std": 0.00425, "ambiguous_selected_std": 0.00724, "rank": 1}, {"id": "10v-3", "n_voters": 10, "type": "cross-model", "description": "Top 10 by accuracy \u2014 accuracy-first 10-voter majority", "relative_cost": 7.76, "metric_value": 0.9125, "metric_std": 0.00592, "same_flow": 0.92656, "switch_flow": 0.93281, "ambiguous_first": 0.84688, "ambiguous_second": 0.94375, "ambiguous_overall": 0.89531, "ambiguous_recognized": 0.89922, "ambiguous_selected": 0.95005, "same_flow_std": 0.00891, "switch_flow_std": 0.00428, "ambiguous_first_std": 0.02037, "ambiguous_second_std": 0.00654, "ambiguous_overall_std": 0.01217, "ambiguous_recognized_std": 0.02193, "ambiguous_selected_std": 0.00664, "rank": 2}, {"id": "10v-4", "n_voters": 10, "type": "cross-model", "description": "Level-diversity 10-voter (4L + 4M + 2H)", "relative_cost": 7.74, "metric_value": 0.90273, "metric_std": 0.00592, "same_flow": 0.93125, "switch_flow": 0.91875, "ambiguous_first": 0.82656, "ambiguous_second": 0.93437, "ambiguous_overall": 0.88047, "ambiguous_recognized": 0.87752, "ambiguous_selected": 0.94697, "same_flow_std": 0.00654, "switch_flow_std": 0.01048, "ambiguous_first_std": 0.02615, "ambiguous_second_std": 0.00891, "ambiguous_overall_std": 0.01398, "ambiguous_recognized_std": 0.02286, "ambiguous_selected_std": 0.00631, "rank": 3}, {"id": "5v-6", "n_voters": 5, "type": "cross-model", "description": "Mid-tier per provider \u2014 Sonnet 4.6, Gemini Flash, GPT-5 Mini, Qwen3-80B, DeepSeek V3", "relative_cost": 1.37, "metric_value": 0.89609, "metric_std": 0.00466, "same_flow": 0.93437, "switch_flow": 0.92812, "ambiguous_first": 0.7875, "ambiguous_second": 0.93437, "ambiguous_overall": 0.86094, "ambiguous_recognized": 0.83411, "ambiguous_selected": 0.94604, "same_flow_std": 0.00891, "switch_flow_std": 0.01159, "ambiguous_first_std": 0.01398, "ambiguous_second_std": 0.00891, "ambiguous_overall_std": 0.0071, "ambiguous_recognized_std": 0.01785, "ambiguous_selected_std": 0.00486, "rank": 4}, {"id": "5v-3", "n_voters": 5, "type": "cross-model", "description": "Sonnet + Opus + Gemini Pro + DeepSeek R1 + GPT-5 Mini \u2014 best hand-picked diversity", "relative_cost": 7.14, "metric_value": 0.89219, "metric_std": 0.00423, "same_flow": 0.92969, "switch_flow": 0.91875, "ambiguous_first": 0.8125, "ambiguous_second": 0.90781, "ambiguous_overall": 0.86016, "ambiguous_recognized": 0.87287, "ambiguous_selected": 0.93253, "same_flow_std": 0.00957, "switch_flow_std": 0.01048, "ambiguous_first_std": 0.01353, "ambiguous_second_std": 0.01503, "ambiguous_overall_std": 0.01152, "ambiguous_recognized_std": 0.01408, "ambiguous_selected_std": 0.0099, "rank": 5}, {"id": "5v-5", "n_voters": 5, "type": "cross-model", "description": "Top 5 overall accuracy \u2014 Sonnet 4.6, Qwen3-235B, Opus 4.6, Gemini Pro, Haiku 4.5", "relative_cost": 7.6, "metric_value": 0.88594, "metric_std": 0.00107, "same_flow": 0.95312, "switch_flow": 0.93281, "ambiguous_first": 0.74375, "ambiguous_second": 0.91406, "ambiguous_overall": 0.82891, "ambiguous_recognized": 0.76899, "ambiguous_selected": 0.94358, "same_flow_std": 0.00552, "switch_flow_std": 0.01185, "ambiguous_first_std": 0.00856, "ambiguous_second_std": 0.00957, "ambiguous_overall_std": 0.00509, "ambiguous_recognized_std": 0.01387, "ambiguous_selected_std": 0.005, "rank": 6}, {"id": "5v-2", "n_voters": 5, "type": "cross-model", "description": "Best per provider (1A rankings) \u2014 Sonnet 4.6, Qwen3-235B, Gemini Pro, DeepSeek V3, GPT-5.2", "relative_cost": 3.42, "metric_value": 0.88516, "metric_std": 0.00639, "same_flow": 0.95, "switch_flow": 0.90781, "ambiguous_first": 0.75938, "ambiguous_second": 0.92344, "ambiguous_overall": 0.84141, "ambiguous_recognized": 0.79225, "ambiguous_selected": 0.9432, "same_flow_std": 0.00428, "switch_flow_std": 0.01019, "ambiguous_first_std": 0.01694, "ambiguous_second_std": 0.00856, "ambiguous_overall_std": 0.0071, "ambiguous_recognized_std": 0.01491, "ambiguous_selected_std": 0.00856, "rank": 7}, {"id": "5v-8", "n_voters": 5, "type": "cross-model", "description": "Most diverse from top 8 \u2014 Gemini Pro, DeepSeek R1, DeepSeek V3-lite, Opus 4.6, Haiku 4.5", "relative_cost": 6.37, "metric_value": 0.88477, "metric_std": 0.00569, "same_flow": 0.91406, "switch_flow": 0.925, "ambiguous_first": 0.78438, "ambiguous_second": 0.91563, "ambiguous_overall": 0.85, "ambiguous_recognized": 0.82636, "ambiguous_selected": 0.94176, "same_flow_std": 0.00552, "switch_flow_std": 0.00428, "ambiguous_first_std": 0.00699, "ambiguous_second_std": 0.01159, "ambiguous_overall_std": 0.0071, "ambiguous_recognized_std": 0.01408, "ambiguous_selected_std": 0.02169, "rank": 8}, {"id": "5v-1", "n_voters": 5, "type": "cross-model", "description": "Opus + GPT-5.2 + Gemini Pro + Qwen3-235B + DeepSeek R1 \u2014 1 per provider (high tier)", "relative_cost": 7.51, "metric_value": 0.88047, "metric_std": 0.0091, "same_flow": 0.91406, "switch_flow": 0.9125, "ambiguous_first": 0.79063, "ambiguous_second": 0.90469, "ambiguous_overall": 0.84766, "ambiguous_recognized": 0.83721, "ambiguous_selected": 0.93886, "same_flow_std": 0.00552, "switch_flow_std": 0.01503, "ambiguous_first_std": 0.01398, "ambiguous_second_std": 0.01503, "ambiguous_overall_std": 0.01381, "ambiguous_recognized_std": 0.0145, "ambiguous_selected_std": 0.01931, "rank": 9}, {"id": "5v-7", "n_voters": 5, "type": "cross-model", "description": "5 most diverse \u2014 DeepSeek R1, Qwen2.5-7B, GPT-5 Nano, Gemma 27B, GPT-5 Mini", "relative_cost": 0.42, "metric_value": 0.87656, "metric_std": 0.00798, "same_flow": 0.9125, "switch_flow": 0.90156, "ambiguous_first": 0.77812, "ambiguous_second": 0.91406, "ambiguous_overall": 0.84609, "ambiguous_recognized": 0.86047, "ambiguous_selected": 0.9297, "same_flow_std": 0.01398, "switch_flow_std": 0.01048, "ambiguous_first_std": 0.03006, "ambiguous_second_std": 0.01353, "ambiguous_overall_std": 0.01926, "ambiguous_recognized_std": 0.0145, "ambiguous_selected_std": 0.01759, "rank": 10}, {"id": "3v-9", "n_voters": 3, "type": "cross-model", "description": "Top 3 overall accuracy \u2014 Sonnet 4.6, Qwen3-235B, Opus 4.6", "relative_cost": 6.5, "metric_value": 0.87266, "metric_std": 0.00774, "same_flow": 0.95312, "switch_flow": 0.93281, "ambiguous_first": 0.70312, "ambiguous_second": 0.90156, "ambiguous_overall": 0.80234, "ambiguous_recognized": 0.71163, "ambiguous_selected": 0.94526, "same_flow_std": 0.01105, "switch_flow_std": 0.00428, "ambiguous_first_std": 0.0214, "ambiguous_second_std": 0.01048, "ambiguous_overall_std": 0.01284, "ambiguous_recognized_std": 0.01851, "ambiguous_selected_std": 0.01838, "rank": 11}, {"id": "3v-10", "n_voters": 3, "type": "cross-model", "description": "Best per provider (top 3) \u2014 Sonnet 4.6, Qwen3-235B, Gemini Pro", "relative_cost": 2.33, "metric_value": 0.86953, "metric_std": 0.00774, "same_flow": 0.94375, "switch_flow": 0.93125, "ambiguous_first": 0.69375, "ambiguous_second": 0.90938, "ambiguous_overall": 0.80156, "ambiguous_recognized": 0.70853, "ambiguous_selected": 0.94738, "same_flow_std": 0.00654, "switch_flow_std": 0.00349, "ambiguous_first_std": 0.01601, "ambiguous_second_std": 0.01048, "ambiguous_overall_std": 0.01152, "ambiguous_recognized_std": 0.01297, "ambiguous_selected_std": 0.00975, "rank": 12}, {"id": "3v-14", "n_voters": 3, "type": "cross-model", "description": "Top 3 Hugo accuracy \u2014 Sonnet 4.6, Qwen3-235B, Gemini Pro", "relative_cost": 2.33, "metric_value": 0.86953, "metric_std": 0.00774, "same_flow": 0.94375, "switch_flow": 0.93125, "ambiguous_first": 0.69375, "ambiguous_second": 0.90938, "ambiguous_overall": 0.80156, "ambiguous_recognized": 0.70853, "ambiguous_selected": 0.94738, "same_flow_std": 0.00654, "switch_flow_std": 0.00349, "ambiguous_first_std": 0.01601, "ambiguous_second_std": 0.01048, "ambiguous_overall_std": 0.01152, "ambiguous_recognized_std": 0.01297, "ambiguous_selected_std": 0.00975, "rank": 13}, {"id": "3v-16", "n_voters": 3, "type": "cross-model", "description": "Most diverse from top 7 \u2014 Gemini Pro, DeepSeek R1, DeepSeek V3", "relative_cost": 1.1, "metric_value": 0.86758, "metric_std": 0.00951, "same_flow": 0.9, "switch_flow": 0.90938, "ambiguous_first": 0.75156, "ambiguous_second": 0.90938, "ambiguous_overall": 0.83047, "ambiguous_recognized": 0.7938, "ambiguous_selected": 0.92955, "same_flow_std": 0.0237, "switch_flow_std": 0.00428, "ambiguous_first_std": 0.02615, "ambiguous_second_std": 0.01523, "ambiguous_overall_std": 0.00654, "ambiguous_recognized_std": 0.0104, "ambiguous_selected_std": 0.02282, "rank": 14}, {"id": "3v-13", "n_voters": 3, "type": "cross-model", "description": "Top 3 Dana accuracy \u2014 Sonnet 4.6, DeepSeek V3, Haiku 4.5", "relative_cost": 1.36, "metric_value": 0.86641, "metric_std": 0.00657, "same_flow": 0.94219, "switch_flow": 0.93594, "ambiguous_first": 0.66406, "ambiguous_second": 0.92344, "ambiguous_overall": 0.79375, "ambiguous_recognized": 0.68682, "ambiguous_selected": 0.94605, "same_flow_std": 0.01523, "switch_flow_std": 0.01284, "ambiguous_first_std": 0.00552, "ambiguous_second_std": 0.00856, "ambiguous_overall_std": 0.00428, "ambiguous_recognized_std": 0.01297, "ambiguous_selected_std": 0.01765, "rank": 15}, {"id": "3v-11", "n_voters": 3, "type": "cross-model", "description": "#1 + #2 + most-different-from-#1 \u2014 Sonnet 4.6, Qwen3-235B, Qwen2.5-7B", "relative_cost": 1.55, "metric_value": 0.86172, "metric_std": 0.00608, "same_flow": 0.94531, "switch_flow": 0.93281, "ambiguous_first": 0.66094, "ambiguous_second": 0.90781, "ambiguous_overall": 0.78438, "ambiguous_recognized": 0.68062, "ambiguous_selected": 0.9386, "same_flow_std": 0.00957, "switch_flow_std": 0.00699, "ambiguous_first_std": 0.01961, "ambiguous_second_std": 0.00856, "ambiguous_overall_std": 0.00751, "ambiguous_recognized_std": 0.01768, "ambiguous_selected_std": 0.01685, "rank": 16}, {"id": "3v-6", "n_voters": 3, "type": "cross-model", "description": "Gemini Pro + Gemini Flash + Gemma 27B \u2014 Google family (level diversity)", "relative_cost": 0.91, "metric_value": 0.85664, "metric_std": 0.01144, "same_flow": 0.88125, "switch_flow": 0.93125, "ambiguous_first": 0.70781, "ambiguous_second": 0.90625, "ambiguous_overall": 0.80703, "ambiguous_recognized": 0.77829, "ambiguous_selected": 0.92421, "same_flow_std": 0.01398, "switch_flow_std": 0.00654, "ambiguous_first_std": 0.01961, "ambiguous_second_std": 0.01914, "ambiguous_overall_std": 0.01342, "ambiguous_recognized_std": 0.01176, "ambiguous_selected_std": 0.01557, "rank": 17}, {"id": "3v-5", "n_voters": 3, "type": "cross-model", "description": "Opus + Sonnet + Haiku \u2014 Claude family (level diversity)", "relative_cost": 6.27, "metric_value": 0.8543, "metric_std": 0.0047, "same_flow": 0.92188, "switch_flow": 0.92031, "ambiguous_first": 0.675, "ambiguous_second": 0.9, "ambiguous_overall": 0.7875, "ambiguous_recognized": 0.70388, "ambiguous_selected": 0.92728, "same_flow_std": 0.00781, "switch_flow_std": 0.01019, "ambiguous_first_std": 0.01419, "ambiguous_second_std": 0.01019, "ambiguous_overall_std": 0.0081, "ambiguous_recognized_std": 0.01491, "ambiguous_selected_std": 0.01269, "rank": 18}, {"id": "3v-12", "n_voters": 3, "type": "cross-model", "description": "3 most diverse (lowest pairwise agreement) \u2014 DeepSeek R1, Qwen2.5-7B, GPT-5 Nano", "relative_cost": 0.26, "metric_value": 0.8543, "metric_std": 0.00642, "same_flow": 0.87813, "switch_flow": 0.90469, "ambiguous_first": 0.72969, "ambiguous_second": 0.90469, "ambiguous_overall": 0.81719, "ambiguous_recognized": 0.80775, "ambiguous_selected": 0.91573, "same_flow_std": 0.01419, "switch_flow_std": 0.01019, "ambiguous_first_std": 0.01307, "ambiguous_second_std": 0.02168, "ambiguous_overall_std": 0.01548, "ambiguous_recognized_std": 0.01274, "ambiguous_selected_std": 0.01559, "rank": 19}, {"id": "3v-4", "n_voters": 3, "type": "cross-model", "description": "Opus + GPT-5.2 + Gemini Pro \u2014 provider diversity (top 3)", "relative_cost": 6.83, "metric_value": 0.85391, "metric_std": 0.0071, "same_flow": 0.89844, "switch_flow": 0.89687, "ambiguous_first": 0.725, "ambiguous_second": 0.89531, "ambiguous_overall": 0.81016, "ambiguous_recognized": 0.78915, "ambiguous_selected": 0.92522, "same_flow_std": 0.00781, "switch_flow_std": 0.01159, "ambiguous_first_std": 0.01601, "ambiguous_second_std": 0.00699, "ambiguous_overall_std": 0.0081, "ambiguous_recognized_std": 0.01681, "ambiguous_selected_std": 0.02171, "rank": 20}, {"id": "3v-8", "n_voters": 3, "type": "mixed-temp", "description": "Sonnet @ temp=0.0 + 0.3 + 0.6 \u2014 mixed temperature diversity", "relative_cost": 3.0, "metric_value": 0.85352, "metric_std": 0.0, "same_flow": 0.92188, "switch_flow": 0.91406, "ambiguous_first": 0.66406, "ambiguous_second": 0.91406, "ambiguous_overall": 0.78906, "ambiguous_recognized": 0.69767, "ambiguous_selected": 0.91111, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 21}, {"id": "3v-1", "n_voters": 3, "type": "self-consistency", "description": "Opus x3 @ temp=0.3 \u2014 temperature diversity (single strong model)", "relative_cost": 15.0, "metric_value": 0.83398, "metric_std": 0.0, "same_flow": 0.84375, "switch_flow": 0.89062, "ambiguous_first": 0.70312, "ambiguous_second": 0.89844, "ambiguous_overall": 0.80078, "ambiguous_recognized": 0.75194, "ambiguous_selected": 0.8866, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 22}, {"id": "3v-2", "n_voters": 3, "type": "self-consistency", "description": "Sonnet x3 @ temp=0.3 \u2014 temperature diversity (mid-tier)", "relative_cost": 3.0, "metric_value": 0.83398, "metric_std": 0.0, "same_flow": 0.90625, "switch_flow": 0.90625, "ambiguous_first": 0.625, "ambiguous_second": 0.89844, "ambiguous_overall": 0.76172, "ambiguous_recognized": 0.66667, "ambiguous_selected": 0.90698, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 23}, {"id": "3v-7", "n_voters": 3, "type": "cross-model", "description": "GPT-5.2 + GPT-5 Mini + GPT-5 Nano \u2014 OpenAI family (level diversity)", "relative_cost": 1.16, "metric_value": 0.83164, "metric_std": 0.0092, "same_flow": 0.87344, "switch_flow": 0.87031, "ambiguous_first": 0.69531, "ambiguous_second": 0.8875, "ambiguous_overall": 0.79141, "ambiguous_recognized": 0.81085, "ambiguous_selected": 0.92724, "same_flow_std": 0.01503, "switch_flow_std": 0.01185, "ambiguous_first_std": 0.01105, "ambiguous_second_std": 0.01185, "ambiguous_overall_std": 0.00761, "ambiguous_recognized_std": 0.01297, "ambiguous_selected_std": 0.02115, "rank": 24}, {"id": "3v-3", "n_voters": 3, "type": "self-consistency", "description": "Gemini Flash x3 @ temp=0.3 \u2014 temperature diversity (non-Claude)", "relative_cost": 0.15, "metric_value": 0.82227, "metric_std": 0.0, "same_flow": 0.8125, "switch_flow": 0.89062, "ambiguous_first": 0.69531, "ambiguous_second": 0.89062, "ambiguous_overall": 0.79297, "ambiguous_recognized": 0.74419, "ambiguous_selected": 0.89583, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 25}, {"id": "3v-15", "n_voters": 3, "type": "cross-model", "description": "3 diverse (alt selection) \u2014 GPT-5.2, Qwen2.5-7B, GPT-5 Nano", "relative_cost": 1.08, "metric_value": 0.81172, "metric_std": 0.00789, "same_flow": 0.87813, "switch_flow": 0.85625, "ambiguous_first": 0.63125, "ambiguous_second": 0.88125, "ambiguous_overall": 0.75625, "ambiguous_recognized": 0.76279, "ambiguous_selected": 0.8842, "same_flow_std": 0.00699, "switch_flow_std": 0.00699, "ambiguous_first_std": 0.02168, "ambiguous_second_std": 0.00349, "ambiguous_overall_std": 0.01159, "ambiguous_recognized_std": 0.01867, "ambiguous_selected_std": 0.00755, "rank": 26}], "baselines": [{"config_id": "1a_004", "model_id": "claude-sonnet-4-6", "model_short": "Sonnet 4.6", "relative_cost": 1.0, "metric_value": 0.83123, "metric_std": 0.0088, "same_flow": 0.93593, "switch_flow": 0.92185, "ambiguous_first": 0.58438, "ambiguous_second": 0.88281, "ambiguous_overall": 0.54419, "ambiguous_recognized": 0.58915, "ambiguous_selected": 0.92384, "same_flow_std": 0.0201, "switch_flow_std": 0.02853, "ambiguous_first_std": 0.0211, "ambiguous_second_std": 0.02874, "ambiguous_overall_std": 0.01387, "ambiguous_recognized_std": 0.01644, "ambiguous_selected_std": 0.01604}, {"config_id": "1a_010", "model_id": "claude-opus-4-6", "model_short": "Opus 4.6", "relative_cost": 5.0, "metric_value": 0.81952, "metric_std": 0.01525, "same_flow": 0.88593, "switch_flow": 0.91717, "ambiguous_first": 0.62502, "ambiguous_second": 0.85001, "ambiguous_overall": 0.6031, "ambiguous_recognized": 0.67442, "ambiguous_selected": 0.89437, "same_flow_std": 0.02334, "switch_flow_std": 0.03458, "ambiguous_first_std": 0.03209, "ambiguous_second_std": 0.03624, "ambiguous_overall_std": 0.01491, "ambiguous_recognized_std": 0.01818, "ambiguous_selected_std": 0.01352}, {"config_id": "1a_006", "model_id": "gemini-3-pro-preview", "model_short": "Gemini 3 Pro", "relative_cost": 0.83, "metric_value": 0.81583, "metric_std": 0.01808, "same_flow": 0.87497, "switch_flow": 0.89063, "ambiguous_first": 0.64583, "ambiguous_second": 0.8559, "ambiguous_overall": 0.40698, "ambiguous_recognized": 0.44961, "ambiguous_selected": 0.8908, "same_flow_std": 0.04133, "switch_flow_std": 0.0541, "ambiguous_first_std": 0.02388, "ambiguous_second_std": 0.02107, "ambiguous_overall_std": 0.30148, "ambiguous_recognized_std": 0.31792, "ambiguous_selected_std": 0.04064}], "self_consistency": [{"id": "3v-1", "n_voters": 3, "type": "self-consistency", "description": "Opus x3 @ temp=0.3 \u2014 temperature diversity (single strong model)", "relative_cost": 15.0, "metric_value": 0.83398, "metric_std": 0.0, "same_flow": 0.84375, "switch_flow": 0.89062, "ambiguous_first": 0.70312, "ambiguous_second": 0.89844, "ambiguous_overall": 0.80078, "ambiguous_recognized": 0.75194, "ambiguous_selected": 0.8866, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 22}, {"id": "3v-2", "n_voters": 3, "type": "self-consistency", "description": "Sonnet x3 @ temp=0.3 \u2014 temperature diversity (mid-tier)", "relative_cost": 3.0, "metric_value": 0.83398, "metric_std": 0.0, "same_flow": 0.90625, "switch_flow": 0.90625, "ambiguous_first": 0.625, "ambiguous_second": 0.89844, "ambiguous_overall": 0.76172, "ambiguous_recognized": 0.66667, "ambiguous_selected": 0.90698, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 23}, {"id": "3v-3", "n_voters": 3, "type": "self-consistency", "description": "Gemini Flash x3 @ temp=0.3 \u2014 temperature diversity (non-Claude)", "relative_cost": 0.15, "metric_value": 0.82227, "metric_std": 0.0, "same_flow": 0.8125, "switch_flow": 0.89062, "ambiguous_first": 0.69531, "ambiguous_second": 0.89062, "ambiguous_overall": 0.79297, "ambiguous_recognized": 0.74419, "ambiguous_selected": 0.89583, "same_flow_std": 0.0, "switch_flow_std": 0.0, "ambiguous_first_std": 0.0, "ambiguous_second_std": 0.0, "ambiguous_overall_std": 0.0, "ambiguous_recognized_std": 0.0, "ambiguous_selected_std": 0.0, "rank": 25}]};
+
+const fmtPct = v => (v * 100).toFixed(1) + '%';
+
+function svgEl(tag, attrs = {}, children = '') {
+  const a = Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ');
+  return `<${tag} ${a}>${children}</${tag}>`;
+}
+
+// ── Top Stats ──────────────────────────────────────────────
+document.getElementById('subtitle').textContent = `Generated ${DATA.generated || 'N/A'}`;
+document.getElementById('top-stats').innerHTML = [
+  { value: DATA.n_ensembles || 0, label: 'Ensembles Tested' },
+  { value: fmtPct(DATA.best_ensemble_acc || 0), label: 'Best Ensemble' },
+  { value: DATA.best_ensemble_id || '?', label: 'Top Ensemble' },
+  { value: fmtPct(DATA.best_baseline_acc || 0), label: 'Best Single-Model' },
+].map(s => `<div class="stat-box"><div class="value">${s.value}</div><div class="label">${s.label}</div></div>`).join('');
+
+// ── SVG Helpers ────────────────────────────────────────────
+function renderHBar(containerId, items, { barH = 22, gap = 4, labelW = 160, maxW = null, colorFn = null, valueFn = null } = {}) {
+  const el = document.getElementById(containerId);
+  if (!items.length) { el.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const chartW = maxW || el.clientWidth || 800;
+  const barArea = chartW - labelW - 80;
+  const maxVal = Math.max(...items.map(d => d.value));
+  const svgH = items.length * (barH + gap) + 10;
+
+  let svg = `<svg width="100%" viewBox="0 0 ${chartW} ${svgH}" style="font-family:inherit">`;
+  items.forEach((d, i) => {
+    const y = i * (barH + gap) + 5;
+    const w = maxVal > 0 ? (d.value / maxVal) * barArea : 0;
+    const color = colorFn ? colorFn(d, i) : '#0969da';
+    const label = d.label.length > 28 ? d.label.slice(0, 26) + '...' : d.label;
+    const valText = valueFn ? valueFn(d) : fmtPct(d.value);
+
+    svg += `<text x="${labelW - 8}" y="${y + barH / 2 + 4}" text-anchor="end" font-size="11" fill="#1f2328">${label}</text>`;
+    svg += `<rect x="${labelW}" y="${y}" width="${w}" height="${barH}" rx="3" fill="${color}"/>`;
+    svg += `<text x="${labelW + w + 6}" y="${y + barH / 2 + 4}" font-size="11" fill="#656d76">${valText}</text>`;
+  });
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+function renderGroupedBar(containerId, groups, series, { barH = 18, gap = 6, groupGap = 14, labelW = 100 } = {}) {
+  const el = document.getElementById(containerId);
+  if (!groups.length) { el.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const chartW = el.clientWidth || 800;
+  const barArea = chartW - labelW - 80;
+  const maxVal = Math.max(...series.flatMap(s => s.values));
+  const nSeries = series.length;
+  const groupH = nSeries * (barH + 2) + groupGap;
+  const svgH = groups.length * groupH + 10;
+
+  let svg = `<svg width="100%" viewBox="0 0 ${chartW} ${svgH}" style="font-family:inherit">`;
+  groups.forEach((g, gi) => {
+    const gy = gi * groupH + 5;
+    svg += `<text x="${labelW - 8}" y="${gy + (nSeries * (barH + 2)) / 2 + 4}" text-anchor="end" font-size="11" fill="#1f2328">${g}</text>`;
+    series.forEach((s, si) => {
+      const y = gy + si * (barH + 2);
+      const val = s.values[gi] || 0;
+      const w = maxVal > 0 ? (val / maxVal) * barArea : 0;
+      svg += `<rect x="${labelW}" y="${y}" width="${w}" height="${barH}" rx="2" fill="${s.color}"/>`;
+      svg += `<text x="${labelW + w + 4}" y="${y + barH / 2 + 4}" font-size="10" fill="#656d76">${fmtPct(val)}</text>`;
+    });
+  });
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+// ── Overall Ranking (sorted by accuracy, colored by group with gradients) ──
+const VOTER_GROUPS = [
+  { key: 'temp', label: 'Temperature', match: r => r.type === 'self-consistency' || r.type === 'mixed-temp' },
+  { key: '3v', label: '3 Voters', match: r => r.type === 'cross-model' && r.n_voters === 3 },
+  { key: '5v', label: '5 Voters', match: r => r.type === 'cross-model' && r.n_voters === 5 },
+  { key: '10v', label: '10 Voters', match: r => r.type === 'cross-model' && r.n_voters === 10 },
+];
+
+// Gradient palettes per group: [lightest, ..., darkest] — up to 6 shades each
+const GROUP_PALETTES = {
+  temp:     ['#e9d5ff', '#c4b5fd', '#a78bfa', '#8250df'],
+  '3v':     ['#fef9c3', '#fde68a', '#fcd34d', '#f59e0b', '#d97706', '#b45309'],
+  '5v':     ['#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8'],
+  '10v':    ['#bbf7d0', '#86efac', '#4ade80', '#22c55e', '#16a34a', '#15803d'],
+  baseline: ['#fca5a5', '#f87171', '#ef4444', '#dc2626'],
+};
+
+function getGroupColor(groupKey, rankInGroup, groupSize) {
+  const pal = GROUP_PALETTES[groupKey] || ['#94a3b8'];
+  if (groupSize <= 1) return pal[Math.floor(pal.length / 2)];
+  const idx = Math.round((rankInGroup / (groupSize - 1)) * (pal.length - 1));
+  return pal[Math.min(idx, pal.length - 1)];
+}
+
+function renderRanking(data) {
+  // Cap each voter group to top 5, then take top 12 overall
+  const ranking = data.ranking || [];
+  const groupCounts = {};
+  const capped = [];
+  for (const r of ranking) {
+    const g = VOTER_GROUPS.find(vg => vg.match(r));
+    const key = g ? g.key : '3v';
+    groupCounts[key] = (groupCounts[key] || 0) + 1;
+    if (groupCounts[key] <= 5) capped.push({ ...r, label: r.id, _group: key });
+  }
+  const top12 = capped.slice(0, 12);
+
+  const baselines = (data.baselines || []).slice(0, 2).map(b => ({
+    ...b, id: b.model_short, label: b.model_short + ' (1A)',
+    metric_value: b.metric_value, metric_std: 0, _group: 'baseline',
+  }));
+
+  const tagged = top12;
+
+  // Merge and sort by accuracy (rank order)
+  const all = [...tagged, ...baselines].sort((a, b) => b.metric_value - a.metric_value);
+
+  // Compute rank within group (0 = best in group) for gradient coloring
+  const groupMembers = {};
+  all.forEach(item => {
+    if (!groupMembers[item._group]) groupMembers[item._group] = [];
+    groupMembers[item._group].push(item);
+  });
+  all.forEach(item => {
+    const members = groupMembers[item._group];
+    const rankInGroup = members.indexOf(item);
+    item._color = getGroupColor(item._group, rankInGroup, members.length);
+  });
+
+  // Render horizontal bar chart sorted by accuracy
+  const el = document.getElementById('ranking-chart');
+  const barH = 22, gap = 4;
+  // Compute axis range from data (5pp padding on each side, rounded to nearest 5%)
+  const allVals = all.map(d => d.metric_value);
+  const dataMin = Math.min(...allVals), dataMax = Math.max(...allVals);
+  const xMin = Math.floor((dataMin - 0.03) * 20) / 20;  // round down to nearest 5%
+  const xMax = Math.ceil((dataMax + 0.03) * 20) / 20;   // round up to nearest 5%
+  const labelW = 160;
+  const chartW = el.clientWidth || 900;
+  const barArea = chartW - labelW - 90;
+  const svgH = all.length * (barH + gap) + 22;
+
+  function sx(v) { return labelW + (v - xMin) / (xMax - xMin) * barArea; }
+
+  let svg = `<svg width="100%" viewBox="0 0 ${chartW} ${svgH}" style="font-family:inherit">`;
+
+  // Grid lines
+  for (let i = 0; i <= 5; i++) {
+    const v = xMin + (xMax - xMin) * i / 5;
+    const x = sx(v);
+    svg += svgEl('line', { x1: x, y1: 0, x2: x, y2: svgH, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x, y: 10, fill: '#656d76', 'font-size': 10, 'text-anchor': 'middle' }, (v * 100).toFixed(0) + '%');
+  }
+
+  all.forEach((item, i) => {
+    const y = 18 + i * (barH + gap);
+    const val = item.metric_value;
+    const std = item.metric_std || 0;
+    const w = Math.max(0, sx(val) - labelW);
+
+    svg += svgEl('text', { x: labelW - 8, y: y + barH / 2 + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#1f2328' }, item.label);
+    svg += svgEl('rect', { x: labelW, y: y, width: w, height: barH, rx: 3, fill: item._color, opacity: 0.9 });
+
+    // Error bar (1 STD) — gray, matches 1A design
+    if (std > 0) {
+      const cy = y + barH / 2;
+      const x1 = sx(Math.max(xMin, val - std));
+      const x2 = sx(Math.min(xMax, val + std));
+      svg += svgEl('line', { x1, y1: cy, x2, y2: cy, stroke: '#9ca3af', 'stroke-width': 1.5 });
+      svg += svgEl('line', { x1, y1: cy - 5, x2: x1, y2: cy + 5, stroke: '#9ca3af', 'stroke-width': 1.5 });
+      svg += svgEl('line', { x1: x2, y1: cy - 5, x2, y2: cy + 5, stroke: '#9ca3af', 'stroke-width': 1.5 });
+    }
+
+    svg += svgEl('text', { x: sx(val) + 6, y: y + barH / 2 + 4, 'font-size': 11, fill: '#656d76', 'font-weight': 600 }, (val * 100).toFixed(1) + '%');
+  });
+
+  svg += '</svg>';
+  el.innerHTML = svg;
+
+  // Legend — show mid-shade per group
+  const legendItems = [
+    ...VOTER_GROUPS.map(vg => {
+      const pal = GROUP_PALETTES[vg.key];
+      return { color: pal[Math.floor(pal.length / 2)], label: vg.label };
+    }),
+    { color: GROUP_PALETTES.baseline[Math.floor(GROUP_PALETTES.baseline.length / 2)], label: 'Single-model baseline (1A)' },
+  ];
+  document.getElementById('ranking-legend').innerHTML = legendItems
+    .map(l => `<div class="legend-item"><span class="legend-dot" style="background:${l.color}"></span> ${l.label}</div>`).join('');
+}
+
+// ── Self-Consistency ───────────────────────────────────────
+function renderSelfConsistency(data) {
+  const sc = data.self_consistency || [];
+  if (!sc.length) {
+    document.getElementById('sc-chart').innerHTML = '<p class="note">No self-consistency data yet.</p>';
+    return;
+  }
+
+  const SC_COLORS = ['#8250df', '#a78bfa', '#c4b5fd'];
+  const items = sc.map((s, i) => ({
+    ...s,
+    _label: s.description.split('\u2014')[0].trim(),
+    _color: SC_COLORS[i % SC_COLORS.length],
+    overall: s.metric_value,
+  }));
+
+  const categories = [
+    { key: 'same_flow', label: 'Same Flow' },
+    { key: 'switch_flow', label: 'Switch Flow' },
+    { key: 'ambiguous_first', label: 'Amb 1st' },
+    { key: 'ambiguous_second', label: 'Amb 2nd' },
+  ];
+
+  renderCategoryVBars('sc-chart', 'sc-legend', items, categories, { yMin: 0.5, yMax: 1.0 });
+}
+
+// ── Category Breakdown (vertical bars) ─────────────────────
+function renderCategoryVBars(chartId, legendId, items, categories, { yMin = 0.4, yMax = 1.0 } = {}) {
+  const container = document.getElementById(chartId);
+  if (!items.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const w = container.clientWidth || 1100;
+  const h = 380;
+  const pad = { top: 20, right: 15, bottom: 30, left: 45 };
+  const plotH = h - pad.top - pad.bottom;
+  const plotW = w - pad.left - pad.right;
+
+  const nItems = items.length;
+  const nCats = categories.length;
+  const barW = Math.min(18, Math.max(6, (plotW - nCats * 30 - (nCats - 1) * 40) / (nCats * nItems)));
+  const barGap = 1;
+  const groupW = nItems * (barW + barGap) - barGap;
+  const catGap = 40;
+  const totalW = nCats * groupW + (nCats - 1) * catGap;
+  const offsetX = pad.left + (plotW - totalW) / 2;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Horizontal grid lines
+  const steps = 6;
+  for (let i = 0; i <= steps; i++) {
+    const v = yMin + (yMax - yMin) * i / steps;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: w - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  const barBottom = sy(yMin);
+
+  categories.forEach((cat, ci) => {
+    const groupX = offsetX + ci * (groupW + catGap);
+
+    // Category label at bottom
+    svg += svgEl('text', { x: groupX + groupW / 2, y: h - 8, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 600 }, cat.label);
+
+    // One bar per item
+    items.forEach((item, ei) => {
+      const bx = groupX + ei * (barW + barGap);
+      const val = item[cat.key];
+      if (val == null) return;
+      const barTop = sy(Math.min(yMax, Math.max(yMin, val)));
+      svg += svgEl('rect', { x: bx, y: barTop, width: barW, height: Math.max(0, barBottom - barTop), rx: 1, fill: item._color, opacity: 0.85 });
+
+      // Error bar (1 STD whisker)
+      const std = item[cat.key + '_std'] || 0;
+      if (std > 0) {
+        const mx = bx + barW / 2;
+        const y1 = sy(Math.min(yMax, val + std));
+        const y2 = sy(Math.max(yMin, val - std));
+        const capW = Math.max(2, barW * 0.4);
+        svg += svgEl('line', { x1: mx, y1, x2: mx, y2, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+        svg += svgEl('line', { x1: mx - capW, y1, x2: mx + capW, y2: y1, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+        svg += svgEl('line', { x1: mx - capW, y1: y2, x2: mx + capW, y2, stroke: '#1f2328', 'stroke-width': 1, opacity: 0.5 });
+      }
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Legend
+  document.getElementById(legendId).innerHTML = items.map(item =>
+    `<div class="legend-item"><span class="legend-dot" style="background:${item._color}"></span> ${item._label}</div>`
+  ).join('');
+}
+
+function buildCategoryItems(data, { nEnsembles = 12, maxPerGroup = 5, shortLabels = false } = {}) {
+  // Cap each voter group, then take top N overall by accuracy
+  const ranking = data.ranking || [];
+  const groupCounts = {};
+  const capped = [];
+  for (const r of ranking) {
+    const g = VOTER_GROUPS.find(vg => vg.match(r));
+    const key = g ? g.key : '3v';
+    groupCounts[key] = (groupCounts[key] || 0) + 1;
+    if (groupCounts[key] <= maxPerGroup) capped.push({ ...r, _group: key });
+  }
+  const topN = capped.slice(0, nEnsembles);
+
+  const baselines = (data.baselines || []).slice(0, 2).map(b => {
+    const label = shortLabels ? b.model_short.split(' ')[0] : b.model_short + ' (1A)';
+    return { ...b, _label: label, _group: 'baseline' };
+  });
+
+  const tagged = topN.map(r => ({ ...r, _label: r.id }));
+
+  const all = [...tagged, ...baselines];
+
+  // Compute rank within group for gradient coloring
+  const groupMembers = {};
+  all.forEach(item => {
+    if (!groupMembers[item._group]) groupMembers[item._group] = [];
+    groupMembers[item._group].push(item);
+  });
+  all.forEach(item => {
+    const members = groupMembers[item._group];
+    const rankInGroup = members.indexOf(item);
+    item._color = getGroupColor(item._group, rankInGroup, members.length);
+  });
+
+  return all;
+}
+
+function renderCategoryBreakdown(data) {
+  const items = buildCategoryItems(data);
+  renderCategoryVBars('category-chart', 'category-legend', items, [
+    { key: 'same_flow', label: 'Same Flow' },
+    { key: 'switch_flow', label: 'Switch Flow' },
+    { key: 'ambiguous_first', label: 'Ambiguous 1st' },
+    { key: 'ambiguous_second', label: 'Ambiguous 2nd' },
+  ]);
+}
+
+// ── Ambiguity Detection: Recognition vs Selection ──────────
+function renderAmbiguityComparison(data) {
+  const items = buildCategoryItems(data, { shortLabels: true });
+  renderCategoryVBars('ambiguity-chart', 'ambiguity-legend', items, [
+    { key: 'ambiguous_recognized', label: 'Recognition' },
+    { key: 'ambiguous_selected', label: 'Selection' },
+  ], { yMin: 0.4, yMax: 1.0 });
+}
+
+// ── Results Table ──────────────────────────────────────────
+function renderResultsTable(data) {
+  const rows = data.ranking || [];
+  if (!rows.length) {
+    document.getElementById('results-table').innerHTML = '<tr><td>No data</td></tr>';
+    return;
+  }
+
+  // Sort by ensemble number (e.g., 3v-1 → [3,1], 10v-3 → [10,3])
+  const parseId = id => {
+    const m = id.match(/(\d+)v-(\d+)/);
+    return m ? [parseInt(m[1]), parseInt(m[2])] : [999, 999];
+  };
+  const sorted = [...rows].sort((a, b) => {
+    const [aN, aS] = parseId(a.id), [bN, bS] = parseId(b.id);
+    return aN !== bN ? aN - bN : aS - bS;
+  });
+
+  function getGroupLabel(r) {
+    if (r.type === 'self-consistency' || r.type === 'mixed-temp') return 'Temperature';
+    if (r.n_voters === 3) return '3 Voters';
+    if (r.n_voters === 5) return '5 Voters';
+    if (r.n_voters === 10) return '10 Voters';
+    return r.type || '?';
+  }
+  const groupBadges = { 'Temperature': 'badge-purple', '3 Voters': 'badge-yellow', '5 Voters': 'badge-blue', '10 Voters': 'badge-green' };
+
+  let html = `<thead><tr>
+    <th>Rank</th><th>Ensemble</th><th>Voters</th><th>Type</th>
+    <th>Accuracy</th><th>Same</th><th>Switch</th><th>Amb 1st</th><th>Amb 2nd</th>
+    <th>Description</th>
+  </tr></thead><tbody>`;
+
+  sorted.forEach(r => {
+    const groupLabel = getGroupLabel(r);
+    const badge = groupBadges[groupLabel] || 'badge-green';
+    const stdStr = r.metric_std > 0 ? ` <span style="color:var(--muted);font-weight:400">\u00b1${(r.metric_std * 100).toFixed(2)}</span>` : '';
+    html += `<tr>
+      <td class="num">${r.rank}</td>
+      <td><strong>${r.id}</strong></td>
+      <td class="num">${r.n_voters || '-'}</td>
+      <td><span class="badge ${badge}">${groupLabel}</span></td>
+      <td class="num"><strong>${fmtPct(r.metric_value)}</strong>${stdStr}</td>
+      <td class="num">${fmtPct(r.same_flow)}</td>
+      <td class="num">${fmtPct(r.switch_flow)}</td>
+      <td class="num">${fmtPct(r.ambiguous_first)}</td>
+      <td class="num">${fmtPct(r.ambiguous_second)}</td>
+      <td style="white-space:normal;max-width:250px;font-size:0.75rem;color:var(--muted)">${r.description || ''}</td>
+    </tr>`;
+  });
+
+  // Baselines
+  html += `<tr><td colspan="10" style="background:var(--surface);font-weight:600;color:var(--muted);padding:0.6rem">Single-Model Baselines (Exp 1A)</td></tr>`;
+  (data.baselines || []).forEach((b, i) => {
+    html += `<tr style="color:var(--muted)">
+      <td class="num">&mdash;</td>
+      <td>${b.model_short || b.model_id}</td>
+      <td class="num">1</td>
+      <td><span class="badge badge-red">Single-Model</span></td>
+      <td class="num">${fmtPct(b.metric_value)}</td>
+      <td class="num">${fmtPct(b.same_flow)}</td>
+      <td class="num">${fmtPct(b.switch_flow)}</td>
+      <td class="num">${fmtPct(b.ambiguous_first)}</td>
+      <td class="num">${fmtPct(b.ambiguous_second)}</td>
+      <td></td>
+    </tr>`;
+  });
+
+  html += '</tbody>';
+  document.getElementById('results-table').innerHTML = html;
+}
+
+// ── Key Findings ───────────────────────────────────────────
+function renderFindings(data) {
+  const el = document.getElementById('findings-section');
+  const r = data.ranking || [];
+  const sc = data.self_consistency || [];
+  const bl = data.baselines || [];
+
+  if (!r.length) { el.innerHTML = '<p class="note">No results yet.</p>'; return; }
+
+  const bestEns = r[0];
+  const bestBaseline = bl[0];
+  const improvement = bestEns && bestBaseline
+    ? ((bestEns.metric_value - bestBaseline.metric_value) * 100).toFixed(1)
+    : '?';
+
+  // Voter-count analysis
+  const threeV = r.filter(e => e.type === 'cross-model' && (e.n_voters || 0) === 3);
+  const fiveV = r.filter(e => e.type === 'cross-model' && (e.n_voters || 0) === 5);
+  const tenV = r.filter(e => e.type === 'cross-model' && (e.n_voters || 0) === 10);
+  const avg3 = threeV.length ? threeV.reduce((s, x) => s + x.metric_value, 0) / threeV.length : 0;
+  const avg5 = fiveV.length ? fiveV.reduce((s, x) => s + x.metric_value, 0) / fiveV.length : 0;
+  const avg10 = tenV.length ? tenV.reduce((s, x) => s + x.metric_value, 0) / tenV.length : 0;
+
+  // Recognition vs selection analysis
+  const crossModel = r.filter(e => e.type === 'cross-model');
+  const avgRecogEns = crossModel.length ? crossModel.reduce((s, x) => s + (x.ambiguous_recognized || 0), 0) / crossModel.length : 0;
+  const avgSelEns = crossModel.length ? crossModel.reduce((s, x) => s + (x.ambiguous_selected || 0), 0) / crossModel.length : 0;
+  const avgRecogBl = bl.length ? bl.reduce((s, x) => s + (x.ambiguous_recognized || 0), 0) / bl.length : 0;
+  const avgSelBl = bl.length ? bl.reduce((s, x) => s + (x.ambiguous_selected || 0), 0) / bl.length : 0;
+
+  // Self-consistency summary
+  let scNote = '';
+  if (sc.length) {
+    const scAvg = sc.reduce((s, x) => s + (x.metric_value || 0), 0) / sc.length;
+    const scBestRecog = Math.max(...sc.map(x => x.ambiguous_recognized || 0));
+    scNote = `Self-consistency average: ${fmtPct(scAvg)}. Best recognition: ${fmtPct(scBestRecog)}.`;
+  }
+
+  // Clear-turn analysis
+  const avgSame = r.reduce((s, x) => s + x.same_flow, 0) / r.length;
+  const avgSwitch = r.reduce((s, x) => s + x.switch_flow, 0) / r.length;
+  const blSame = bl.length ? bl.reduce((s, x) => s + x.same_flow, 0) / bl.length : 0;
+  const blSwitch = bl.length ? bl.reduce((s, x) => s + x.switch_flow, 0) / bl.length : 0;
+
+  let html = `<div class="card full">
+    <ul style="font-size:0.85rem; line-height:1.8; padding-left:1.2rem; color: var(--text);">
+      <li><strong>Best ensemble:</strong> ${bestEns.id} at ${fmtPct(bestEns.metric_value)}, <strong>${improvement > 0 ? '+' : ''}${improvement}pp</strong> vs best single model (${bestBaseline ? bestBaseline.model_short : '?'} at ${bestBaseline ? fmtPct(bestBaseline.metric_value) : '?'})</li>
+      <li><strong>Recognition is nearly free for ensembles:</strong> cross-model ensembles average ${fmtPct(avgRecogEns)} recognition vs ${fmtPct(avgRecogBl)} for single models &mdash; voter disagreement makes criterion 1 trivial</li>
+      <li><strong>Selection benefits from vote aggregation:</strong> ensemble selection rate ${fmtPct(avgSelEns)} vs ${fmtPct(avgSelBl)} for baselines &mdash; flattened vote counting surfaces correct candidate flows</li>
+      <li><strong>Clear turns already strong:</strong> ensembles average ${fmtPct(avgSame)} same-flow / ${fmtPct(avgSwitch)} switch-flow vs baselines at ${fmtPct(blSame)} / ${fmtPct(blSwitch)} &mdash; marginal gains on clear turns, major gains on ambiguity</li>
+      <li><strong>Voter count:</strong> 3-voter avg ${fmtPct(avg3)}, 5-voter avg ${fmtPct(avg5)}, 10-voter avg ${fmtPct(avg10)} &mdash; ${avg5 > avg3 && avg10 <= avg5 ? 'sweet spot at 5 voters, diminishing returns beyond' : avg10 > avg5 ? 'more voters consistently helps' : 'diminishing returns beyond 3 voters'}</li>
+      ${sc.length ? `<li><strong>Self-consistency:</strong> ${scNote} Temperature diversity alone ${sc[0] && sc[0].metric_value > (bestBaseline ? bestBaseline.metric_value : 0) ? 'beats' : 'approaches'} single-model baselines, but cross-model diversity yields higher recognition</li>` : ''}
+    </ul>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ── Cost vs. Accuracy Scatter ──────────────────────────────
+function renderCostAccuracy(data) {
+  const container = document.getElementById('cost-chart');
+  const items = buildCategoryItems(data);
+  if (!items.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const w = container.clientWidth || 1100;
+  const h = 420;
+  const pad = { top: 25, right: 40, bottom: 50, left: 60 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  // Data with cost and accuracy
+  const pts = items.filter(d => d.relative_cost != null && d.metric_value != null);
+  if (!pts.length) { container.innerHTML = '<p class="note">No cost data.</p>'; return; }
+
+  const costs = pts.map(d => d.relative_cost);
+  const accs = pts.map(d => d.metric_value);
+
+  // Log-scale x-axis
+  const logCosts = costs.map(c => Math.log(Math.max(c, 0.01)));
+  const logMin = Math.min(...logCosts) - 0.3;
+  const logMax = Math.max(...logCosts) + 0.3;
+  const accMin = Math.floor((Math.min(...accs) - 0.02) * 20) / 20;
+  const accMax = Math.ceil((Math.max(...accs) + 0.02) * 20) / 20;
+
+  function sx(logC) { return pad.left + (logC - logMin) / (logMax - logMin) * plotW; }
+  function sy(acc) { return pad.top + plotH - (acc - accMin) / (accMax - accMin) * plotH; }
+
+  // Log regression: accuracy = a * ln(cost) + b
+  const n = pts.length;
+  const sumX = logCosts.reduce((s, x) => s + x, 0);
+  const sumY = accs.reduce((s, y) => s + y, 0);
+  const sumXY = logCosts.reduce((s, x, i) => s + x * accs[i], 0);
+  const sumX2 = logCosts.reduce((s, x) => s + x * x, 0);
+  const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const b = (sumY - a * sumX) / n;
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid lines - horizontal (accuracy)
+  const ySteps = 6;
+  for (let i = 0; i <= ySteps; i++) {
+    const v = accMin + (accMax - accMin) * i / ySteps;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: w - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 8, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Grid lines - vertical (cost, log scale, nice tick values)
+  const niceTicks = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 20];
+  niceTicks.forEach(c => {
+    const lc = Math.log(c);
+    if (lc < logMin || lc > logMax) return;
+    const x = sx(lc);
+    svg += svgEl('line', { x1: x, y1: pad.top, x2: x, y2: pad.top + plotH, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x, y: pad.top + plotH + 16, fill: '#656d76', 'font-size': 10, 'text-anchor': 'middle' }, c + 'x');
+  });
+
+  // Axis labels
+  svg += svgEl('text', { x: pad.left + plotW / 2, y: h - 5, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, 'Relative Cost (log scale, Sonnet = 1.0x)');
+  svg += `<text x="14" y="${pad.top + plotH / 2}" fill="#1f2328" font-size="11" text-anchor="middle" transform="rotate(-90, 14, ${pad.top + plotH / 2})">Accuracy</text>`;
+
+  // Log-fit curve (dashed)
+  const curveN = 80;
+  let pathD = '';
+  for (let i = 0; i <= curveN; i++) {
+    const lc = logMin + (logMax - logMin) * i / curveN;
+    const fitAcc = a * lc + b;
+    const x = sx(lc);
+    const y = sy(Math.max(accMin, Math.min(accMax, fitAcc)));
+    pathD += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }
+  svg += `<path d="${pathD}" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6,4"/>`;
+
+  // Points
+  const r = 7;
+  pts.forEach((d, i) => {
+    const x = sx(logCosts[i]);
+    const y = sy(d.metric_value);
+    svg += svgEl('circle', { cx: x, cy: y, r, fill: d._color, stroke: '#fff', 'stroke-width': 1.5 });
+    // Label
+    const labelText = d._label || d.id || '';
+    const short = labelText.length > 10 ? labelText.slice(0, 8) + '..' : labelText;
+    svg += svgEl('text', { x: x, y: y - r - 3, fill: '#1f2328', 'font-size': 9, 'text-anchor': 'middle' }, short);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Legend — reuse group legend
+  const legendItems = [
+    ...VOTER_GROUPS.map(vg => {
+      const pal = GROUP_PALETTES[vg.key];
+      return { color: pal[Math.floor(pal.length / 2)], label: vg.label };
+    }),
+    { color: GROUP_PALETTES.baseline[Math.floor(GROUP_PALETTES.baseline.length / 2)], label: 'Single-model baseline' },
+  ];
+  document.getElementById('cost-legend').innerHTML = legendItems
+    .map(l => `<div class="legend-item"><span class="legend-dot" style="background:${l.color}"></span> ${l.label}</div>`).join('');
+}
+
+// ── Render all ─────────────────────────────────────────────
+renderRanking(DATA);
+renderSelfConsistency(DATA);
+renderCategoryBreakdown(DATA);
+renderAmbiguityComparison(DATA);
+renderCostAccuracy(DATA);
+renderResultsTable(DATA);
+renderFindings(DATA);
+</script>
+</body>
+</html>

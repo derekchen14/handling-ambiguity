@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 1C — Confidence Calibration</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de;
+    --text: #1f2328; --muted: #656d76; --accent: #0969da;
+    --green: #1a7f37; --yellow: #9a6700; --red: #cf222e;
+    --purple: #8250df; --orange: #bc4c00; --cyan: #0550ae;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+  .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.5rem; min-width: 140px; text-align: center; flex: 1;
+  }
+  .stat-box .value { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-box .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem; overflow-x: auto;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h3 { margin-top: 0; }
+  .chart-container { width: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+  td { white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(9,105,218,0.04); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem; font-style: italic; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+  .badge-green { background: rgba(26,127,55,0.1); color: var(--green); }
+  .badge-yellow { background: rgba(154,103,0,0.1); color: var(--yellow); }
+  .badge-red { background: rgba(207,34,46,0.1); color: var(--red); }
+  .badge-purple { background: rgba(130,80,223,0.1); color: var(--purple); }
+  .badge-orange { background: rgba(188,76,0,0.1); color: var(--orange); }
+  .badge-blue { background: rgba(9,105,218,0.1); color: var(--accent); }
+  .legend { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>Experiment 1C — Confidence Calibration</h1>
+<p class="subtitle" id="subtitle">Loading results...</p>
+
+<div class="stat-row" id="top-stats"></div>
+
+<h2>Reliability Diagrams</h2>
+<div class="card full">
+  <div class="chart-container" id="reliability-chart"></div>
+  <div class="legend" id="reliability-legend"></div>
+  <p class="note">Each line shows one config's calibration curve. Dashed diagonal = perfect calibration. Points plotted only where bins have data.</p>
+</div>
+
+<h2>Calibration Metrics by Config</h2>
+<div class="card full">
+  <div class="chart-container" id="calibration-bars"></div>
+  <div class="legend" id="calibration-legend"></div>
+  <p class="note">ECE and Brier Score across all 14 configs. Lower = better calibrated.</p>
+</div>
+
+<h2>Accuracy vs. ECE</h2>
+<div class="card full">
+  <div class="chart-container" id="acc-ece-chart"></div>
+  <div class="legend" id="acc-ece-legend"></div>
+  <p class="note">Ideal = top-left (high accuracy, low ECE). Dashed reference lines at ECE=0.10 and Accuracy=80%.</p>
+</div>
+
+<h2>Overconfidence Heatmap</h2>
+<div class="card full">
+  <div class="chart-container" id="overconf-heatmap"></div>
+  <p class="note">Overconfidence rate by category. Darker red = higher fraction of wrong predictions made with confidence >= 0.64.</p>
+</div>
+
+<h2>Full Results Table</h2>
+<div class="card full">
+  <table id="results-table"></table>
+</div>
+
+<h2>Key Findings</h2>
+<div id="findings-section"></div>
+
+<footer>
+  <p>Generated from 1A/1B prediction data (0 API calls). Regenerate with: <code>python3 experiments/results/build_report_1c.py</code></p>
+</footer>
+
+<script>
+const DATA = {"generated": "2026-02-27 00:33", "n_configs": 14, "n_ensembles": 10, "n_baselines": 4, "best_ece_ensemble": {"id": "10v-1", "ece": 0.07542}, "best_ece_single": {"id": "Gemini 3 Pro", "ece": 0.09668}, "worst_overconfidence": {"id": "3v-10", "rate": 0.88788}, "configs": [{"id": "10v-1", "label": "10v-1", "group": "10v", "accuracy": 0.91211, "relative_cost": 8.88, "n_voters": 10, "type": "cross-model", "description": "Provider-balanced 10-voter majority (2 per provider, high+mid tiers)", "overall": {"ece": 0.07542, "mce": 0.38099, "brier": 0.08281, "overconfidence_rate": 0.50222, "underconfidence_rate": 0.11221, "spearman_r": 0.26191, "mean_confidence": 0.87942, "accuracy": 0.91211, "n_turns": 2560, "bin_confs": [null, null, 0.2703, 0.3333, 0.40487, 0.5458, 0.69511, 0.77664, 0.81822, 0.98609], "bin_accs": [null, null, 0.50909, 0.71429, 0.62195, 0.77391, 0.88112, 0.91667, 0.93, 0.95602]}, "by_domain": {"dana": {"ece": 0.06531, "mce": 0.32609, "brier": 0.08639, "overconfidence_rate": 0.49206, "underconfidence_rate": 0.11872, "spearman_r": 0.30328, "mean_confidence": 0.87891, "accuracy": 0.90156, "n_turns": 1280, "bin_confs": [null, null, 0.28261, null, 0.4, 0.54211, 0.69834, 0.7778, 0.80544, 0.98509], "bin_accs": [null, null, 0.6087, null, 0.55, 0.73188, 0.8, 1.0, 0.90816, 0.95539]}, "hugo": {"ece": 0.08553, "mce": 0.38099, "brier": 0.07924, "overconfidence_rate": 0.51515, "underconfidence_rate": 0.10584, "spearman_r": 0.21607, "mean_confidence": 0.87994, "accuracy": 0.92266, "n_turns": 1280, "bin_confs": [null, null, 0.26146, 0.3333, 0.40951, 0.55133, 0.69278, 0.77654, 0.8305, 0.98711], "bin_accs": [null, null, 0.4375, 0.71429, 0.69048, 0.83696, 0.93976, 0.90909, 0.95098, 0.95667]}}, "by_category": {"same_flow": {"ece": 0.02013, "mce": 0.2, "brier": 0.04902, "overconfidence_rate": 0.46667, "underconfidence_rate": 0.05546, "spearman_r": 0.42381, "mean_confidence": 0.9152, "accuracy": 0.92969, "n_turns": 640, "bin_confs": [null, null, 0.3, null, 0.40888, 0.54679, 0.69541, 0.77317, 0.81546, 0.98665], "bin_accs": [null, null, 0.5, null, 0.46667, 0.63158, 0.65517, 0.66667, 0.91304, 0.99004]}, "switch_flow": {"ece": 0.02594, "mce": 0.25185, "brier": 0.03063, "overconfidence_rate": 0.08511, "underconfidence_rate": 0.0489, "spearman_r": 0.55656, "mean_confidence": 0.91569, "accuracy": 0.92656, "n_turns": 640, "bin_confs": [null, null, 0.25185, null, 0.40317, 0.54686, 0.69584, 0.7778, 0.83334, 0.98891], "bin_accs": [null, null, 0.0, null, 0.28571, 0.54348, 0.75, 1.0, 1.0, 1.0]}, "ambiguous_first": {"ece": 0.21766, "mce": 0.44686, "brier": 0.1826, "overconfidence_rate": 0.81522, "underconfidence_rate": 0.23723, "spearman_r": -0.09554, "mean_confidence": 0.81516, "accuracy": 0.85625, "n_turns": 640, "bin_confs": [null, null, 0.29227, 0.3333, 0.40541, 0.54653, 0.69753, 0.7778, 0.81368, 0.98153], "bin_accs": [null, null, 0.73913, 0.66667, 0.82927, 0.9625, 0.94444, 1.0, 0.88462, 0.82102]}, "ambiguous_second": {"ece": 0.08212, "mce": 0.4167, "brier": 0.069, "overconfidence_rate": 0.31707, "underconfidence_rate": 0.11686, "spearman_r": 0.27493, "mean_confidence": 0.87163, "accuracy": 0.93594, "n_turns": 640, "bin_confs": [null, null, 0.24514, 0.3333, 0.4, 0.54361, 0.69167, 0.7778, 0.82052, 0.98575], "bin_accs": [null, null, 0.5625, 0.75, 0.5, 0.78788, 1.0, 1.0, 0.98077, 0.97285]}}}, {"id": "10v-3", "label": "10v-3", "group": "10v", "accuracy": 0.91172, "relative_cost": 7.76, "n_voters": 10, "type": "cross-model", "description": "Top 10 by accuracy \u2014 accuracy-first 10-voter majority", "overall": {"ece": 0.08104, "mce": 0.29123, "brier": 0.0847, "overconfidence_rate": 0.48673, "underconfidence_rate": 0.12296, "spearman_r": 0.25775, "mean_confidence": 0.87915, "accuracy": 0.91172, "n_turns": 2560, "bin_confs": [null, null, 0.28772, null, 0.4, 0.55039, 0.69972, 0.77317, 0.80346, 0.98563], "bin_accs": [null, null, 0.57895, null, 0.61957, 0.77559, 0.925, 0.5, 0.93889, 0.953]}, "by_domain": {"dana": {"ece": 0.07154, "mce": 0.7778, "brier": 0.08665, "overconfidence_rate": 0.456, "underconfidence_rate": 0.11515, "spearman_r": 0.28651, "mean_confidence": 0.88183, "accuracy": 0.90234, "n_turns": 1280, "bin_confs": [null, null, 0.3, null, 0.4, 0.54773, 0.7, 0.7778, 0.80089, 0.98512], "bin_accs": [null, null, 0.7, null, 0.58974, 0.67424, 0.93023, 0.0, 0.93, 0.95182]}, "hugo": {"ece": 0.09053, "mce": 0.33197, "brier": 0.08275, "overconfidence_rate": 0.52475, "underconfidence_rate": 0.13062, "spearman_r": 0.228, "mean_confidence": 0.87647, "accuracy": 0.92109, "n_turns": 1280, "bin_confs": [null, null, 0.27407, null, 0.4, 0.55328, 0.69957, 0.77085, 0.80667, 0.98615], "bin_accs": [null, null, 0.44444, null, 0.64151, 0.88525, 0.92208, 0.75, 0.95, 0.9542]}}, "by_category": {"same_flow": {"ece": 0.01491, "mce": 0.7778, "brier": 0.04993, "overconfidence_rate": 0.38298, "underconfidence_rate": 0.05228, "spearman_r": 0.41725, "mean_confidence": 0.91846, "accuracy": 0.92656, "n_turns": 640, "bin_confs": [null, null, 0.3, null, 0.4, 0.55278, 0.69825, 0.7778, 0.80667, 0.98538], "bin_accs": [null, null, 0.5, null, 0.45, 0.55556, 0.78947, 0.0, 0.9, 0.98269]}, "switch_flow": {"ece": 0.02828, "mce": 0.3, "brier": 0.03177, "overconfidence_rate": 0.0, "underconfidence_rate": 0.0603, "spearman_r": 0.54185, "mean_confidence": 0.91484, "accuracy": 0.93281, "n_turns": 640, "bin_confs": [null, null, 0.2875, null, 0.4, 0.54706, 0.7, null, 0.8, 0.99011], "bin_accs": [null, null, 0.0, null, 0.35, 0.56863, 1.0, null, 1.0, 1.0]}, "ambiguous_first": {"ece": 0.20909, "mce": 0.49643, "brier": 0.18515, "overconfidence_rate": 0.79592, "underconfidence_rate": 0.24723, "spearman_r": -0.06553, "mean_confidence": 0.81773, "accuracy": 0.84688, "n_turns": 640, "bin_confs": [null, null, 0.28929, null, 0.4, 0.55444, 0.7, 0.77085, 0.80452, 0.97739], "bin_accs": [null, null, 0.78571, null, 0.80556, 0.92222, 0.89362, 0.5, 0.89831, 0.82713]}, "ambiguous_second": {"ece": 0.09911, "mce": 0.35, "brier": 0.07196, "overconfidence_rate": 0.36842, "underconfidence_rate": 0.14286, "spearman_r": 0.25073, "mean_confidence": 0.86557, "accuracy": 0.94063, "n_turns": 640, "bin_confs": [null, null, 0.28235, null, 0.4, 0.54675, 0.7, 0.7778, 0.80146, 0.98765], "bin_accs": [null, null, 0.52941, null, 0.75, 0.84416, 1.0, 1.0, 0.98361, 0.9697]}}}, {"id": "10v-4", "label": "10v-4", "group": "10v", "accuracy": 0.90352, "relative_cost": 7.74, "n_voters": 10, "type": "cross-model", "description": "Level-diversity 10-voter (4L + 4M + 2H)", "overall": {"ece": 0.07808, "mce": 0.31235, "brier": 0.08834, "overconfidence_rate": 0.49798, "underconfidence_rate": 0.115, "spearman_r": 0.27236, "mean_confidence": 0.87652, "accuracy": 0.90352, "n_turns": 2560, "bin_confs": [null, null, 0.28765, 0.3333, 0.40911, 0.55404, 0.69434, 0.77558, 0.81293, 0.98467], "bin_accs": [null, null, 0.6, 0.22222, 0.5812, 0.77169, 0.9281, 0.76, 0.91515, 0.94964]}, "by_domain": {"dana": {"ece": 0.06864, "mce": 0.46311, "brier": 0.09199, "overconfidence_rate": 0.51429, "underconfidence_rate": 0.09912, "spearman_r": 0.30402, "mean_confidence": 0.88131, "accuracy": 0.89062, "n_turns": 1280, "bin_confs": [null, null, 0.29689, 0.3333, 0.41257, 0.55487, 0.69423, 0.7778, 0.81964, 0.98413], "bin_accs": [null, null, 0.76, 0.14286, 0.49057, 0.69792, 0.90667, 0.75, 0.87209, 0.94492]}, "hugo": {"ece": 0.08804, "mce": 0.27588, "brier": 0.08468, "overconfidence_rate": 0.47664, "underconfidence_rate": 0.13043, "spearman_r": 0.24101, "mean_confidence": 0.87174, "accuracy": 0.91641, "n_turns": 1280, "bin_confs": [null, null, 0.27611, 0.3333, 0.40624, 0.55339, 0.69445, 0.77352, 0.80563, 0.98524], "bin_accs": [null, null, 0.4, 0.5, 0.65625, 0.82927, 0.94872, 0.76923, 0.96203, 0.9545]}}, "by_category": {"same_flow": {"ece": 0.03023, "mce": 0.7778, "brier": 0.04794, "overconfidence_rate": 0.38636, "underconfidence_rate": 0.05872, "spearman_r": 0.44352, "mean_confidence": 0.91571, "accuracy": 0.93125, "n_turns": 640, "bin_confs": [null, null, 0.3, null, 0.41211, 0.56835, 0.69649, 0.7778, 0.80762, 0.9833], "bin_accs": [null, null, 0.85714, null, 0.31818, 0.66667, 0.73684, 0.0, 1.0, 0.98273]}, "switch_flow": {"ece": 0.03833, "mce": 0.3333, "brier": 0.03404, "overconfidence_rate": 0.03846, "underconfidence_rate": 0.04252, "spearman_r": 0.58636, "mean_confidence": 0.91267, "accuracy": 0.91875, "n_turns": 640, "bin_confs": [null, null, 0.28055, 0.3333, 0.41151, 0.54929, 0.69445, 0.7778, 0.80593, 0.98987], "bin_accs": [null, null, 0.0, 0.0, 0.33333, 0.41026, 0.91667, 1.0, 1.0, 1.0]}, "ambiguous_first": {"ece": 0.21572, "mce": 0.40318, "brier": 0.20275, "overconfidence_rate": 0.80357, "underconfidence_rate": 0.23864, "spearman_r": -0.09152, "mean_confidence": 0.81537, "accuracy": 0.825, "n_turns": 640, "bin_confs": [null, null, 0.29565, 0.3333, 0.40634, 0.54514, 0.69296, 0.77502, 0.81552, 0.97602], "bin_accs": [null, null, 0.69565, 0.66667, 0.80952, 0.925, 0.96154, 0.7, 0.8254, 0.79837]}, "ambiguous_second": {"ece": 0.08964, "mce": 0.3333, "brier": 0.06863, "overconfidence_rate": 0.35897, "underconfidence_rate": 0.13311, "spearman_r": 0.28484, "mean_confidence": 0.86234, "accuracy": 0.93906, "n_turns": 640, "bin_confs": [null, null, 0.26565, 0.3333, 0.40854, 0.56037, 0.69483, 0.77471, 0.81539, 0.9875], "bin_accs": [null, null, 0.45455, 0.0, 0.69231, 0.85075, 0.96552, 1.0, 0.94231, 0.97837]}}}, {"id": "5v-6", "label": "5v-6", "group": "5v", "accuracy": 0.89492, "relative_cost": 1.37, "n_voters": 5, "type": "cross-model", "description": "Mid-tier per provider \u2014 Sonnet 4.6, Gemini Flash, GPT-5 Mini, Qwen3-80B, DeepSeek V3", "overall": {"ece": 0.10102, "mce": 0.75, "brier": 0.10222, "overconfidence_rate": 0.55762, "underconfidence_rate": 0.1471, "spearman_r": 0.21455, "mean_confidence": 0.88648, "accuracy": 0.89492, "n_turns": 2560, "bin_confs": [null, null, 0.2, null, 0.4, 0.59898, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.69565, null, 0.65468, 0.78231, null, 0.0, 0.91193, 0.93314]}, "by_domain": {"dana": {"ece": 0.09289, "mce": 0.26197, "brier": 0.1006, "overconfidence_rate": 0.51773, "underconfidence_rate": 0.14838, "spearman_r": 0.24645, "mean_confidence": 0.88914, "accuracy": 0.88984, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.59937, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.28571, null, 0.66197, 0.75472, null, null, 0.90667, 0.93393]}, "hugo": {"ece": 0.10914, "mce": 0.75, "brier": 0.10383, "overconfidence_rate": 0.60156, "underconfidence_rate": 0.14583, "spearman_r": 0.18257, "mean_confidence": 0.88383, "accuracy": 0.9, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.59852, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.875, null, 0.64706, 0.81481, null, 0.0, 0.91584, 0.93232]}}, "by_category": {"same_flow": {"ece": 0.03563, "mce": 0.8, "brier": 0.05415, "overconfidence_rate": 0.47619, "underconfidence_rate": 0.0786, "spearman_r": 0.3966, "mean_confidence": 0.92219, "accuracy": 0.93437, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.598, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 1.0, null, 0.61111, 0.7, null, 0.0, 0.86364, 0.98753]}, "switch_flow": {"ece": 0.02563, "mce": 0.2, "brier": 0.03113, "overconfidence_rate": 0.02174, "underconfidence_rate": 0.05556, "spearman_r": 0.60915, "mean_confidence": 0.92312, "accuracy": 0.92812, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.25, 0.5625, null, null, 0.98148, 1.0]}, "ambiguous_first": {"ece": 0.25047, "mce": 0.8, "brier": 0.23802, "overconfidence_rate": 0.81618, "underconfidence_rate": 0.28571, "spearman_r": -0.15367, "mean_confidence": 0.83391, "accuracy": 0.7875, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.59908, null, null, 0.8, 1.0], "bin_accs": [null, null, 1.0, null, 0.84906, 0.84404, null, null, 0.87302, 0.72464]}, "ambiguous_second": {"ece": 0.11297, "mce": 0.68889, "brier": 0.08558, "overconfidence_rate": 0.4, "underconfidence_rate": 0.18992, "spearman_r": 0.21777, "mean_confidence": 0.86672, "accuracy": 0.92969, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.59885, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.88889, null, 0.65909, 0.87356, null, null, 0.97619, 0.96154]}}}, {"id": "5v-3", "label": "5v-3", "group": "5v", "accuracy": 0.89336, "relative_cost": 7.14, "n_voters": 5, "type": "cross-model", "description": "Sonnet + Opus + Gemini Pro + DeepSeek R1 + GPT-5 Mini \u2014 best hand-picked diversity", "overall": {"ece": 0.08195, "mce": 0.29565, "brier": 0.09742, "overconfidence_rate": 0.57875, "underconfidence_rate": 0.12287, "spearman_r": 0.2522, "mean_confidence": 0.89422, "accuracy": 0.89336, "n_turns": 2560, "bin_confs": [null, null, 0.21333, null, 0.4, 0.58722, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.33333, null, 0.69565, 0.73684, null, 0.86364, 0.86705, 0.94025]}, "by_domain": {"dana": {"ece": 0.07555, "mce": 0.28852, "brier": 0.10281, "overconfidence_rate": 0.60667, "underconfidence_rate": 0.12301, "spearman_r": 0.27014, "mean_confidence": 0.89633, "accuracy": 0.88281, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.59773, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.68852, 0.73485, null, 1.0, 0.81579, 0.93694]}, "hugo": {"ece": 0.08992, "mce": 0.3037, "brier": 0.09203, "overconfidence_rate": 0.54472, "underconfidence_rate": 0.12273, "spearman_r": 0.23516, "mean_confidence": 0.89211, "accuracy": 0.90391, "n_turns": 1280, "bin_confs": [null, null, 0.22, null, 0.4, 0.57687, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.5, null, 0.7037, 0.73881, null, 0.85, 0.92949, 0.94357]}}, "by_category": {"same_flow": {"ece": 0.04781, "mce": 0.75, "brier": 0.06184, "overconfidence_rate": 0.53333, "underconfidence_rate": 0.07059, "spearman_r": 0.32298, "mean_confidence": 0.91937, "accuracy": 0.92969, "n_turns": 640, "bin_confs": [null, null, 0.25, null, 0.4, 0.5881, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 1.0, null, 0.7, 0.64286, null, 0.81818, 0.89362, 0.97458]}, "switch_flow": {"ece": 0.01438, "mce": 0.2, "brier": 0.0452, "overconfidence_rate": 0.30769, "underconfidence_rate": 0.05442, "spearman_r": 0.57816, "mean_confidence": 0.93312, "accuracy": 0.91875, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.59318, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.31579, 0.59091, null, 0.66667, 0.8, 0.98859]}, "ambiguous_first": {"ece": 0.20531, "mce": 0.37083, "brier": 0.19748, "overconfidence_rate": 0.725, "underconfidence_rate": 0.25192, "spearman_r": -0.04203, "mean_confidence": 0.83219, "accuracy": 0.8125, "n_turns": 640, "bin_confs": [null, null, 0.225, null, 0.4, 0.58482, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.5, null, 0.77083, 0.82143, null, 0.91667, 0.89231, 0.78443]}, "ambiguous_second": {"ece": 0.07031, "mce": 0.42143, "brier": 0.08517, "overconfidence_rate": 0.55357, "underconfidence_rate": 0.13014, "spearman_r": 0.27929, "mean_confidence": 0.89219, "accuracy": 0.9125, "n_turns": 640, "bin_confs": [null, null, 0.21, null, 0.4, 0.58676, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.4, null, 0.82143, 0.75, null, 0.93333, 0.82927, 0.9638]}}}, {"id": "5v-5", "label": "5v-5", "group": "5v", "accuracy": 0.88633, "relative_cost": 7.6, "n_voters": 5, "type": "cross-model", "description": "Top 5 overall accuracy \u2014 Sonnet 4.6, Qwen3-235B, Opus 4.6, Gemini Pro, Haiku 4.5", "overall": {"ece": 0.09438, "mce": 0.31717, "brier": 0.10731, "overconfidence_rate": 0.68385, "underconfidence_rate": 0.11018, "spearman_r": 0.19399, "mean_confidence": 0.91539, "accuracy": 0.88633, "n_turns": 2560, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.33333, null, 0.71717, 0.75758, null, null, 0.85145, 0.91864]}, "by_domain": {"dana": {"ece": 0.09328, "mce": 0.33077, "brier": 0.11309, "overconfidence_rate": 0.66879, "underconfidence_rate": 0.11131, "spearman_r": 0.20609, "mean_confidence": 0.91219, "accuracy": 0.87734, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.25, null, 0.73077, 0.71074, null, null, 0.84459, 0.91414]}, "hugo": {"ece": 0.09547, "mce": 0.30213, "brier": 0.10153, "overconfidence_rate": 0.70149, "underconfidence_rate": 0.10908, "spearman_r": 0.17947, "mean_confidence": 0.91859, "accuracy": 0.89531, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.375, null, 0.70213, 0.80909, null, null, 0.85938, 0.923]}}, "by_category": {"same_flow": {"ece": 0.04438, "mce": 0.5, "brier": 0.048, "overconfidence_rate": 0.7, "underconfidence_rate": 0.05574, "spearman_r": 0.24581, "mean_confidence": 0.94312, "accuracy": 0.95312, "n_turns": 640, "bin_confs": [null, null, null, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, null, null, 0.9, 0.75758, null, null, 0.88372, 0.97847]}, "switch_flow": {"ece": 0.02531, "mce": 0.2, "brier": 0.02719, "overconfidence_rate": 0.02326, "underconfidence_rate": 0.03685, "spearman_r": 0.68959, "mean_confidence": 0.94375, "accuracy": 0.93281, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.22222, 0.4186, null, null, 0.96429, 1.0]}, "ambiguous_first": {"ece": 0.26781, "mce": 0.8, "brier": 0.26769, "overconfidence_rate": 0.87879, "underconfidence_rate": 0.24842, "spearman_r": -0.13413, "mean_confidence": 0.86875, "accuracy": 0.74219, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 1.0, null, 0.75, 0.91011, null, null, 0.76596, 0.69853]}, "ambiguous_second": {"ece": 0.08625, "mce": 0.55652, "brier": 0.08638, "overconfidence_rate": 0.60377, "underconfidence_rate": 0.12947, "spearman_r": 0.21005, "mean_confidence": 0.90594, "accuracy": 0.91719, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, null, 0.8, 1.0], "bin_accs": [null, null, 0.375, null, 0.95652, 0.77273, null, null, 0.88235, 0.94947]}}}, {"id": "5v-8", "label": "5v-8", "group": "5v", "accuracy": 0.88555, "relative_cost": 6.37, "n_voters": 5, "type": "cross-model", "description": "Most diverse from top 8 \u2014 Gemini Pro, DeepSeek R1, DeepSeek V3-lite, Opus 4.6, Haiku 4.5", "overall": {"ece": 0.07595, "mce": 0.3333, "brier": 0.09798, "overconfidence_rate": 0.55973, "underconfidence_rate": 0.11689, "spearman_r": 0.28959, "mean_confidence": 0.89632, "accuracy": 0.88555, "n_turns": 2560, "bin_confs": [null, null, 0.20652, null, 0.4, 0.58824, 0.6667, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.43478, null, 0.55172, 0.74902, 1.0, 0.87755, 0.84333, 0.93888]}, "by_domain": {"dana": {"ece": 0.05898, "mce": 0.25, "brier": 0.10329, "overconfidence_rate": 0.51149, "underconfidence_rate": 0.11212, "spearman_r": 0.36076, "mean_confidence": 0.89414, "accuracy": 0.86406, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.6, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.35714, null, 0.46774, 0.67669, null, 1.0, 0.80247, 0.93688]}, "hugo": {"ece": 0.09292, "mce": 0.33889, "brier": 0.09266, "overconfidence_rate": 0.63025, "underconfidence_rate": 0.12145, "spearman_r": 0.20748, "mean_confidence": 0.89849, "accuracy": 0.90703, "n_turns": 1280, "bin_confs": [null, null, 0.21667, null, 0.4, 0.57541, 0.6667, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.55556, null, 0.64815, 0.82787, 1.0, 0.86047, 0.8913, 0.94085]}}, "by_category": {"same_flow": {"ece": 0.02023, "mce": 0.21, "brier": 0.0527, "overconfidence_rate": 0.36364, "underconfidence_rate": 0.05812, "spearman_r": 0.49618, "mean_confidence": 0.91898, "accuracy": 0.91406, "n_turns": 640, "bin_confs": [null, null, 0.21, null, 0.4, 0.59091, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.4, 0.59091, null, 0.8, 0.85714, 0.98554]}, "switch_flow": {"ece": 0.01547, "mce": 0.2125, "brier": 0.03413, "overconfidence_rate": 0.125, "underconfidence_rate": 0.05068, "spearman_r": 0.65716, "mean_confidence": 0.93422, "accuracy": 0.925, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.59038, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.1875, 0.51923, null, 0.75, 0.85714, 1.0]}, "ambiguous_first": {"ece": 0.22411, "mce": 0.625, "brier": 0.22795, "overconfidence_rate": 0.80576, "underconfidence_rate": 0.25749, "spearman_r": -0.06379, "mean_confidence": 0.84307, "accuracy": 0.78281, "n_turns": 640, "bin_confs": [null, null, 0.20833, null, 0.4, 0.58529, 0.6667, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.83333, null, 0.77083, 0.85294, 1.0, 0.94118, 0.76, 0.7623]}, "ambiguous_second": {"ece": 0.08445, "mce": 0.41875, "brier": 0.07714, "overconfidence_rate": 0.5098, "underconfidence_rate": 0.12224, "spearman_r": 0.26549, "mean_confidence": 0.88898, "accuracy": 0.92031, "n_turns": 640, "bin_confs": [null, null, 0.20625, null, 0.4, 0.58947, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.625, null, 0.5, 0.89474, null, 0.88889, 0.92045, 0.9611]}}}, {"id": "5v-2", "label": "5v-2", "group": "5v", "accuracy": 0.88438, "relative_cost": 3.42, "n_voters": 5, "type": "cross-model", "description": "Best per provider (1A rankings) \u2014 Sonnet 4.6, Qwen3-235B, Gemini Pro, DeepSeek V3, GPT-5.2", "overall": {"ece": 0.08797, "mce": 0.25, "brier": 0.10357, "overconfidence_rate": 0.58446, "underconfidence_rate": 0.12412, "spearman_r": 0.24553, "mean_confidence": 0.89641, "accuracy": 0.88438, "n_turns": 2560, "bin_confs": [null, null, 0.21875, null, 0.4, 0.58955, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.25, null, 0.65, 0.74254, null, 0.88095, 0.86711, 0.9294]}, "by_domain": {"dana": {"ece": 0.07996, "mce": 0.25, "brier": 0.09958, "overconfidence_rate": 0.51007, "underconfidence_rate": 0.13174, "spearman_r": 0.28503, "mean_confidence": 0.89145, "accuracy": 0.88359, "n_turns": 1280, "bin_confs": [null, null, 0.2, null, 0.4, 0.59796, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.16667, null, 0.62319, 0.71429, null, 1.0, 0.87654, 0.93715]}, "hugo": {"ece": 0.09629, "mce": 0.28627, "brier": 0.10756, "overconfidence_rate": 0.65986, "underconfidence_rate": 0.1165, "spearman_r": 0.20494, "mean_confidence": 0.90137, "accuracy": 0.88516, "n_turns": 1280, "bin_confs": [null, null, 0.23, null, 0.4, 0.57934, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.3, null, 0.68627, 0.77686, null, 0.86486, 0.85612, 0.92191]}}, "by_category": {"same_flow": {"ece": 0.03609, "mce": 0.25, "brier": 0.0395, "overconfidence_rate": 0.28125, "underconfidence_rate": 0.05921, "spearman_r": 0.3879, "mean_confidence": 0.93031, "accuracy": 0.95, "n_turns": 640, "bin_confs": [null, null, 0.25, null, 0.4, 0.59286, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.625, 0.61905, null, 0.90909, 0.95833, 0.98996]}, "switch_flow": {"ece": 0.03844, "mce": 0.24894, "brier": 0.03501, "overconfidence_rate": 0.01695, "underconfidence_rate": 0.03959, "spearman_r": 0.7127, "mean_confidence": 0.92469, "accuracy": 0.90781, "n_turns": 640, "bin_confs": [null, null, 0.2, null, 0.4, 0.58936, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.0, null, 0.22581, 0.34043, null, 0.83333, 1.0, 1.0]}, "ambiguous_first": {"ece": 0.24664, "mce": 0.44, "brier": 0.24947, "overconfidence_rate": 0.83974, "underconfidence_rate": 0.2686, "spearman_r": -0.09309, "mean_confidence": 0.83898, "accuracy": 0.75625, "n_turns": 640, "bin_confs": [null, null, 0.22222, null, 0.4, 0.59167, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.33333, null, 0.84, 0.88542, null, 0.84615, 0.73729, 0.72316]}, "ambiguous_second": {"ece": 0.10992, "mce": 0.42609, "brier": 0.0903, "overconfidence_rate": 0.65306, "underconfidence_rate": 0.15567, "spearman_r": 0.12543, "mean_confidence": 0.89164, "accuracy": 0.92344, "n_turns": 640, "bin_confs": [null, null, 0.21667, null, 0.4, 0.58554, null, 0.75, 0.8, 1.0], "bin_accs": [null, null, 0.33333, null, 0.82609, 0.86747, null, 0.91667, 0.92405, 0.94318]}}}, {"id": "3v-9", "label": "3v-9", "group": "3v", "accuracy": 0.87148, "relative_cost": 6.5, "n_voters": 3, "type": "cross-model", "description": "Top 3 overall accuracy \u2014 Sonnet 4.6, Qwen3-235B, Opus 4.6", "overall": {"ece": 0.09921, "mce": 0.23659, "brier": 0.11641, "overconfidence_rate": 0.87842, "underconfidence_rate": 0.02376, "spearman_r": 0.22072, "mean_confidence": 0.92618, "accuracy": 0.87148, "n_turns": 2560, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.56989, null, null, 0.75853, null, null, 0.90556]}, "by_domain": {"dana": {"ece": 0.09713, "mce": 0.33337, "brier": 0.12144, "overconfidence_rate": 0.92398, "underconfidence_rate": 0.02344, "spearman_r": 0.22246, "mean_confidence": 0.92553, "accuracy": 0.86641, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.66667, null, null, 0.72115, null, null, 0.90319]}, "hugo": {"ece": 0.1013, "mce": 0.1667, "brier": 0.11137, "overconfidence_rate": 0.82911, "underconfidence_rate": 0.02406, "spearman_r": 0.21809, "mean_confidence": 0.92683, "accuracy": 0.87656, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.5, null, null, 0.80347, null, null, 0.90788]}}, "by_category": {"same_flow": {"ece": 0.04166, "mce": 0.52384, "brier": 0.04653, "overconfidence_rate": 0.96667, "underconfidence_rate": 0.00984, "spearman_r": 0.27499, "mean_confidence": 0.95521, "accuracy": 0.95312, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.85714, null, null, 0.79167, null, null, 0.97504]}, "switch_flow": {"ece": 0.02032, "mce": 0.1667, "brier": 0.03177, "overconfidence_rate": 0.76744, "underconfidence_rate": 0.00335, "spearman_r": 0.72746, "mean_confidence": 0.95313, "accuracy": 0.93281, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.16667, null, null, 0.5, null, null, 1.0]}, "ambiguous_first": {"ece": 0.2927, "mce": 0.3417, "brier": 0.3, "overconfidence_rate": 0.93299, "underconfidence_rate": 0.06054, "spearman_r": -0.10501, "mean_confidence": 0.8823, "accuracy": 0.69688, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.675, null, null, 0.80822, null, null, 0.663]}, "ambiguous_second": {"ece": 0.08281, "mce": 0.19611, "brier": 0.08733, "overconfidence_rate": 0.74194, "underconfidence_rate": 0.03114, "spearman_r": 0.27206, "mean_confidence": 0.91407, "accuracy": 0.90312, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, null, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.52941, null, null, 0.83505, null, null, 0.94106]}}}, {"id": "3v-10", "label": "3v-10", "group": "3v", "accuracy": 0.87109, "relative_cost": 2.33, "n_voters": 3, "type": "cross-model", "description": "Best per provider (top 3) \u2014 Sonnet 4.6, Qwen3-235B, Gemini Pro", "overall": {"ece": 0.09648, "mce": 0.35636, "brier": 0.11842, "overconfidence_rate": 0.88788, "underconfidence_rate": 0.03767, "spearman_r": 0.22939, "mean_confidence": 0.92227, "accuracy": 0.87109, "n_turns": 2560, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.68966, null, 0.70588, 0.72043, null, null, 0.90856]}, "by_domain": {"dana": {"ece": 0.10312, "mce": 0.5, "brier": 0.11814, "overconfidence_rate": 0.90506, "underconfidence_rate": 0.03654, "spearman_r": 0.19678, "mean_confidence": 0.91407, "accuracy": 0.87656, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.71154, null, 1.0, 0.75909, null, null, 0.91036]}, "hugo": {"ece": 0.09037, "mce": 0.32384, "brier": 0.11871, "overconfidence_rate": 0.87209, "underconfidence_rate": 0.03881, "spearman_r": 0.26683, "mean_confidence": 0.93047, "accuracy": 0.86562, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.65714, null, 0.66667, 0.66447, null, null, 0.90687]}}, "by_category": {"same_flow": {"ece": 0.03672, "mce": 0.50003, "brier": 0.04753, "overconfidence_rate": 0.83333, "underconfidence_rate": 0.01159, "spearman_r": 0.38055, "mean_confidence": 0.94922, "accuracy": 0.94375, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.83333, null, 0.28571, 0.76, null, null, 0.97826]}, "switch_flow": {"ece": 0.02526, "mce": 0.5, "brier": 0.03598, "overconfidence_rate": 0.70455, "underconfidence_rate": 0.0151, "spearman_r": 0.71256, "mean_confidence": 0.95026, "accuracy": 0.93125, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.42857, null, 0.0, 0.44231, null, null, 0.99647]}, "ambiguous_first": {"ece": 0.26484, "mce": 0.4167, "brier": 0.29345, "overconfidence_rate": 0.95361, "underconfidence_rate": 0.07175, "spearman_r": -0.06869, "mean_confidence": 0.87891, "accuracy": 0.69688, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.75, null, 0.84615, 0.73248, null, null, 0.67647]}, "ambiguous_second": {"ece": 0.10182, "mce": 0.44795, "brier": 0.09674, "overconfidence_rate": 0.83929, "underconfidence_rate": 0.06164, "spearman_r": 0.17048, "mean_confidence": 0.91068, "accuracy": 0.9125, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, 0.6667, null, null, 1.0], "bin_accs": [null, null, null, 0.78125, null, 0.84615, 0.82955, null, null, 0.93688]}}}, {"id": "Sonnet 4.6", "label": "Sonnet 4.6", "group": "baseline", "accuracy": 0.83281, "relative_cost": 1.0, "n_voters": 1, "type": "single-model", "description": "Sonnet 4.6", "overall": {"ece": 0.17813, "mce": 0.6667, "brier": 0.17292, "overconfidence_rate": 0.76869, "underconfidence_rate": 0.16463, "spearman_r": 0.06471, "mean_confidence": 0.91172, "accuracy": 0.83281, "n_turns": 2560, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.77703, null, null, null, 0.84408]}, "by_domain": {"dana": {"ece": 0.16745, "mce": 0.6667, "brier": 0.16892, "overconfidence_rate": 0.71889, "underconfidence_rate": 0.16557, "spearman_r": 0.11028, "mean_confidence": 0.90677, "accuracy": 0.83047, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.73707, null, null, null, 0.85043]}, "hugo": {"ece": 0.1888, "mce": 0.6667, "brier": 0.17691, "overconfidence_rate": 0.81991, "underconfidence_rate": 0.1637, "spearman_r": 0.01616, "mean_confidence": 0.91667, "accuracy": 0.83516, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.82075, null, null, null, 0.83786]}}, "by_category": {"same_flow": {"ece": 0.04609, "mce": 0.5, "brier": 0.03711, "overconfidence_rate": 0.43902, "underconfidence_rate": 0.0, "spearman_r": 0.73798, "mean_confidence": 0.98203, "accuracy": 0.93594, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.97083]}, "switch_flow": {"ece": 0.05938, "mce": 0.5, "brier": 0.05, "overconfidence_rate": 0.52, "underconfidence_rate": 0.0, "spearman_r": 0.67804, "mean_confidence": 0.98125, "accuracy": 0.92188, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.95779]}, "ambiguous_first": {"ece": 0.43672, "mce": 0.6667, "brier": 0.42669, "overconfidence_rate": 0.93233, "underconfidence_rate": 0.2139, "spearman_r": -0.20079, "mean_confidence": 0.92266, "accuracy": 0.58437, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.81053, null, null, null, 0.54244]}, "ambiguous_second": {"ece": 0.24375, "mce": 0.6667, "brier": 0.17786, "overconfidence_rate": 0.52113, "underconfidence_rate": 0.47627, "spearman_r": 5e-05, "mean_confidence": 0.76094, "accuracy": 0.88906, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.88742, null, null, null, 0.88955]}}}, {"id": "Opus 4.6", "label": "Opus 4.6", "group": "baseline", "accuracy": 0.82383, "relative_cost": 5.0, "n_voters": 1, "type": "single-model", "description": "Opus 4.6", "overall": {"ece": 0.13652, "mce": 0.4667, "brier": 0.15661, "overconfidence_rate": 0.55876, "underconfidence_rate": 0.18445, "spearman_r": 0.23122, "mean_confidence": 0.88418, "accuracy": 0.82383, "n_turns": 2560, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.8, null, 0.65794, null, null, null, 0.87221]}, "by_domain": {"dana": {"ece": 0.13021, "mce": 0.23813, "brier": 0.15712, "overconfidence_rate": 0.52542, "underconfidence_rate": 0.18678, "spearman_r": 0.26166, "mean_confidence": 0.87917, "accuracy": 0.81563, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.57143, null, 0.63667, null, null, null, 0.87256]}, "hugo": {"ece": 0.14284, "mce": 0.6667, "brier": 0.1561, "overconfidence_rate": 0.59535, "underconfidence_rate": 0.18216, "spearman_r": 0.19803, "mean_confidence": 0.88919, "accuracy": 0.83203, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.68132, null, null, null, 0.87187]}}, "by_category": {"same_flow": {"ece": 0.06797, "mce": 0.5, "brier": 0.04492, "overconfidence_rate": 0.19178, "underconfidence_rate": 0.0, "spearman_r": 0.88811, "mean_confidence": 0.95391, "accuracy": 0.88594, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.9759]}, "switch_flow": {"ece": 0.04922, "mce": 0.5, "brier": 0.03242, "overconfidence_rate": 0.18868, "underconfidence_rate": 0.0, "spearman_r": 0.89316, "mean_confidence": 0.96641, "accuracy": 0.91719, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.98325]}, "ambiguous_first": {"ece": 0.37813, "mce": 0.6667, "brier": 0.37943, "overconfidence_rate": 0.83539, "underconfidence_rate": 0.29471, "spearman_r": -0.14804, "mean_confidence": 0.87656, "accuracy": 0.62031, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.74026, null, null, null, 0.57971]}, "ambiguous_second": {"ece": 0.21016, "mce": 0.4167, "brier": 0.16966, "overconfidence_rate": 0.30488, "underconfidence_rate": 0.48746, "spearman_r": 0.14195, "mean_confidence": 0.73984, "accuracy": 0.87187, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.75, null, 0.82965, null, null, null, 0.91961]}}}, {"id": "Gemini 3 Pro", "label": "Gemini 3 Pro", "group": "baseline", "accuracy": 0.58594, "relative_cost": 0.83, "n_voters": 1, "type": "single-model", "description": "Gemini 3 Pro", "overall": {"ece": 0.09668, "mce": 0.50003, "brier": 0.1141, "overconfidence_rate": 0.17689, "underconfidence_rate": 0.175, "spearman_r": 0.73113, "mean_confidence": 0.63574, "accuracy": 0.58594, "n_turns": 1024, "bin_confs": [0.0, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, 0.83333, null, 0.63291, null, null, null, 0.86842]}, "by_domain": {"dana": {"ece": 0.11198, "mce": 0.4667, "brier": 0.14627, "overconfidence_rate": 0.36508, "underconfidence_rate": 0.17358, "spearman_r": 0.47615, "mean_confidence": 0.82161, "accuracy": 0.75391, "n_turns": 512, "bin_confs": [0.0, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, 0.8, null, 0.58333, null, null, null, 0.87397]}, "hugo": {"ece": 0.08138, "mce": 0.6667, "brier": 0.08192, "overconfidence_rate": 0.09732, "underconfidence_rate": 0.17757, "spearman_r": 0.83295, "mean_confidence": 0.44987, "accuracy": 0.41797, "n_turns": 512, "bin_confs": [0.0, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, 1.0, null, 0.74, null, null, null, 0.85854]}}, "by_category": {"same_flow": {"ece": 0.0625, "mce": 0.5, "brier": 0.04688, "overconfidence_rate": 0.09091, "underconfidence_rate": 0.0, "spearman_r": 0.92113, "mean_confidence": 0.71875, "accuracy": 0.65625, "n_turns": 256, "bin_confs": [0.0, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, null, null, 0.0, null, null, null, 0.95455]}, "switch_flow": {"ece": 0.04883, "mce": 0.5, "brier": 0.03223, "overconfidence_rate": 0.04706, "underconfidence_rate": 0.0, "spearman_r": 0.95346, "mean_confidence": 0.7168, "accuracy": 0.66797, "n_turns": 256, "bin_confs": [0.0, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, null, null, 0.0, null, null, null, 0.97714]}, "ambiguous_first": {"ece": 0.2793, "mce": 0.39437, "brier": 0.26855, "overconfidence_rate": 0.43077, "underconfidence_rate": 0.31746, "spearman_r": 0.39439, "mean_confidence": 0.65039, "accuracy": 0.49219, "n_turns": 256, "bin_confs": [0.0, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, 0.66667, null, 0.80851, null, null, null, 0.60563]}, "ambiguous_second": {"ece": 0.125, "mce": 0.6667, "brier": 0.10872, "overconfidence_rate": 0.05785, "underconfidence_rate": 0.48148, "spearman_r": 0.7777, "mean_confidence": 0.45703, "accuracy": 0.52734, "n_turns": 256, "bin_confs": [0.0, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [0.0, null, null, 1.0, null, 0.79487, null, null, null, 0.90909]}}}, {"id": "DeepSeek R1", "label": "DeepSeek R1", "group": "baseline", "accuracy": 0.81211, "relative_cost": 0.18, "n_voters": 1, "type": "single-model", "description": "DeepSeek R1", "overall": {"ece": 0.1377, "mce": 0.33337, "brier": 0.16279, "overconfidence_rate": 0.54678, "underconfidence_rate": 0.19048, "spearman_r": 0.24029, "mean_confidence": 0.87988, "accuracy": 0.81211, "n_turns": 2560, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.66667, null, 0.64484, null, null, null, 0.86485]}, "by_domain": {"dana": {"ece": 0.14792, "mce": 0.1667, "brier": 0.17465, "overconfidence_rate": 0.57364, "underconfidence_rate": 0.18787, "spearman_r": 0.22558, "mean_confidence": 0.88177, "accuracy": 0.79844, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.5, null, 0.63667, null, null, null, 0.84867]}, "hugo": {"ece": 0.12747, "mce": 0.6667, "brier": 0.15093, "overconfidence_rate": 0.5157, "underconfidence_rate": 0.193, "spearman_r": 0.25691, "mean_confidence": 0.87799, "accuracy": 0.82578, "n_turns": 1280, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.65273, null, null, null, 0.8812]}}, "by_category": {"same_flow": {"ece": 0.08828, "mce": 0.5, "brier": 0.05742, "overconfidence_rate": 0.17708, "underconfidence_rate": 0.0, "spearman_r": 0.8933, "mean_confidence": 0.93828, "accuracy": 0.85, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.9697]}, "switch_flow": {"ece": 0.06875, "mce": 0.5, "brier": 0.04766, "overconfidence_rate": 0.23944, "underconfidence_rate": 0.0, "spearman_r": 0.85936, "mean_confidence": 0.95781, "accuracy": 0.88906, "n_turns": 640, "bin_confs": [null, null, null, null, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, null, null, 0.0, null, null, null, 0.97099]}, "ambiguous_first": {"ece": 0.36979, "mce": 0.6667, "brier": 0.36632, "overconfidence_rate": 0.82759, "underconfidence_rate": 0.31618, "spearman_r": -0.15719, "mean_confidence": 0.86771, "accuracy": 0.6375, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 1.0, null, 0.7619, null, null, null, 0.59236]}, "ambiguous_second": {"ece": 0.23177, "mce": 0.35806, "brier": 0.17977, "overconfidence_rate": 0.45122, "underconfidence_rate": 0.47849, "spearman_r": 0.05017, "mean_confidence": 0.75573, "accuracy": 0.87187, "n_turns": 640, "bin_confs": [null, null, null, 0.3333, null, 0.5, null, null, null, 1.0], "bin_accs": [null, null, null, 0.5, null, 0.85806, null, null, null, 0.8872]}}}]};
+
+const fmtPct = v => (v * 100).toFixed(1) + '%';
+const fmtDec = (v, d = 3) => v.toFixed(d);
+
+function svgEl(tag, attrs = {}, children = '') {
+  const a = Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ');
+  return `<${tag} ${a}>${children}</${tag}>`;
+}
+
+// ── Group colors (same as 1B) ──────────────────────────────
+const VOTER_GROUPS = [
+  { key: 'temp', label: 'Temperature', match: r => r.type === 'self-consistency' || r.type === 'mixed-temp' },
+  { key: '3v', label: '3 Voters', match: r => r.type === 'cross-model' && r.n_voters === 3 },
+  { key: '5v', label: '5 Voters', match: r => r.type === 'cross-model' && r.n_voters === 5 },
+  { key: '10v', label: '10 Voters', match: r => r.type === 'cross-model' && r.n_voters === 10 },
+];
+
+const GROUP_PALETTES = {
+  temp:     ['#e9d5ff', '#c4b5fd', '#a78bfa', '#8250df'],
+  '3v':     ['#fef9c3', '#fde68a', '#fcd34d', '#f59e0b', '#d97706', '#b45309'],
+  '5v':     ['#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8'],
+  '10v':    ['#bbf7d0', '#86efac', '#4ade80', '#22c55e', '#16a34a', '#15803d'],
+  baseline: ['#fca5a5', '#f87171', '#ef4444', '#dc2626'],
+};
+
+function getGroupColor(groupKey, rankInGroup, groupSize) {
+  const pal = GROUP_PALETTES[groupKey] || ['#94a3b8'];
+  if (groupSize <= 1) return pal[Math.floor(pal.length / 2)];
+  const idx = Math.round((rankInGroup / (groupSize - 1)) * (pal.length - 1));
+  return pal[Math.min(idx, pal.length - 1)];
+}
+
+function getGroupMidColor(groupKey) {
+  const pal = GROUP_PALETTES[groupKey] || ['#94a3b8'];
+  return pal[Math.floor(pal.length / 2)];
+}
+
+function assignColors(configs) {
+  const groupMembers = {};
+  configs.forEach(c => {
+    if (!groupMembers[c.group]) groupMembers[c.group] = [];
+    groupMembers[c.group].push(c);
+  });
+  configs.forEach(c => {
+    const members = groupMembers[c.group];
+    const rank = members.indexOf(c);
+    c._color = getGroupColor(c.group, rank, members.length);
+  });
+  return configs;
+}
+
+function groupLegend(containerId) {
+  const items = [
+    ...VOTER_GROUPS.map(vg => ({ color: getGroupMidColor(vg.key), label: vg.label })),
+    { color: getGroupMidColor('baseline'), label: 'Single-model baseline' },
+  ];
+  document.getElementById(containerId).innerHTML = items
+    .map(l => `<div class="legend-item"><span class="legend-dot" style="background:${l.color}"></span> ${l.label}</div>`).join('');
+}
+
+// ── Top Stats ──────────────────────────────────────────────
+document.getElementById('subtitle').textContent = `Generated ${DATA.generated || 'N/A'}`;
+document.getElementById('top-stats').innerHTML = [
+  { value: DATA.n_configs || 0, label: 'Configs Tested' },
+  { value: DATA.best_ece_ensemble ? fmtDec(DATA.best_ece_ensemble.ece) : '?', label: 'Best ECE (Ensemble)' },
+  { value: DATA.best_ece_single ? fmtDec(DATA.best_ece_single.ece) : '?', label: 'Best ECE (Single)' },
+  { value: DATA.worst_overconfidence ? fmtPct(DATA.worst_overconfidence.rate) : '?', label: 'Worst Overconfidence' },
+].map(s => `<div class="stat-box"><div class="value">${s.value}</div><div class="label">${s.label}</div></div>`).join('');
+
+// ── Reliability Diagram ────────────────────────────────────
+function renderReliabilityDiagram(containerId, legendId, configs) {
+  const container = document.getElementById(containerId);
+  if (!configs.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const w = container.clientWidth || 600;
+  const h = 500;
+  const pad = { top: 20, right: 20, bottom: 45, left: 50 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  function sx(v) { return pad.left + v * plotW; }
+  function sy(v) { return pad.top + plotH - v * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid
+  for (let i = 0; i <= 5; i++) {
+    const v = i / 5;
+    svg += svgEl('line', { x1: pad.left, y1: sy(v), x2: w - pad.right, y2: sy(v), stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 6, y: sy(v) + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+    svg += svgEl('line', { x1: sx(v), y1: pad.top, x2: sx(v), y2: pad.top + plotH, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: sx(v), y: pad.top + plotH + 16, fill: '#656d76', 'font-size': 10, 'text-anchor': 'middle' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Diagonal (perfect calibration)
+  svg += svgEl('line', { x1: sx(0), y1: sy(0), x2: sx(1), y2: sy(1), stroke: '#9ca3af', 'stroke-width': 1.5, 'stroke-dasharray': '6,4' });
+
+  // Axis labels
+  svg += svgEl('text', { x: pad.left + plotW / 2, y: h - 5, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, 'Mean Predicted Confidence');
+  svg += `<text x="14" y="${pad.top + plotH / 2}" fill="#1f2328" font-size="11" text-anchor="middle" transform="rotate(-90, 14, ${pad.top + plotH / 2})">Actual Accuracy</text>`;
+
+  // Lines per config (limit to top 8 for readability)
+  const shown = configs.slice(0, 8);
+  shown.forEach(c => {
+    const bc = c.overall.bin_confs || [];
+    const ba = c.overall.bin_accs || [];
+    const points = [];
+    for (let i = 0; i < bc.length; i++) {
+      if (bc[i] != null && ba[i] != null) {
+        points.push({ x: bc[i], y: ba[i] });
+      }
+    }
+    if (!points.length) return;
+
+    // Polyline
+    const pathD = points.map((p, i) => (i === 0 ? 'M' : 'L') + sx(p.x).toFixed(1) + ',' + sy(p.y).toFixed(1)).join('');
+    svg += `<path d="${pathD}" fill="none" stroke="${c._color}" stroke-width="2" opacity="0.85"/>`;
+
+    // Points
+    points.forEach(p => {
+      svg += svgEl('circle', { cx: sx(p.x).toFixed(1), cy: sy(p.y).toFixed(1), r: 4, fill: c._color, stroke: '#fff', 'stroke-width': 1 });
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Legend — show configs included
+  document.getElementById(legendId).innerHTML = shown.map(c =>
+    `<div class="legend-item"><span class="legend-dot" style="background:${c._color}"></span> ${c.label}</div>`
+  ).join('');
+}
+
+// ── Calibration Metric Bars (ECE + Brier) ──────────────────
+function renderCalibrationBars(chartId, legendId, configs) {
+  const container = document.getElementById(chartId);
+  if (!configs.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const categories = [
+    { key: 'ece', label: 'ECE' },
+    { key: 'brier', label: 'Brier Score' },
+    { key: 'overconfidence_rate', label: 'Overconfidence Rate' },
+  ];
+
+  const items = configs.map(c => ({
+    ...c,
+    _label: c.label,
+    ece: c.overall.ece,
+    brier: c.overall.brier,
+    overconfidence_rate: c.overall.overconfidence_rate,
+  }));
+
+  const w = container.clientWidth || 1100;
+  const h = 380;
+  const padL = { top: 20, right: 15, bottom: 30, left: 45 };
+  const plotH = h - padL.top - padL.bottom;
+  const plotW = w - padL.left - padL.right;
+  const yMin = 0, yMax = 0.5;
+
+  const nItems = items.length;
+  const nCats = categories.length;
+  const barW = Math.min(18, Math.max(6, (plotW - nCats * 30 - (nCats - 1) * 40) / (nCats * nItems)));
+  const barGap = 1;
+  const groupW = nItems * (barW + barGap) - barGap;
+  const catGap = 40;
+  const totalW = nCats * groupW + (nCats - 1) * catGap;
+  const offsetX = padL.left + (plotW - totalW) / 2;
+
+  function sy(v) { return padL.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid
+  const steps = 5;
+  for (let i = 0; i <= steps; i++) {
+    const v = yMin + (yMax - yMin) * i / steps;
+    const y = sy(v);
+    svg += svgEl('line', { x1: padL.left, y1: y, x2: w - padL.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: padL.left - 5, y: y + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, v.toFixed(2));
+  }
+
+  const barBottom = sy(yMin);
+
+  categories.forEach((cat, ci) => {
+    const groupX = offsetX + ci * (groupW + catGap);
+    svg += svgEl('text', { x: groupX + groupW / 2, y: h - 8, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 600 }, cat.label);
+
+    items.forEach((item, ei) => {
+      const bx = groupX + ei * (barW + barGap);
+      const val = item[cat.key];
+      if (val == null) return;
+      const clamped = Math.min(yMax, Math.max(yMin, val));
+      const barTop = sy(clamped);
+      svg += svgEl('rect', { x: bx, y: barTop, width: barW, height: Math.max(0, barBottom - barTop), rx: 1, fill: item._color, opacity: 0.85 });
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+  groupLegend(legendId);
+}
+
+// ── Accuracy vs. ECE Scatter ───────────────────────────────
+function renderAccuracyVsECE(configs) {
+  const container = document.getElementById('acc-ece-chart');
+  if (!configs.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const w = container.clientWidth || 1100;
+  const h = 420;
+  const pad = { top: 25, right: 40, bottom: 50, left: 60 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  const pts = configs.filter(c => c.overall.ece != null && c.overall.accuracy != null);
+  const eces = pts.map(c => c.overall.ece);
+  const accs = pts.map(c => c.overall.accuracy);
+
+  const eceMin = 0;
+  const eceMax = Math.ceil(Math.max(...eces) * 20 + 1) / 20;
+  const accMin = Math.floor((Math.min(...accs) - 0.03) * 20) / 20;
+  const accMax = Math.ceil((Math.max(...accs) + 0.03) * 20) / 20;
+
+  function sx(e) { return pad.left + (e - eceMin) / (eceMax - eceMin) * plotW; }
+  function sy(a) { return pad.top + plotH - (a - accMin) / (accMax - accMin) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Grid - horizontal (accuracy)
+  for (let i = 0; i <= 5; i++) {
+    const v = accMin + (accMax - accMin) * i / 5;
+    svg += svgEl('line', { x1: pad.left, y1: sy(v), x2: w - pad.right, y2: sy(v), stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 8, y: sy(v) + 4, fill: '#656d76', 'font-size': 10, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Grid - vertical (ECE)
+  const eceSteps = [0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40];
+  eceSteps.forEach(e => {
+    if (e < eceMin || e > eceMax) return;
+    svg += svgEl('line', { x1: sx(e), y1: pad.top, x2: sx(e), y2: pad.top + plotH, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: sx(e), y: pad.top + plotH + 16, fill: '#656d76', 'font-size': 10, 'text-anchor': 'middle' }, e.toFixed(2));
+  });
+
+  // Reference lines: ECE = 0.10, Acc = 80%
+  if (0.10 >= eceMin && 0.10 <= eceMax) {
+    svg += svgEl('line', { x1: sx(0.10), y1: pad.top, x2: sx(0.10), y2: pad.top + plotH, stroke: '#cf222e', 'stroke-width': 1, 'stroke-dasharray': '4,3', opacity: 0.5 });
+    svg += svgEl('text', { x: sx(0.10) + 3, y: pad.top + 12, fill: '#cf222e', 'font-size': 9, opacity: 0.7 }, 'ECE=0.10');
+  }
+  if (0.80 >= accMin && 0.80 <= accMax) {
+    svg += svgEl('line', { x1: pad.left, y1: sy(0.80), x2: w - pad.right, y2: sy(0.80), stroke: '#1a7f37', 'stroke-width': 1, 'stroke-dasharray': '4,3', opacity: 0.5 });
+    svg += svgEl('text', { x: w - pad.right - 3, y: sy(0.80) - 5, fill: '#1a7f37', 'font-size': 9, 'text-anchor': 'end', opacity: 0.7 }, 'Acc=80%');
+  }
+
+  // Axis labels
+  svg += svgEl('text', { x: pad.left + plotW / 2, y: h - 5, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, 'Expected Calibration Error (lower = better)');
+  svg += `<text x="14" y="${pad.top + plotH / 2}" fill="#1f2328" font-size="11" text-anchor="middle" transform="rotate(-90, 14, ${pad.top + plotH / 2})">Accuracy</text>`;
+
+  // Points
+  const r = 7;
+  pts.forEach(c => {
+    const x = sx(c.overall.ece);
+    const y = sy(c.overall.accuracy);
+    svg += svgEl('circle', { cx: x, cy: y, r, fill: c._color, stroke: '#fff', 'stroke-width': 1.5 });
+    const short = c.label.length > 12 ? c.label.slice(0, 10) + '..' : c.label;
+    svg += svgEl('text', { x, y: y - r - 3, fill: '#1f2328', 'font-size': 9, 'text-anchor': 'middle' }, short);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+  groupLegend('acc-ece-legend');
+}
+
+// ── Overconfidence Heatmap ─────────────────────────────────
+function renderOverconfidenceHeatmap(containerId, configs) {
+  const container = document.getElementById(containerId);
+  if (!configs.length) { container.innerHTML = '<p class="note">No data.</p>'; return; }
+
+  const cats = [
+    { key: 'same_flow', label: 'Same Flow' },
+    { key: 'switch_flow', label: 'Switch Flow' },
+    { key: 'ambiguous_first', label: 'Amb 1st' },
+    { key: 'ambiguous_second', label: 'Amb 2nd' },
+  ];
+
+  const cellW = 60, cellH = 40, labelW = 100, headerH = 60;
+  const w = labelW + configs.length * cellW + 20;
+  const h = headerH + cats.length * cellH + 10;
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;overflow-x:auto">`;
+
+  // Column headers
+  configs.forEach((c, ci) => {
+    const x = labelW + ci * cellW + cellW / 2;
+    const short = c.label.length > 8 ? c.label.slice(0, 7) + '..' : c.label;
+    svg += `<text x="${x}" y="${headerH - 8}" fill="#1f2328" font-size="9" text-anchor="middle" transform="rotate(-30, ${x}, ${headerH - 8})">${short}</text>`;
+  });
+
+  // Rows
+  cats.forEach((cat, ri) => {
+    const y = headerH + ri * cellH;
+    svg += svgEl('text', { x: labelW - 8, y: y + cellH / 2 + 4, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'end' }, cat.label);
+
+    configs.forEach((c, ci) => {
+      const x = labelW + ci * cellW;
+      const catData = c.by_category[cat.key];
+      const rate = catData ? catData.overconfidence_rate : 0;
+      // Interpolate white → red based on rate (0 → 1)
+      const intensity = Math.min(1, rate);
+      const r = 255;
+      const g = Math.round(255 * (1 - intensity * 0.8));
+      const b = Math.round(255 * (1 - intensity * 0.9));
+      const fill = `rgb(${r},${g},${b})`;
+
+      svg += svgEl('rect', { x: x + 2, y: y + 2, width: cellW - 4, height: cellH - 4, rx: 3, fill, stroke: '#e5e7eb', 'stroke-width': 0.5 });
+      svg += svgEl('text', { x: x + cellW / 2, y: y + cellH / 2 + 4, fill: intensity > 0.5 ? '#fff' : '#1f2328', 'font-size': 10, 'text-anchor': 'middle', 'font-weight': 600 }, fmtPct(rate));
+    });
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Results Table ──────────────────────────────────────────
+function renderResultsTable(configs) {
+  const el = document.getElementById('results-table');
+  if (!configs.length) { el.innerHTML = '<tr><td>No data</td></tr>'; return; }
+
+  const groupBadges = { temp: 'badge-purple', '3v': 'badge-yellow', '5v': 'badge-blue', '10v': 'badge-green', baseline: 'badge-red' };
+  const groupLabels = { temp: 'Temperature', '3v': '3 Voters', '5v': '5 Voters', '10v': '10 Voters', baseline: 'Single-Model' };
+
+  let html = `<thead><tr>
+    <th>Config</th><th>Type</th><th>Voters</th>
+    <th>Accuracy</th><th>ECE</th><th>MCE</th><th>Brier</th>
+    <th>Mean Conf</th><th>Overconf %</th><th>Spearman r</th>
+  </tr></thead><tbody>`;
+
+  // Ensembles first, then baselines
+  const ensembles = configs.filter(c => c.group !== 'baseline');
+  const baselines = configs.filter(c => c.group === 'baseline');
+
+  ensembles.forEach(c => {
+    const o = c.overall;
+    const badge = groupBadges[c.group] || 'badge-blue';
+    const label = groupLabels[c.group] || c.group;
+    html += `<tr>
+      <td><strong>${c.label}</strong></td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td class="num">${c.n_voters}</td>
+      <td class="num">${fmtPct(o.accuracy)}</td>
+      <td class="num"><strong>${fmtDec(o.ece)}</strong></td>
+      <td class="num">${fmtDec(o.mce)}</td>
+      <td class="num">${fmtDec(o.brier)}</td>
+      <td class="num">${fmtPct(o.mean_confidence)}</td>
+      <td class="num">${fmtPct(o.overconfidence_rate)}</td>
+      <td class="num">${fmtDec(o.spearman_r)}</td>
+    </tr>`;
+  });
+
+  if (baselines.length) {
+    html += `<tr><td colspan="10" style="background:var(--surface);font-weight:600;color:var(--muted);padding:0.6rem">Single-Model Baselines (Exp 1A)</td></tr>`;
+    baselines.forEach(c => {
+      const o = c.overall;
+      html += `<tr style="color:var(--muted)">
+        <td>${c.label}</td>
+        <td><span class="badge badge-red">Single-Model</span></td>
+        <td class="num">1</td>
+        <td class="num">${fmtPct(o.accuracy)}</td>
+        <td class="num"><strong>${fmtDec(o.ece)}</strong></td>
+        <td class="num">${fmtDec(o.mce)}</td>
+        <td class="num">${fmtDec(o.brier)}</td>
+        <td class="num">${fmtPct(o.mean_confidence)}</td>
+        <td class="num">${fmtPct(o.overconfidence_rate)}</td>
+        <td class="num">${fmtDec(o.spearman_r)}</td>
+      </tr>`;
+    });
+  }
+
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+// ── Key Findings ───────────────────────────────────────────
+function renderFindings(configs) {
+  const el = document.getElementById('findings-section');
+  if (!configs.length) { el.innerHTML = '<p class="note">No results yet.</p>'; return; }
+
+  const ensembles = configs.filter(c => c.group !== 'baseline');
+  const baselines = configs.filter(c => c.group === 'baseline');
+
+  const bestEceEns = ensembles.length ? ensembles.reduce((a, b) => a.overall.ece < b.overall.ece ? a : b) : null;
+  const bestEceSingle = baselines.length ? baselines.reduce((a, b) => a.overall.ece < b.overall.ece ? a : b) : null;
+  const bestAcc = configs.reduce((a, b) => a.overall.accuracy > b.overall.accuracy ? a : b);
+
+  const avgEceEns = ensembles.length ? ensembles.reduce((s, c) => s + c.overall.ece, 0) / ensembles.length : 0;
+  const avgEceBl = baselines.length ? baselines.reduce((s, c) => s + c.overall.ece, 0) / baselines.length : 0;
+  const avgOverconfEns = ensembles.length ? ensembles.reduce((s, c) => s + c.overall.overconfidence_rate, 0) / ensembles.length : 0;
+  const avgOverconfBl = baselines.length ? baselines.reduce((s, c) => s + c.overall.overconfidence_rate, 0) / baselines.length : 0;
+
+  // Voter count analysis
+  const byVoters = {};
+  ensembles.forEach(c => {
+    const nv = c.n_voters;
+    if (!byVoters[nv]) byVoters[nv] = [];
+    byVoters[nv].push(c.overall.ece);
+  });
+  const voterEce = Object.entries(byVoters).map(([nv, eces]) => ({
+    nv: parseInt(nv), avgEce: eces.reduce((s, e) => s + e, 0) / eces.length,
+  })).sort((a, b) => a.nv - b.nv);
+
+  let voterNote = voterEce.map(v => `${v.nv}-voter avg ECE ${v.avgEce.toFixed(3)}`).join(', ');
+
+  // Pareto-optimal: best accuracy per cost bracket among ensembles
+  const byValue = [...ensembles].sort((a, b) => {
+    const scoreA = a.overall.accuracy / Math.max(a.relative_cost, 0.01);
+    const scoreB = b.overall.accuracy / Math.max(b.relative_cost, 0.01);
+    return scoreB - scoreA;
+  });
+  const bestValue = byValue.length ? byValue[0] : null;
+
+  // Best accuracy with ECE < 0.10
+  const wellCalibrated = configs.filter(c => c.overall.ece < 0.10).sort((a, b) => b.overall.accuracy - a.overall.accuracy);
+  const bestCalAcc = wellCalibrated.length ? wellCalibrated[0] : null;
+
+  // Cheapest baseline with >80% accuracy
+  const cheapAccurate = baselines.filter(c => c.overall.accuracy >= 0.80).sort((a, b) => a.relative_cost - b.relative_cost);
+  const budgetPick = cheapAccurate.length ? cheapAccurate[0] : null;
+
+  // Low overconfidence ensembles (< 50%)
+  const lowOverconf = ensembles.filter(c => c.overall.overconfidence_rate < 0.50);
+
+  let html = `<div class="card full">
+    <h4 style="margin:0 0 0.5rem 0; font-size:0.9rem; color: var(--text);">Analysis</h4>
+    <ul style="font-size:0.85rem; line-height:1.8; padding-left:1.2rem; color: var(--text);">
+      <li><strong>Best calibrated ensemble:</strong> ${bestEceEns ? bestEceEns.label : '?'} with ECE ${bestEceEns ? fmtDec(bestEceEns.overall.ece) : '?'} and accuracy ${bestEceEns ? fmtPct(bestEceEns.overall.accuracy) : '?'}</li>
+      <li><strong>Best calibrated single model:</strong> ${bestEceSingle ? bestEceSingle.label : '?'} with ECE ${bestEceSingle ? fmtDec(bestEceSingle.overall.ece) : '?'} and accuracy ${bestEceSingle ? fmtPct(bestEceSingle.overall.accuracy) : '?'}</li>
+      <li><strong>Ensembles vs. baselines:</strong> average ECE ${fmtDec(avgEceEns)} vs ${fmtDec(avgEceBl)}, overconfidence rate ${fmtPct(avgOverconfEns)} vs ${fmtPct(avgOverconfBl)}</li>
+      <li><strong>Voter count effect:</strong> ${voterNote}</li>
+      <li><strong>Most accurate:</strong> ${bestAcc.label} at ${fmtPct(bestAcc.overall.accuracy)} (ECE ${fmtDec(bestAcc.overall.ece)})</li>
+    </ul>
+    <h4 style="margin:1rem 0 0.5rem 0; font-size:0.9rem; color: var(--text);">Deployment Recommendations</h4>
+    <ul style="font-size:0.85rem; line-height:1.8; padding-left:1.2rem; color: var(--text);">
+      ${bestCalAcc ? `<li><strong>Best overall:</strong> <em>${bestCalAcc.label}</em> — ${fmtPct(bestCalAcc.overall.accuracy)} accuracy with ECE ${fmtDec(bestCalAcc.overall.ece)} (${bestCalAcc.relative_cost.toFixed(1)}x cost). Choose this when both accuracy and trustworthy confidence scores matter.</li>` : ''}
+      ${bestValue ? `<li><strong>Best value:</strong> <em>${bestValue.label}</em> — ${fmtPct(bestValue.overall.accuracy)} accuracy at only ${bestValue.relative_cost.toFixed(1)}x cost (ECE ${fmtDec(bestValue.overall.ece)}). Best accuracy-per-dollar for production systems with moderate calibration needs.</li>` : ''}
+      ${budgetPick ? `<li><strong>Budget option:</strong> <em>${budgetPick.label}</em> — ${fmtPct(budgetPick.overall.accuracy)} accuracy at ${budgetPick.relative_cost.toFixed(1)}x cost. Accept the calibration tradeoff (ECE ${fmtDec(budgetPick.overall.ece)}) when confidence routing is not needed.</li>` : ''}
+      <li><strong>Confidence routing:</strong> ${lowOverconf.length ? `Only ${lowOverconf.length} ensemble(s) achieve <50% overconfidence (${lowOverconf.map(c => c.label).join(', ')}). If your system routes uncertain predictions to a fallback (human or stronger model), use one of these — their confidence signals are meaningful.` : 'No ensembles in this set achieve <50% overconfidence. Consider larger voter pools or calibration post-processing if confidence routing is critical.'}</li>
+      <li><strong>Avoid relying on 3-voter confidence:</strong> 3-voter ensembles average ${voterEce.find(v => v.nv === 3) ? fmtDec(voterEce.find(v => v.nv === 3).avgEce) : '?'} ECE with ~${ensembles.filter(c => c.n_voters === 3).length ? fmtPct(ensembles.filter(c => c.n_voters === 3).reduce((s, c) => s + c.overall.overconfidence_rate, 0) / ensembles.filter(c => c.n_voters === 3).length) : '?'} overconfidence — their confidence scores add little beyond a binary correct/incorrect signal.</li>
+      <li><strong>General guidance:</strong> 5-voter ensembles offer the best cost-calibration tradeoff. Use 10-voter only when confidence-based routing is critical to your pipeline and the added latency is acceptable.</li>
+    </ul>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ── Render all ─────────────────────────────────────────────
+const configs = assignColors(DATA.configs || []);
+renderReliabilityDiagram('reliability-chart', 'reliability-legend', configs);
+renderCalibrationBars('calibration-bars', 'calibration-legend', configs);
+renderAccuracyVsECE(configs);
+renderOverconfidenceHeatmap('overconf-heatmap', configs);
+renderResultsTable(configs);
+renderFindings(configs);
+</script>
+</body>
+</html>

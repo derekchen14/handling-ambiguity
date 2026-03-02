@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 2 — Pipeline vs Flat Report</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de;
+    --text: #1f2328; --muted: #656d76; --accent: #0969da;
+    --green: #1a7f37; --yellow: #9a6700; --red: #cf222e;
+    --purple: #8250df; --orange: #bc4c00; --cyan: #0550ae;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+  .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.5rem; min-width: 140px; text-align: center; flex: 1;
+  }
+  .stat-box .value { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-box .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem; overflow-x: auto;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h3 { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+  td { white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(9,105,218,0.04); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem; font-style: italic; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+  .badge-green { background: rgba(26,127,55,0.1); color: var(--green); }
+  .badge-yellow { background: rgba(154,103,0,0.1); color: var(--yellow); }
+  .badge-red { background: rgba(207,34,46,0.1); color: var(--red); }
+  .legend { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+  .section-notes { list-style: disc; padding-left: 1.5rem; margin-top: 0.75rem; }
+  .section-notes li { color: var(--text); font-size: 0.85rem; margin: 0.3rem 0; }
+  .findings { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
+  .findings p { font-size: 0.9rem; line-height: 1.7; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>Experiment 2 — Pipeline vs Flat</h1>
+<p class="subtitle" id="subtitle">Loading results...</p>
+
+<div class="stat-row" id="top-stats"></div>
+
+<!-- §1. Hero: Pipeline vs Flat -->
+<h2>1. Pipeline vs Flat — End-to-End Accuracy</h2>
+<p class="note" style="margin-bottom:0.75rem">Pipeline E2E = Intent (Flash) &times; Flow (5v-6 ensemble) &times; Scoped Tool (per model). Positive delta means pipeline wins.</p>
+<div class="card full">
+  <div id="hero-chart"></div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> Pipeline E2E</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#dc2626"></span> Flat</div>
+  </div>
+</div>
+<div class="card full">
+  <table id="hero-table"></table>
+</div>
+
+<!-- §2. Pipeline Stages Breakdown -->
+<h2>2. Pipeline Stages Breakdown</h2>
+<p class="note" style="margin-bottom:0.75rem">Per-stage accuracy: where in the pipeline does accuracy change?</p>
+<div class="card full">
+  <div id="pipeline-chart"></div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#93c5fd"></span> Intent (Exp 2A)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> Flow Detection (Exp 1A)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#86efac"></span> Scoped Tool (Exp 2A)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#dc2626"></span> Flat Tool (Exp 2B)</div>
+  </div>
+</div>
+<div class="card full">
+  <table id="stages-table"></table>
+</div>
+<ul class="section-notes" id="s2-notes"></ul>
+
+<!-- §3. Domain Split — Hugo vs Dana -->
+<h2>3. Domain Split — Hugo vs Dana</h2>
+<p class="note" style="margin-bottom:0.75rem">Does the pipeline help more in Hugo (more confusable tools) than Dana? Tests hypothesis H5.</p>
+<div class="grid">
+  <div class="card"><h3>Hugo</h3><div id="domain-hugo-chart"></div></div>
+  <div class="card"><h3>Dana</h3><div id="domain-dana-chart"></div></div>
+</div>
+<ul class="section-notes" id="s3-notes"></ul>
+
+<!-- §4. Category Breakdown — Where Flat Struggles -->
+<h2>4. Category Breakdown — Where Flat Struggles</h2>
+<p class="note" style="margin-bottom:0.75rem">Flat tool-calling accuracy by conversation category.</p>
+<div class="card full">
+  <div id="flat-cat-chart"></div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#93c5fd"></span> Same Flow</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> Switch Flow</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span> Ambiguous 1st</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span> Ambiguous 2nd</div>
+  </div>
+</div>
+<ul class="section-notes" id="s4-notes"></ul>
+
+<!-- §5. Ambiguity Hint Ablation (Exp 2C) -->
+<h2>5. Ambiguity Hint Ablation (Exp 2C)</h2>
+<p class="note" style="margin-bottom:0.75rem">Flat tool-calling + explicit prompt hint to prefer <code>handle_ambiguity</code> on unclear requests. Arrows show change vs Exp 2B (no hint).</p>
+<div class="grid">
+  <div class="card"><h3>Same Flow</h3><div id="hint-same"></div></div>
+  <div class="card"><h3>Switch Flow</h3><div id="hint-switch"></div></div>
+  <div class="card"><h3>Ambiguous 1st</h3><div id="hint-ambig1"></div></div>
+  <div class="card"><h3>Ambiguous 2nd</h3><div id="hint-ambig2"></div></div>
+</div>
+<div style="margin-top:-0.5rem;margin-bottom:1rem" class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#dc2626"></span> Flat (2B)</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Hint (2C)</div>
+</div>
+<div class="card full">
+  <table id="hint-table"></table>
+</div>
+<ul class="section-notes" id="s5-notes"></ul>
+
+<!-- §6. Flat Tool Confusion Analysis -->
+<h2>6. Flat Tool Confusion Analysis</h2>
+<div class="grid">
+  <div class="card"><h3>Hugo</h3><table id="flat-conf-hugo"></table></div>
+  <div class="card"><h3>Dana</h3><table id="flat-conf-dana"></table></div>
+</div>
+<ul class="section-notes" id="s6-notes"></ul>
+
+<!-- §7. Key Findings -->
+<h2>7. Key Findings</h2>
+<div class="findings"><p id="findings-text"></p></div>
+
+<footer>
+  <p>Generated from Exp 2 JSONL data. Regenerate: <code>python3 results/build_report_2.py</code></p>
+</footer>
+
+<script>
+const DATA = {"generated": "2026-03-01 13:39", "total_flat_runs": 43, "total_intent_runs": 42, "total_scoped_runs": 42, "total_hint_runs": 18, "total_cost": 632.93498439, "hero_rows": [{"model_short": "Haiku 4.5", "model_id": "claude-haiku-4-5-20251001", "provider": "anthropic", "tier": "low", "pipeline_e2e": 0.7200120781249999, "pipeline_hugo": 0.75186053125, "pipeline_dana": 0.688163625, "flat_acc": 0.5463169642857143, "flat_hugo": 0.580078125, "flat_dana": 0.5013020833333334, "delta": 0.1736951138392856, "rel_gain": 0.31793834933605697, "_sort": 0}, {"model_short": "Gemini 3 Flash", "model_id": "gemini-3-flash-preview", "provider": "google", "tier": "medium", "pipeline_e2e": 0.84320613671875, "pipeline_hugo": 0.8502964609375, "pipeline_dana": 0.8361158125, "flat_acc": 0.7298177083333334, "flat_hugo": 0.76171875, "flat_dana": 0.6979166666666666, "delta": 0.11338842838541663, "rel_gain": 0.15536541123996425, "_sort": 1}, {"model_short": "Sonnet 4.6", "model_id": "claude-sonnet-4-6", "provider": "anthropic", "tier": "medium", "pipeline_e2e": 0.7835030507812499, "pipeline_hugo": 0.8338174140625, "pipeline_dana": 0.7331886875, "flat_acc": 0.615234375, "flat_hugo": 0.6510416666666666, "flat_dana": 0.5794270833333334, "delta": 0.16826867578124993, "rel_gain": 0.27350337142857134, "_sort": 2}, {"model_short": "GPT-5 mini", "model_id": "gpt-5-mini", "provider": "openai", "tier": "medium", "pipeline_e2e": 0.8134320820312501, "pipeline_hugo": 0.8598807578125001, "pipeline_dana": 0.76698340625, "flat_acc": 0.5983072916666666, "flat_hugo": 0.66015625, "flat_dana": 0.5364583333333334, "delta": 0.21512479036458343, "rel_gain": 0.3595556887921656, "_sort": 3}, {"model_short": "Opus 4.6", "model_id": "claude-opus-4-6", "provider": "anthropic", "tier": "high", "pipeline_e2e": 0.7559526640625001, "pipeline_hugo": 0.786626515625, "pipeline_dana": 0.7252788125, "flat_acc": 0.6276041666666666, "flat_hugo": 0.6627604166666666, "flat_dana": 0.5924479166666666, "delta": 0.12834849739583343, "rel_gain": 0.20450548962655618, "_sort": 4}, {"model_short": "Qwen3 235B", "model_id": "Qwen/Qwen3-235B-A22B-Thinking-2507", "provider": "qwen", "tier": "high", "pipeline_e2e": 0.8484135937499999, "pipeline_hugo": 0.87432159375, "pipeline_dana": 0.82250559375, "flat_acc": 0.7180989583333334, "flat_hugo": 0.7708333333333334, "flat_dana": 0.6653645833333334, "delta": 0.13031463541666655, "rel_gain": 0.1814716953762464, "_sort": 5}, {"model_short": "DeepSeek R1", "model_id": "deepseek-reasoner", "provider": "deepseek", "tier": "high", "pipeline_e2e": 0.7224794218749999, "pipeline_hugo": 0.737664875, "pipeline_dana": 0.70729396875, "flat_acc": 0.4837239583333333, "flat_hugo": 0.4739583333333333, "flat_dana": 0.4934895833333333, "delta": 0.2387554635416666, "rel_gain": 0.4935779165545086, "_sort": 6}], "flat_ranking": [{"config_id": "2_002", "model_id": "gemini-3-flash-preview", "model_short": "Gemini 3 Flash", "provider": "google", "tier": "medium", "accuracy": 0.7298177083333334, "accuracy_std": 0.034974937548341904, "hugo_acc": 0.76171875, "hugo_std": 0.0, "hugo_seeds": 3, "dana_acc": 0.6979166666666666, "dana_std": 0.002255274489021976, "dana_seeds": 3, "cost_per_run": 0.36066185, "seed_count": 6, "cat_same_flow": 0.7786458333333334, "cat_same_flow_std": 0.11710066227040165, "cat_switch_flow": 0.8880208333333334, "cat_switch_flow_std": 0.015362376253908985, "cat_ambiguous_first": 0.4765625, "cat_ambiguous_first_std": 0.04501518840902479, "cat_ambiguous_second": 0.7760416666666666, "cat_ambiguous_second_std": 0.02551551815399144, "_sort": 1, "ambiguity_flagged": 3.5}, {"config_id": "2_021", "model_id": "Qwen/Qwen3-235B-A22B-Thinking-2507", "model_short": "Qwen3 235B", "provider": "qwen", "tier": "high", "accuracy": 0.7180989583333334, "accuracy_std": 0.058432939048839706, "hugo_acc": 0.7708333333333334, "hugo_std": 0.013718299157360338, "hugo_seeds": 3, "dana_acc": 0.6653645833333334, "dana_std": 0.002255274489021976, "dana_seeds": 3, "cost_per_run": 9.798537583333333, "seed_count": 6, "cat_same_flow": 0.7864583333333334, "cat_same_flow_std": 0.11552642194176477, "cat_switch_flow": 0.859375, "cat_switch_flow_std": 0.06629126073623882, "cat_ambiguous_first": 0.5052083333333334, "cat_ambiguous_first_std": 0.04153625424453518, "cat_ambiguous_second": 0.7213541666666666, "cat_ambiguous_second_std": 0.026912522255757944, "_sort": 5, "ambiguity_flagged": 11.333333333333334}, {"config_id": "2_010", "model_id": "claude-opus-4-6", "model_short": "Opus 4.6", "provider": "anthropic", "tier": "high", "accuracy": 0.6276041666666666, "accuracy_std": 0.03864358708656155, "hugo_acc": 0.6627604166666666, "hugo_std": 0.002255274489021976, "hugo_seeds": 3, "dana_acc": 0.5924479166666666, "dana_std": 0.004510548978043951, "dana_seeds": 3, "cost_per_run": 44.36983, "seed_count": 6, "cat_same_flow": 0.6640625, "cat_same_flow_std": 0.09413981457120042, "cat_switch_flow": 0.75, "cat_switch_flow_std": 0.009882117688026186, "cat_ambiguous_first": 0.4557291666666667, "cat_ambiguous_first_std": 0.0571257065966511, "cat_ambiguous_second": 0.640625, "cat_ambiguous_second_std": 0.02209708691207961, "_sort": 4, "ambiguity_flagged": 6.5}, {"config_id": "2_004", "model_id": "claude-sonnet-4-6", "model_short": "Sonnet 4.6", "provider": "anthropic", "tier": "medium", "accuracy": 0.615234375, "accuracy_std": 0.03989350447402121, "hugo_acc": 0.6510416666666666, "hugo_std": 0.005966895436140417, "hugo_seeds": 3, "dana_acc": 0.5794270833333334, "dana_std": 0.009830513587592123, "dana_seeds": 3, "cost_per_run": 8.6091215, "seed_count": 6, "cat_same_flow": 0.6927083333333334, "cat_same_flow_std": 0.11552642194176477, "cat_switch_flow": 0.75, "cat_switch_flow_std": 0.013975424859373685, "cat_ambiguous_first": 0.4348958333333333, "cat_ambiguous_first_std": 0.022999377256062103, "cat_ambiguous_second": 0.5833333333333334, "cat_ambiguous_second_std": 0.04153625424453518, "_sort": 2, "ambiguity_flagged": 12.0}, {"config_id": "2_008", "model_id": "gpt-5-mini", "model_short": "GPT-5 mini", "provider": "openai", "tier": "medium", "accuracy": 0.5983072916666666, "accuracy_std": 0.06821599546851469, "hugo_acc": 0.66015625, "hugo_std": 0.00390625, "hugo_seeds": 3, "dana_acc": 0.5364583333333334, "dana_std": 0.011933790872280834, "dana_seeds": 3, "cost_per_run": 0.9518923333333333, "seed_count": 6, "cat_same_flow": 0.5807291666666666, "cat_same_flow_std": 0.12516265459060327, "cat_switch_flow": 0.6197916666666666, "cat_switch_flow_std": 0.05103103630798288, "cat_ambiguous_first": 0.5729166666666666, "cat_ambiguous_first_std": 0.06964381104352825, "cat_ambiguous_second": 0.6197916666666666, "cat_ambiguous_second_std": 0.05291010458000123, "_sort": 3, "ambiguity_flagged": 65.16666666666667}, {"config_id": "2_001", "model_id": "claude-haiku-4-5-20251001", "model_short": "Haiku 4.5", "provider": "anthropic", "tier": "low", "accuracy": 0.5463169642857143, "accuracy_std": 0.04855017616502295, "hugo_acc": 0.580078125, "hugo_std": 0.03322226776607571, "hugo_seeds": 4, "dana_acc": 0.5013020833333334, "dana_std": 0.009830513587592123, "dana_seeds": 3, "cost_per_run": 2.3205867428571425, "seed_count": 7, "cat_same_flow": 0.59375, "cat_same_flow_std": 0.08699631816921909, "cat_switch_flow": 0.6763392857142857, "cat_switch_flow_std": 0.02337541379822174, "cat_ambiguous_first": 0.375, "cat_ambiguous_first_std": 0.07328774624724109, "cat_ambiguous_second": 0.5401785714285714, "cat_ambiguous_second_std": 0.047613234392190944, "_sort": 0, "ambiguity_flagged": 7.0}, {"config_id": "2_024", "model_id": "deepseek-reasoner", "model_short": "DeepSeek R1", "provider": "deepseek", "tier": "high", "accuracy": 0.4837239583333333, "accuracy_std": 0.018391206890397832, "hugo_acc": 0.4739583333333333, "hugo_std": 0.005966895436140417, "hugo_seeds": 3, "dana_acc": 0.4934895833333333, "dana_std": 0.022888536238602795, "dana_seeds": 3, "cost_per_run": 1.7118652433333335, "seed_count": 6, "cat_same_flow": 0.5182291666666666, "cat_same_flow_std": 0.01826633116328144, "cat_switch_flow": 0.5625, "cat_switch_flow_std": 0.07057243619147634, "cat_ambiguous_first": 0.4036458333333333, "cat_ambiguous_first_std": 0.05881036349289695, "cat_ambiguous_second": 0.4505208333333333, "cat_ambiguous_second_std": 0.03880120944206078, "_sort": 6, "ambiguity_flagged": 18.333333333333332}], "comparison_rows": [{"model_short": "Haiku 4.5", "model_id": "claude-haiku-4-5-20251001", "provider": "anthropic", "tier": "low", "intent_acc": 0.9401041666666666, "flow_acc": 0.79765625, "scoped_acc": 0.7955729166666666, "flat_acc": 0.5463169642857143, "_sort": 0}, {"model_short": "Gemini 3 Flash", "model_id": "gemini-3-flash-preview", "provider": "google", "tier": "medium", "intent_acc": 0.94921875, "flow_acc": 0.8015625, "scoped_acc": 0.9388020833333334, "flat_acc": 0.7298177083333334, "_sort": 1}, {"model_short": "Sonnet 4.6", "model_id": "claude-sonnet-4-6", "provider": "anthropic", "tier": "medium", "intent_acc": 0.92578125, "flow_acc": 0.83125, "scoped_acc": 0.869140625, "flat_acc": 0.615234375, "_sort": 2}, {"model_short": "GPT-5 mini", "model_id": "gpt-5-mini", "provider": "openai", "tier": "medium", "intent_acc": 0.9303385416666666, "flow_acc": 0.779296875, "scoped_acc": 0.9016927083333334, "flat_acc": 0.5983072916666666, "_sort": 3}, {"model_short": "Opus 4.6", "model_id": "claude-opus-4-6", "provider": "anthropic", "tier": "high", "intent_acc": 0.943359375, "flow_acc": 0.81953125, "scoped_acc": 0.8365885416666666, "flat_acc": 0.6276041666666666, "_sort": 4}, {"model_short": "Qwen3 235B", "model_id": "Qwen/Qwen3-235B-A22B-Thinking-2507", "provider": "qwen", "tier": "high", "intent_acc": 0.9231770833333334, "flow_acc": 0.798828125, "scoped_acc": 0.943359375, "flat_acc": 0.7180989583333334, "_sort": 5}, {"model_short": "DeepSeek R1", "model_id": "deepseek-reasoner", "provider": "deepseek", "tier": "high", "intent_acc": 0.8990885416666666, "flow_acc": 0.810546875, "scoped_acc": 0.7981770833333334, "flat_acc": 0.4837239583333333, "_sort": 6}], "hint_rows": [{"model_short": "Haiku 4.5", "model_id": "claude-haiku-4-5-20251001", "tier": "low", "hint_acc": 0.5970052083333334, "flat_acc": 0.5463169642857143, "delta": 0.05068824404761907, "hint_seeds": 6, "_sort": 0, "d_same_flow": 0.05729166666666663, "hint_same_flow": 0.6510416666666666, "flat_same_flow": 0.59375, "d_switch_flow": 0.005952380952380931, "hint_switch_flow": 0.6822916666666666, "flat_switch_flow": 0.6763392857142857, "d_ambiguous_first": 0.1171875, "hint_ambiguous_first": 0.4921875, "flat_ambiguous_first": 0.375, "d_ambiguous_second": 0.022321428571428603, "hint_ambiguous_second": 0.5625, "flat_ambiguous_second": 0.5401785714285714}, {"model_short": "Gemini 3 Flash", "model_id": "gemini-3-flash-preview", "tier": "medium", "hint_acc": 0.7424739583333334, "flat_acc": 0.7298177083333334, "delta": 0.012656250000000036, "hint_seeds": 6, "_sort": 1, "d_same_flow": 0.05208333333333326, "hint_same_flow": 0.8307291666666666, "flat_same_flow": 0.7786458333333334, "d_switch_flow": -0.0234375, "hint_switch_flow": 0.8645833333333334, "flat_switch_flow": 0.8880208333333334, "d_ambiguous_first": 0.044791666666666674, "hint_ambiguous_first": 0.5213541666666667, "flat_ambiguous_first": 0.4765625, "d_ambiguous_second": -0.04947916666666663, "hint_ambiguous_second": 0.7265625, "flat_ambiguous_second": 0.7760416666666666}, {"model_short": "Sonnet 4.6", "model_id": "claude-sonnet-4-6", "tier": "medium", "hint_acc": 0.63671875, "flat_acc": 0.615234375, "delta": 0.021484375, "hint_seeds": 6, "_sort": 2, "d_same_flow": 0.02604166666666663, "hint_same_flow": 0.71875, "flat_same_flow": 0.6927083333333334, "d_switch_flow": 0.0078125, "hint_switch_flow": 0.7578125, "flat_switch_flow": 0.75, "d_ambiguous_first": 0.049479166666666685, "hint_ambiguous_first": 0.484375, "flat_ambiguous_first": 0.4348958333333333, "d_ambiguous_second": 0.0026041666666666297, "hint_ambiguous_second": 0.5859375, "flat_ambiguous_second": 0.5833333333333334}], "flat_confusions_hugo": [{"expected": "ambiguous", "predicted": "search_posts", "count": 89}, {"expected": "ambiguous", "predicted": "read_post", "count": 69}, {"expected": "compare", "predicted": "search_posts", "count": 68}, {"expected": "blueprint", "predicted": "search_posts", "count": 64}, {"expected": "inspect", "predicted": "analyze_content", "count": 62}, {"expected": "ambiguous", "predicted": "analyze_content", "count": 52}, {"expected": "expand", "predicted": "read_post", "count": 50}, {"expected": "ambiguous", "predicted": "publish_post", "count": 49}, {"expected": "ambiguous", "predicted": "check_platform", "count": 45}, {"expected": "format", "predicted": "analyze_content", "count": 38}, {"expected": "ambiguous", "predicted": "write_section", "count": 35}, {"expected": "view", "predicted": "search_posts", "count": 34}], "flat_confusions_dana": [{"expected": "ambiguous", "predicted": "describe_stats", "count": 132}, {"expected": "fill", "predicted": "execute_python", "count": 71}, {"expected": "outline", "predicted": "execute_sql", "count": 66}, {"expected": "ambiguous", "predicted": "dimension_breakdown", "count": 61}, {"expected": "join", "predicted": "list_datasets", "count": 56}, {"expected": "ambiguous", "predicted": "execute_sql", "count": 49}, {"expected": "datatype", "predicted": "describe_stats", "count": 39}, {"expected": "dashboard", "predicted": "handle_ambiguity", "count": 36}, {"expected": "plot", "predicted": "dimension_breakdown", "count": 34}, {"expected": "dedupe", "predicted": "describe_stats", "count": 33}, {"expected": "append", "predicted": "list_datasets", "count": 32}, {"expected": "trend", "predicted": "execute_sql", "count": 31}], "findings_text": "The 3-stage NLU pipeline (intent \u2192 flow \u2192 scoped tools) outperforms flat tool-calling for 7 of 7 models tested, with an average end-to-end advantage of +16.7%. The best pipeline configuration (Qwen3 235B) achieves 84.8% E2E accuracy, compared to 73.0% for the best flat model (Gemini 3 Flash). The pipeline benefit is largest for DeepSeek R1 (+23.9%) and smallest for Gemini 3 Flash (+11.3%), suggesting weaker models gain more from staged narrowing. Contrary to hypothesis H5, the pipeline advantage is nearly identical across domains (Hugo +16.2%, Dana +17.3%), indicating that staged narrowing helps regardless of tool-set complexity. Overall, the results validate the pipeline architecture: the cost of running three lightweight stages is repaid by substantially higher accuracy, especially for models that struggle with large tool inventories. An explicit ambiguity hint (Exp 2C) improves flat accuracy by +2.8% on average, indicating that prompt-level intervention partially compensates for the pipeline's structural ambiguity handling."};
+
+// ── SVG helpers ──────────────────────────────────────────────────
+function fmtPct(v) { return v == null ? '-' : (v * 100).toFixed(1) + '%'; }
+function fmtCost(v) { return v == null ? '-' : '$' + v.toFixed(3); }
+function fmtDelta(v) { return v == null ? '-' : (v >= 0 ? '+' : '') + (v * 100).toFixed(1); }
+
+function svgEl(tag, attrs, children) {
+  const a = Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ');
+  return `<${tag} ${a}>${children || ''}</${tag}>`;
+}
+
+// ── Vertical bar chart ───────────────────────────────────────────
+function renderVBarChart(containerId, items, {
+  valuePairs = null,
+  valueKey = null,
+  stdKey = null,
+  labelKey = 'model_short',
+  colorFn = null,
+  showDelta = false,
+  arrowDelta = false,
+  deltaKey = 'delta',
+  yMin = 0.5, yMax = 1.0,
+  width = 1050, height = 340,
+} = {}) {
+  const container = document.getElementById(containerId);
+  if (!container || !items.length) return;
+
+  const pad = { top: 30, right: 20, bottom: 60, left: 50 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+
+  const n = items.length;
+  const isPaired = valuePairs != null;
+  const groupW = plotW / n;
+  const barW = isPaired ? Math.min(groupW * 0.35, 32) : Math.min(groupW * 0.6, 48);
+  const barGap = isPaired ? 3 : 0;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+  function sx(i) { return pad.left + groupW * i + groupW / 2; }
+
+  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  // Y grid lines
+  for (let i = 0; i <= 5; i++) {
+    const v = yMin + (yMax - yMin) * i / 5;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: width - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 8, y: y + 4, fill: '#656d76', 'font-size': 11, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  // Bars
+  items.forEach((item, i) => {
+    const cx = sx(i);
+
+    if (isPaired) {
+      valuePairs.forEach((pair, pi) => {
+        const v = item[pair.key];
+        if (v == null) return;
+        const barX = cx + (pi === 0 ? -barW - barGap/2 : barGap/2);
+        const barY = sy(v);
+        const barH = sy(yMin) - barY;
+        svg += svgEl('rect', { x: barX, y: barY, width: barW, height: Math.max(barH, 1), fill: pair.color, rx: 2 });
+        svg += svgEl('text', { x: barX + barW/2, y: barY - 5, fill: '#1f2328', 'font-size': 10, 'text-anchor': 'middle', 'font-weight': 600 }, (v * 100).toFixed(1));
+
+        const stdVal = pair.stdKey ? item[pair.stdKey] : null;
+        if (stdVal) {
+          const top = sy(Math.min(v + stdVal, yMax));
+          const bot = sy(Math.max(v - stdVal, yMin));
+          const mx = barX + barW/2;
+          svg += svgEl('line', { x1: mx, y1: top, x2: mx, y2: bot, stroke: '#656d76', 'stroke-width': 1.5 });
+          svg += svgEl('line', { x1: mx-3, y1: top, x2: mx+3, y2: top, stroke: '#656d76', 'stroke-width': 1.5 });
+          svg += svgEl('line', { x1: mx-3, y1: bot, x2: mx+3, y2: bot, stroke: '#656d76', 'stroke-width': 1.5 });
+        }
+      });
+
+      // Delta label above the pair
+      if (showDelta && item[deltaKey] != null) {
+        const d = item[deltaKey];
+        const dColor = d >= 0 ? '#1a7f37' : '#cf222e';
+        const arrow = arrowDelta ? (d >= 0 ? '▲ ' : '▼ ') : '';
+        svg += svgEl('text', { x: cx, y: pad.top - 6, fill: dColor, 'font-size': 10, 'text-anchor': 'middle', 'font-weight': 700 }, arrow + fmtDelta(d));
+      }
+    } else {
+      const v = item[valueKey];
+      if (v == null) return;
+      const barX = cx - barW/2;
+      const barY = sy(v);
+      const barH = sy(yMin) - barY;
+      const color = colorFn ? colorFn(item) : '#2563eb';
+      svg += svgEl('rect', { x: barX, y: barY, width: barW, height: Math.max(barH, 1), fill: color, rx: 2 });
+      svg += svgEl('text', { x: cx, y: barY - 5, fill: '#1f2328', 'font-size': 10, 'text-anchor': 'middle', 'font-weight': 600 }, (v * 100).toFixed(1));
+
+      if (stdKey && item[stdKey]) {
+        const top = sy(Math.min(v + item[stdKey], yMax));
+        const bot = sy(Math.max(v - item[stdKey], yMin));
+        svg += svgEl('line', { x1: cx, y1: top, x2: cx, y2: bot, stroke: '#656d76', 'stroke-width': 1.5 });
+        svg += svgEl('line', { x1: cx-3, y1: top, x2: cx+3, y2: top, stroke: '#656d76', 'stroke-width': 1.5 });
+        svg += svgEl('line', { x1: cx-3, y1: bot, x2: cx+3, y2: bot, stroke: '#656d76', 'stroke-width': 1.5 });
+      }
+    }
+
+    // X label
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 16, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, item[labelKey]);
+    const tierColor = { low: '#57a0d3', medium: '#2563eb', high: '#1e40af' }[item.tier] || '#94a3b8';
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 30, fill: tierColor, 'font-size': 9, 'text-anchor': 'middle', 'font-weight': 600 }, item.tier);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Grouped vertical bar chart (for categories) ──────────────────
+function renderGroupedVBarChart(containerId, items, groups, {
+  yMin = 0.5, yMax = 1.0, width = 1050, height = 340,
+} = {}) {
+  const container = document.getElementById(containerId);
+  if (!container || !items.length) return;
+
+  const pad = { top: 25, right: 20, bottom: 60, left: 50 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const n = items.length;
+  const nG = groups.length;
+  const groupW = plotW / n;
+  const barW = Math.min(groupW / (nG + 1), 20);
+  const totalBarsW = nG * barW + (nG - 1) * 2;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+  function sx(i) { return pad.left + groupW * i + groupW / 2; }
+
+  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  for (let i = 0; i <= 5; i++) {
+    const v = yMin + (yMax - yMin) * i / 5;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: width - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 8, y: y + 4, fill: '#656d76', 'font-size': 11, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  items.forEach((item, i) => {
+    const cx = sx(i);
+    const startX = cx - totalBarsW / 2;
+
+    groups.forEach((g, gi) => {
+      const v = item[g.key];
+      if (v == null) return;
+      const barX = startX + gi * (barW + 2);
+      const barY = sy(v);
+      const barH = sy(yMin) - barY;
+      svg += svgEl('rect', { x: barX, y: barY, width: barW, height: Math.max(barH, 1), fill: g.color, rx: 1 });
+
+      const stdVal = item[g.key + '_std'];
+      if (stdVal) {
+        const top = sy(Math.min(v + stdVal, yMax));
+        const bot = sy(Math.max(v - stdVal, yMin));
+        const mx = barX + barW/2;
+        svg += svgEl('line', { x1: mx, y1: top, x2: mx, y2: bot, stroke: '#656d76', 'stroke-width': 1 });
+        svg += svgEl('line', { x1: mx-2, y1: top, x2: mx+2, y2: top, stroke: '#656d76', 'stroke-width': 1 });
+        svg += svgEl('line', { x1: mx-2, y1: bot, x2: mx+2, y2: bot, stroke: '#656d76', 'stroke-width': 1 });
+      }
+    });
+
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 16, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, item.model_short);
+    const tierColor = { low: '#57a0d3', medium: '#2563eb', high: '#1e40af' }[item.tier] || '#94a3b8';
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 30, fill: tierColor, 'font-size': 9, 'text-anchor': 'middle', 'font-weight': 600 }, item.tier);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Multi-metric comparison chart (for pipeline stages) ──────────
+function renderPipelineChart(containerId, items, metrics, {
+  yMin = 0.5, yMax = 1.0, width = 1050, height = 360,
+} = {}) {
+  const container = document.getElementById(containerId);
+  if (!container || !items.length) return;
+
+  const pad = { top: 25, right: 20, bottom: 60, left: 50 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const n = items.length;
+  const nM = metrics.length;
+  const groupW = plotW / n;
+  const barW = Math.min(groupW / (nM + 1), 22);
+  const totalBarsW = nM * barW + (nM - 1) * 3;
+
+  function sy(v) { return pad.top + plotH - (v - yMin) / (yMax - yMin) * plotH; }
+  function sx(i) { return pad.left + groupW * i + groupW / 2; }
+
+  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+  for (let i = 0; i <= 5; i++) {
+    const v = yMin + (yMax - yMin) * i / 5;
+    const y = sy(v);
+    svg += svgEl('line', { x1: pad.left, y1: y, x2: width - pad.right, y2: y, stroke: '#e5e7eb', 'stroke-dasharray': '2,3' });
+    svg += svgEl('text', { x: pad.left - 8, y: y + 4, fill: '#656d76', 'font-size': 11, 'text-anchor': 'end' }, (v * 100).toFixed(0) + '%');
+  }
+
+  items.forEach((item, i) => {
+    const cx = sx(i);
+    const startX = cx - totalBarsW / 2;
+
+    metrics.forEach((m, mi) => {
+      const v = item[m.key];
+      if (v == null) return;
+      const barX = startX + mi * (barW + 3);
+      const barY = sy(v);
+      const barH = sy(yMin) - barY;
+      svg += svgEl('rect', { x: barX, y: barY, width: barW, height: Math.max(barH, 1), fill: m.color, rx: 2 });
+      svg += svgEl('text', { x: barX + barW/2, y: barY - 4, fill: '#1f2328', 'font-size': 9, 'text-anchor': 'middle', 'font-weight': 600 }, (v * 100).toFixed(0));
+    });
+
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 16, fill: '#1f2328', 'font-size': 11, 'text-anchor': 'middle' }, item.model_short);
+    const tierColor = { low: '#57a0d3', medium: '#2563eb', high: '#1e40af' }[item.tier] || '#94a3b8';
+    svg += svgEl('text', { x: cx, y: height - pad.bottom + 30, fill: tierColor, 'font-size': 9, 'text-anchor': 'middle', 'font-weight': 600 }, item.tier);
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// ── Populate page ────────────────────────────────────────────────
+
+// Subtitle
+document.getElementById('subtitle').textContent =
+  `Generated: ${DATA.generated} | Flat: ${DATA.total_flat_runs} runs | Intent: ${DATA.total_intent_runs} runs | Scoped: ${DATA.total_scoped_runs} runs | Hint: ${DATA.total_hint_runs} runs | Cost: $${DATA.total_cost.toFixed(2)}`;
+
+// Top stats
+const ts = document.getElementById('top-stats');
+function addStat(label, value, sub) {
+  const d = document.createElement('div');
+  d.className = 'stat-box';
+  d.innerHTML = `<div class="value">${value}</div><div class="label">${label}</div>`;
+  if (sub) d.innerHTML += `<div style="font-size:0.72rem;color:#656d76;margin-top:2px">${sub}</div>`;
+  ts.appendChild(d);
+}
+
+// Pipeline advantage
+if (DATA.hero_rows.length) {
+  const deltas = DATA.hero_rows.filter(r => r.delta != null).map(r => r.delta);
+  if (deltas.length) {
+    const avgD = deltas.reduce((a,b) => a+b, 0) / deltas.length;
+    addStat('Pipeline Advantage', fmtDelta(avgD) + 'pp', deltas.length + ' models compared');
+  }
+  const bestP = [...DATA.hero_rows].filter(r => r.pipeline_e2e != null).sort((a,b) => b.pipeline_e2e - a.pipeline_e2e)[0];
+  if (bestP) addStat('Best Pipeline E2E', fmtPct(bestP.pipeline_e2e), bestP.model_short);
+}
+if (DATA.flat_ranking.length) {
+  const b = DATA.flat_ranking[0];
+  addStat('Best Flat', fmtPct(b.accuracy), b.model_short);
+}
+addStat('Total Cost', '$' + DATA.total_cost.toFixed(2), DATA.total_flat_runs + DATA.total_intent_runs + DATA.total_scoped_runs + ' runs');
+
+// Sort by display order
+function sortByDisplay(arr) { return [...arr].sort((a, b) => (a._sort || 999) - (b._sort || 999)); }
+
+// ── §1. Hero chart: Pipeline vs Flat ─────────────────────────────
+const heroSorted = sortByDisplay(DATA.hero_rows);
+renderVBarChart('hero-chart', heroSorted, {
+  valuePairs: [
+    { key: 'pipeline_e2e', color: '#2563eb' },
+    { key: 'flat_acc', color: '#dc2626' },
+  ],
+  showDelta: true,
+  deltaKey: 'delta',
+  yMin: 0.2, yMax: 1.0,
+});
+
+// Hero table
+const heroTbl = document.getElementById('hero-table');
+heroTbl.innerHTML = `<thead>
+  <tr><th rowspan="2">Model</th><th rowspan="2">Tier</th>
+    <th rowspan="2">Pipeline E2E</th><th rowspan="2">Flat</th>
+    <th rowspan="2">Delta</th><th rowspan="2">Rel. Gain</th>
+    <th colspan="2" style="text-align:center;border-bottom:none">Pipeline</th>
+    <th colspan="2" style="text-align:center;border-bottom:none">Flat</th></tr>
+  <tr><th>Hugo</th><th>Dana</th><th>Hugo</th><th>Dana</th></tr>
+</thead><tbody></tbody>`;
+function fmtRel(v) { return v == null ? '-' : (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%'; }
+heroSorted.forEach(r => {
+  const dColor = r.delta != null ? (r.delta >= 0 ? 'color:var(--green);font-weight:700' : 'color:var(--red)') : '';
+  heroTbl.querySelector('tbody').innerHTML += `<tr>
+    <td>${r.model_short}</td><td>${r.tier}</td>
+    <td class="num"><strong>${fmtPct(r.pipeline_e2e)}</strong></td>
+    <td class="num">${fmtPct(r.flat_acc)}</td>
+    <td class="num" style="${dColor}">${r.delta != null ? fmtDelta(r.delta) + 'pp' : '-'}</td>
+    <td class="num" style="color:var(--accent);font-weight:700">${fmtRel(r.rel_gain)}</td>
+    <td class="num">${fmtPct(r.pipeline_hugo)}</td><td class="num">${fmtPct(r.pipeline_dana)}</td>
+    <td class="num">${fmtPct(r.flat_hugo)}</td><td class="num">${fmtPct(r.flat_dana)}</td>
+  </tr>`;
+});
+
+// Combined (average) row
+if (heroSorted.length) {
+  const mean = (arr) => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null;
+  const pE = mean(heroSorted.filter(r => r.pipeline_e2e != null).map(r => r.pipeline_e2e));
+  const fA = mean(heroSorted.filter(r => r.flat_acc != null).map(r => r.flat_acc));
+  const pH = mean(heroSorted.filter(r => r.pipeline_hugo != null).map(r => r.pipeline_hugo));
+  const pD = mean(heroSorted.filter(r => r.pipeline_dana != null).map(r => r.pipeline_dana));
+  const fH = mean(heroSorted.filter(r => r.flat_hugo != null).map(r => r.flat_hugo));
+  const fD = mean(heroSorted.filter(r => r.flat_dana != null).map(r => r.flat_dana));
+  const cDelta = (pE != null && fA != null) ? pE - fA : null;
+  const cRel = (cDelta != null && fA) ? cDelta / fA : null;
+  const cColor = cDelta != null ? (cDelta >= 0 ? 'color:var(--green);font-weight:700' : 'color:var(--red)') : '';
+  heroTbl.querySelector('tbody').innerHTML += `<tr style="border-top:2px solid var(--border);font-weight:600">
+    <td>Combined</td><td>medium</td>
+    <td class="num"><strong>${fmtPct(pE)}</strong></td>
+    <td class="num">${fmtPct(fA)}</td>
+    <td class="num" style="${cColor}">${cDelta != null ? fmtDelta(cDelta) + 'pp' : '-'}</td>
+    <td class="num" style="color:var(--accent);font-weight:700">${fmtRel(cRel)}</td>
+    <td class="num">${fmtPct(pH)}</td><td class="num">${fmtPct(pD)}</td>
+    <td class="num">${fmtPct(fH)}</td><td class="num">${fmtPct(fD)}</td>
+  </tr>`;
+}
+
+// ── §2. Pipeline stages chart ────────────────────────────────────
+const compSorted = sortByDisplay(DATA.comparison_rows);
+renderPipelineChart('pipeline-chart', compSorted, [
+  { key: 'intent_acc', color: '#93c5fd', label: 'Intent' },
+  { key: 'flow_acc', color: '#2563eb', label: 'Flow' },
+  { key: 'scoped_acc', color: '#86efac', label: 'Scoped Tool' },
+  { key: 'flat_acc', color: '#dc2626', label: 'Flat Tool' },
+], { yMin: 0.5, yMax: 1.0 });
+
+// Stages table
+const stgTbl = document.getElementById('stages-table');
+stgTbl.innerHTML = `<thead><tr><th>Model</th><th>Tier</th>
+  <th>Intent</th><th>Flow (1A)</th><th>Scoped Tool</th><th>Flat Tool</th>
+</tr></thead><tbody></tbody>`;
+compSorted.forEach(r => {
+  let scopedCls = '', flatCls = '';
+  if (r.scoped_acc != null && r.flat_acc != null) {
+    if (r.scoped_acc > r.flat_acc) { scopedCls = 'style="color:var(--green);font-weight:700"'; flatCls = 'style="color:var(--red)"'; }
+    else if (r.flat_acc > r.scoped_acc) { flatCls = 'style="color:var(--green);font-weight:700"'; scopedCls = 'style="color:var(--red)"'; }
+  }
+  stgTbl.querySelector('tbody').innerHTML += `<tr>
+    <td>${r.model_short}</td><td>${r.tier}</td>
+    <td class="num">${fmtPct(r.intent_acc)}</td>
+    <td class="num">${fmtPct(r.flow_acc)}</td>
+    <td class="num" ${scopedCls}>${fmtPct(r.scoped_acc)}</td>
+    <td class="num" ${flatCls}>${fmtPct(r.flat_acc)}</td>
+  </tr>`;
+});
+
+// §2 takeaways
+(function() {
+  const notes = [];
+  const withAll = compSorted.filter(r => r.intent_acc != null && r.flow_acc != null && r.scoped_acc != null);
+  if (withAll.length) {
+    // Bottleneck stage
+    const avgIntent = withAll.reduce((a,r) => a + r.intent_acc, 0) / withAll.length;
+    const avgFlow = withAll.reduce((a,r) => a + r.flow_acc, 0) / withAll.length;
+    const avgScoped = withAll.reduce((a,r) => a + r.scoped_acc, 0) / withAll.length;
+    const stages = [['Intent', avgIntent], ['Flow detection', avgFlow], ['Scoped tool', avgScoped]];
+    stages.sort((a,b) => a[1] - b[1]);
+    notes.push(`<strong>${stages[0][0]}</strong> is the pipeline bottleneck at ${(stages[0][1]*100).toFixed(1)}% average accuracy, while <strong>${stages[2][0]}</strong> is the strongest at ${(stages[2][1]*100).toFixed(1)}%.`);
+  }
+  const withBoth = compSorted.filter(r => r.scoped_acc != null && r.flat_acc != null);
+  if (withBoth.length) {
+    const allBetter = withBoth.every(r => r.scoped_acc > r.flat_acc);
+    if (allBetter) notes.push('Scoped tool accuracy exceeds flat for every model tested, confirming that intent-based tool filtering improves selection.');
+    else {
+      const better = withBoth.filter(r => r.scoped_acc > r.flat_acc).length;
+      notes.push(`Scoped tools beat flat for ${better}/${withBoth.length} models.`);
+    }
+  }
+  notes.push('Intent classification is consistently above 90% across all models, making it the most reliable pipeline stage.');
+  const el = document.getElementById('s2-notes');
+  notes.forEach(n => { el.innerHTML += `<li>${n}</li>`; });
+})();
+
+// ── §3. Domain split — Hugo vs Dana ──────────────────────────────
+const domainHugo = heroSorted.map(r => ({
+  ...r,
+  pipeline_domain: r.pipeline_hugo,
+  flat_domain: r.flat_hugo,
+  delta_domain: (r.pipeline_hugo != null && r.flat_hugo != null) ? r.pipeline_hugo - r.flat_hugo : null,
+}));
+const domainDana = heroSorted.map(r => ({
+  ...r,
+  pipeline_domain: r.pipeline_dana,
+  flat_domain: r.flat_dana,
+  delta_domain: (r.pipeline_dana != null && r.flat_dana != null) ? r.pipeline_dana - r.flat_dana : null,
+}));
+
+renderVBarChart('domain-hugo-chart', domainHugo, {
+  valuePairs: [
+    { key: 'pipeline_domain', color: '#2563eb' },
+    { key: 'flat_domain', color: '#dc2626' },
+  ],
+  showDelta: true,
+  deltaKey: 'delta_domain',
+  yMin: 0.2, yMax: 1.0,
+  width: 520, height: 300,
+});
+
+renderVBarChart('domain-dana-chart', domainDana, {
+  valuePairs: [
+    { key: 'pipeline_domain', color: '#2563eb' },
+    { key: 'flat_domain', color: '#dc2626' },
+  ],
+  showDelta: true,
+  deltaKey: 'delta_domain',
+  yMin: 0.2, yMax: 1.0,
+  width: 520, height: 300,
+});
+
+// §3 takeaways
+(function() {
+  const notes = [];
+  const hugoDels = domainHugo.filter(r => r.delta_domain != null).map(r => r.delta_domain);
+  const danaDels = domainDana.filter(r => r.delta_domain != null).map(r => r.delta_domain);
+  if (hugoDels.length && danaDels.length) {
+    const hAvg = hugoDels.reduce((a,b) => a+b,0) / hugoDels.length;
+    const dAvg = danaDels.reduce((a,b) => a+b,0) / danaDels.length;
+    const diff = Math.abs(hAvg - dAvg);
+    if (diff < 0.03) {
+      notes.push(`Pipeline advantage is similar across domains (Hugo ${fmtDelta(hAvg)}pp, Dana ${fmtDelta(dAvg)}pp), suggesting the benefit comes from staged narrowing itself rather than domain-specific tool complexity.`);
+    } else {
+      const stronger = hAvg > dAvg ? 'Hugo' : 'Dana';
+      notes.push(`Pipeline advantage is stronger in <strong>${stronger}</strong> (${fmtDelta(hAvg > dAvg ? hAvg : dAvg)}pp vs ${fmtDelta(hAvg > dAvg ? dAvg : hAvg)}pp), likely due to higher tool confusability in that domain.`);
+    }
+  }
+  const hugoFlats = domainHugo.filter(r => r.flat_domain != null).map(r => r.flat_domain);
+  const danaFlats = domainDana.filter(r => r.flat_domain != null).map(r => r.flat_domain);
+  if (hugoFlats.length && danaFlats.length) {
+    const hFlat = hugoFlats.reduce((a,b) => a+b,0) / hugoFlats.length;
+    const dFlat = danaFlats.reduce((a,b) => a+b,0) / danaFlats.length;
+    const harder = hFlat < dFlat ? 'Hugo' : 'Dana';
+    notes.push(`Flat tool-calling is harder in <strong>${harder}</strong> (${(Math.min(hFlat,dFlat)*100).toFixed(1)}% avg) than ${harder === 'Hugo' ? 'Dana' : 'Hugo'} (${(Math.max(hFlat,dFlat)*100).toFixed(1)}% avg).`);
+  }
+  const el = document.getElementById('s3-notes');
+  notes.forEach(n => { el.innerHTML += `<li>${n}</li>`; });
+})();
+
+// ── §4. Category breakdown — flat accuracy by category ───────────
+const flatSorted = sortByDisplay(DATA.flat_ranking);
+renderGroupedVBarChart('flat-cat-chart', flatSorted, [
+  { key: 'cat_same_flow', color: '#93c5fd' },
+  { key: 'cat_switch_flow', color: '#2563eb' },
+  { key: 'cat_ambiguous_first', color: '#a78bfa' },
+  { key: 'cat_ambiguous_second', color: '#7c3aed' },
+], { yMin: 0.0, yMax: 1.0 });
+
+// §4 takeaways
+(function() {
+  const notes = [];
+  if (flatSorted.length) {
+    const cats = ['cat_same_flow', 'cat_switch_flow', 'cat_ambiguous_first', 'cat_ambiguous_second'];
+    const labels = ['same_flow', 'switch_flow', 'ambiguous_first', 'ambiguous_second'];
+    const avgs = cats.map((c, i) => {
+      const vals = flatSorted.filter(r => r[c] != null).map(r => r[c]);
+      return { label: labels[i], avg: vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null };
+    }).filter(x => x.avg != null);
+    if (avgs.length) {
+      avgs.sort((a,b) => a.avg - b.avg);
+      notes.push(`<strong>${avgs[0].label}</strong> is the hardest category for flat tool-calling at ${(avgs[0].avg*100).toFixed(1)}% average accuracy, while <strong>${avgs[avgs.length-1].label}</strong> is easiest at ${(avgs[avgs.length-1].avg*100).toFixed(1)}%.`);
+      const ambCats = avgs.filter(x => x.label.startsWith('ambiguous'));
+      const nonAmb = avgs.filter(x => !x.label.startsWith('ambiguous'));
+      if (ambCats.length && nonAmb.length) {
+        const ambAvg = ambCats.reduce((a,x) => a+x.avg, 0) / ambCats.length;
+        const nonAvg = nonAmb.reduce((a,x) => a+x.avg, 0) / nonAmb.length;
+        if (ambAvg > nonAvg) {
+          notes.push('Ambiguous turns are not harder for flat models — the pipeline’s structural advantage on ambiguity comes from routing, not from flat models failing on those turns.');
+        } else {
+          notes.push('Flat models struggle more on ambiguous turns, confirming that the pipeline’s explicit ambiguity handling provides a structural advantage.');
+        }
+      }
+    }
+  }
+  const el = document.getElementById('s4-notes');
+  notes.forEach(n => { el.innerHTML += `<li>${n}</li>`; });
+})();
+
+// ── §5. Ambiguity Hint Ablation (Exp 2C) ────────────────────────
+if (DATA.hint_rows && DATA.hint_rows.length) {
+  const hintSorted = sortByDisplay(DATA.hint_rows);
+
+  // Per-category paired bar charts (2×2 grid)
+  const catCharts = [
+    { id: 'hint-same',   flatKey: 'flat_same_flow',        hintKey: 'hint_same_flow',        dKey: 'd_same_flow' },
+    { id: 'hint-switch', flatKey: 'flat_switch_flow',      hintKey: 'hint_switch_flow',      dKey: 'd_switch_flow' },
+    { id: 'hint-ambig1', flatKey: 'flat_ambiguous_first',  hintKey: 'hint_ambiguous_first',  dKey: 'd_ambiguous_first' },
+    { id: 'hint-ambig2', flatKey: 'flat_ambiguous_second', hintKey: 'hint_ambiguous_second', dKey: 'd_ambiguous_second' },
+  ];
+  catCharts.forEach(cc => {
+    renderVBarChart(cc.id, hintSorted, {
+      valuePairs: [
+        { key: cc.flatKey, color: '#dc2626' },
+        { key: cc.hintKey, color: '#f97316' },
+      ],
+      showDelta: true,
+      arrowDelta: true,
+      deltaKey: cc.dKey,
+      yMin: 0.0, yMax: 1.0,
+      width: 520, height: 280,
+    });
+  });
+
+  // Hint table with per-category values (flat → hint)
+  function fmtCatD(v) {
+    if (v == null) return '-';
+    const s = (v >= 0 ? '+' : '') + (v * 100).toFixed(1);
+    const c = v > 0.01 ? 'color:var(--green);font-weight:700' : v < -0.01 ? 'color:var(--red);font-weight:700' : '';
+    const arrow = v > 0.01 ? '▲' : v < -0.01 ? '▼' : '';
+    return `<span style="${c}">${arrow} ${s}</span>`;
+  }
+  const hintTbl = document.getElementById('hint-table');
+  hintTbl.innerHTML = `<thead>
+    <tr><th rowspan="2">Model</th><th rowspan="2">Tier</th>
+      <th colspan="2" style="text-align:center;border-bottom:none">Overall</th>
+      <th colspan="4" style="text-align:center;border-bottom:none">Category Delta (Hint − Flat)</th></tr>
+    <tr><th>Flat</th><th>Hint</th>
+      <th>same</th><th>switch</th><th>ambig 1st</th><th>ambig 2nd</th></tr>
+  </thead><tbody></tbody>`;
+
+  hintSorted.forEach(r => {
+    const dColor = r.delta >= 0 ? 'color:var(--green);font-weight:700' : 'color:var(--red);font-weight:700';
+    const dArrow = r.delta >= 0 ? '▲' : '▼';
+    hintTbl.querySelector('tbody').innerHTML += `<tr>
+      <td>${r.model_short}</td><td>${r.tier}</td>
+      <td class="num">${fmtPct(r.flat_acc)}</td>
+      <td class="num" style="${dColor}">${dArrow} ${fmtPct(r.hint_acc)}</td>
+      <td class="num">${fmtCatD(r.d_same_flow)}</td>
+      <td class="num">${fmtCatD(r.d_switch_flow)}</td>
+      <td class="num">${fmtCatD(r.d_ambiguous_first)}</td>
+      <td class="num">${fmtCatD(r.d_ambiguous_second)}</td>
+    </tr>`;
+  });
+
+  // §5 takeaways
+  (function() {
+    const notes = [];
+    const avgDelta = hintSorted.reduce((a,r) => a + r.delta, 0) / hintSorted.length;
+    notes.push(`Adding an explicit ambiguity hint ${avgDelta >= 0 ? 'improves' : 'hurts'} overall accuracy by ${fmtDelta(avgDelta)}pp on average across ${hintSorted.length} models.`);
+
+    // Check ambiguous category improvement
+    const ambD1 = hintSorted.filter(r => r.d_ambiguous_first != null).map(r => r.d_ambiguous_first);
+    const ambD2 = hintSorted.filter(r => r.d_ambiguous_second != null).map(r => r.d_ambiguous_second);
+    if (ambD1.length) {
+      const a1 = ambD1.reduce((a,b) => a+b, 0) / ambD1.length;
+      const a2 = ambD2.length ? ambD2.reduce((a,b) => a+b, 0) / ambD2.length : null;
+      const ambMsg = a2 != null
+        ? `Ambiguous categories: ambig_1st ${fmtDelta(a1)}pp, ambig_2nd ${fmtDelta(a2)}pp.`
+        : `Ambiguous 1st category: ${fmtDelta(a1)}pp.`;
+      const verdict = (a1 > 0.01 || (a2 != null && a2 > 0.01))
+        ? ' The hint partially closes the gap with the pipeline on ambiguous turns.'
+        : ' The hint does not meaningfully improve ambiguity detection.';
+      notes.push(ambMsg + verdict);
+    }
+
+    // Check same_flow / switch_flow regression
+    const sfD = hintSorted.filter(r => r.d_same_flow != null).map(r => r.d_same_flow);
+    const swD = hintSorted.filter(r => r.d_switch_flow != null).map(r => r.d_switch_flow);
+    if (sfD.length) {
+      const sf = sfD.reduce((a,b) => a+b, 0) / sfD.length;
+      const sw = swD.length ? swD.reduce((a,b) => a+b, 0) / swD.length : 0;
+      if (sf < -0.01 || sw < -0.01) {
+        notes.push(`As hypothesised, the hint causes regression on clear requests: same_flow ${fmtDelta(sf)}pp, switch_flow ${fmtDelta(sw)}pp — models over-trigger ambiguity handling.`);
+      } else {
+        notes.push(`Contrary to expectations, the hint does not cause significant regression on clear requests (same_flow ${fmtDelta(sf)}pp, switch_flow ${fmtDelta(sw)}pp).`);
+      }
+    }
+
+    const el = document.getElementById('s5-notes');
+    notes.forEach(n => { el.innerHTML += `<li>${n}</li>`; });
+  })();
+} else {
+  // No hint data — hide the section gracefully
+  ['hint-same','hint-switch','hint-ambig1','hint-ambig2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<p style="color:var(--muted);text-align:center;padding:2rem">No data</p>';
+  });
+}
+
+// ── §6. Flat confusion tables ────────────────────────────────────
+function fillConfusion(tableId, data) {
+  const tbl = document.getElementById(tableId);
+  tbl.innerHTML = '<thead><tr><th>Expected</th><th>Predicted</th><th>Count</th></tr></thead><tbody></tbody>';
+  data.forEach(c => {
+    tbl.querySelector('tbody').innerHTML += `<tr><td>${c.expected}</td><td>${c.predicted}</td><td class="num">${c.count}</td></tr>`;
+  });
+  if (!data.length) {
+    tbl.querySelector('tbody').innerHTML = '<tr><td colspan="3" style="color:var(--muted)">No confusion data</td></tr>';
+  }
+}
+fillConfusion('flat-conf-hugo', DATA.flat_confusions_hugo);
+fillConfusion('flat-conf-dana', DATA.flat_confusions_dana);
+
+// §6 takeaways
+(function() {
+  const notes = [];
+  const hConf = DATA.flat_confusions_hugo;
+  const dConf = DATA.flat_confusions_dana;
+  if (hConf.length) {
+    notes.push(`Hugo’s top confusion: <strong>${hConf[0].expected}</strong> → <strong>${hConf[0].predicted}</strong> (${hConf[0].count} occurrences). ` +
+      (hConf.length >= 3 ? `The top 3 confusions account for ${hConf.slice(0,3).reduce((a,c)=>a+c.count,0)} errors total.` : ''));
+  }
+  if (dConf.length) {
+    notes.push(`Dana’s top confusion: <strong>${dConf[0].expected}</strong> → <strong>${dConf[0].predicted}</strong> (${dConf[0].count} occurrences).`);
+  }
+  const el = document.getElementById('s6-notes');
+  notes.forEach(n => { el.innerHTML += `<li>${n}</li>`; });
+})();
+
+// ── §7. Findings ─────────────────────────────────────────────────
+const ft = document.getElementById('findings-text');
+ft.innerHTML = DATA.findings_text || '<span style="color:var(--muted)">No data available yet.</span>';
+</script>
+</body>
+</html>
