@@ -145,7 +145,7 @@ def compute_calibration(records: list[dict]) -> dict:
     confs = np.array([r['confidence'] for r in records])
     correct = np.array([r['correct'] for r in records], dtype=float)
 
-    bin_confs_arr, bin_accs_arr = reliability_diagram(confs, correct)
+    bin_confs_arr, bin_accs_arr, bin_counts_arr = reliability_diagram(confs, correct)
 
     if np.std(confs) < 1e-10 or np.std(correct) < 1e-10:
         sp_r = 0.0
@@ -164,6 +164,7 @@ def compute_calibration(records: list[dict]) -> dict:
         'n_turns': len(records),
         'bin_confs': [round(float(x), 5) if not np.isnan(x) else None for x in bin_confs_arr],
         'bin_accs': [round(float(x), 5) if not np.isnan(x) else None for x in bin_accs_arr],
+        'bin_counts': [int(x) for x in bin_counts_arr],
     }
 
 

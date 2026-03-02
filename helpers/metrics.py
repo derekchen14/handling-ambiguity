@@ -166,11 +166,12 @@ def brier_score(
 
 def reliability_diagram(
     confidences: np.ndarray, correct: np.ndarray, n_bins: int = 10,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Returns (mean_predicted_confidence, fraction_correct) per bin."""
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Returns (mean_predicted_confidence, fraction_correct, bin_counts) per bin."""
     bin_boundaries = np.linspace(0.0, 1.0, n_bins + 1)
     bin_confs = []
     bin_accs = []
+    bin_counts = []
 
     for i in range(n_bins):
         lo, hi = bin_boundaries[i], bin_boundaries[i + 1]
@@ -180,6 +181,7 @@ def reliability_diagram(
             mask = (confidences >= lo) & (confidences < hi)
 
         n_bin = mask.sum()
+        bin_counts.append(int(n_bin))
         if n_bin == 0:
             bin_confs.append(np.nan)
             bin_accs.append(np.nan)
@@ -187,7 +189,7 @@ def reliability_diagram(
             bin_confs.append(confidences[mask].mean())
             bin_accs.append(correct[mask].mean())
 
-    return np.array(bin_confs), np.array(bin_accs)
+    return np.array(bin_confs), np.array(bin_accs), np.array(bin_counts)
 
 
 def overconfidence_rate(
