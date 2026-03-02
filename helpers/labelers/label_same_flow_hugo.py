@@ -281,7 +281,7 @@ LABELS = {
 
 
 def main():
-    with open("eval/eval_hugo.json") as f:
+    with open("datasets/hugo/eval_set.json") as f:
         data = json.load(f)
 
     labeled = 0
@@ -301,7 +301,7 @@ def main():
                 print(f"WARNING: No label for {key}")
                 missing += 1
 
-    with open("eval/eval_hugo.json", "w") as f:
+    with open("datasets/hugo/eval_set.json", "w") as f:
         json.dump(data, f, indent=2)
 
     print(f"Labeled {labeled} turns, {missing} missing")

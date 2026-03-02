@@ -34,7 +34,7 @@ from experiments.data_aug.validator import validate_file
 
 log = logging.getLogger(__name__)
 
-EVAL_DIR = str(Path(__file__).parent.parent / 'eval')
+EVAL_DIR = str(Path(__file__).parent.parent)
 
 
 def main():

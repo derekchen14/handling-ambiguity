@@ -389,9 +389,9 @@ def validate_file(
     file_path = Path(file_path)
 
     if domain == 'hugo':
-        from assistants.Hugo.schemas.ontology import FLOW_CATALOG
+        from datasets.hugo.ontology import FLOW_CATALOG
     elif domain == 'dana':
-        from assistants.Dana.schemas.ontology import FLOW_CATALOG
+        from datasets.dana.ontology import FLOW_CATALOG
     else:
         raise ValueError(f'Unknown domain: {domain}')
 

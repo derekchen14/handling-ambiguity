@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 # Add project root so we can import assistant ontologies
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
@@ -14,9 +14,9 @@ if str(_PROJECT_ROOT) not in sys.path:
 def _load_flow_catalog(domain: str) -> tuple:
     """Import the FLOW_CATALOG for a domain."""
     if domain == 'hugo':
-        from assistants.Hugo.schemas.ontology import FLOW_CATALOG, Intent
+        from datasets.hugo.ontology import FLOW_CATALOG, Intent
     elif domain == 'dana':
-        from assistants.Dana.schemas.ontology import FLOW_CATALOG, Intent
+        from datasets.dana.ontology import FLOW_CATALOG, Intent
     else:
         raise ValueError(f'Unknown domain: {domain}')
     return FLOW_CATALOG, Intent

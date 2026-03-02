@@ -4,7 +4,7 @@
   "domain": "dana",
   "config_id": "1a_006",
   "seed": 3,
-  "timestamp": "2026-02-28T18:55:21.295956+00:00",
+  "timestamp": "2026-03-02T22:03:24.591017+00:00",
   "summary": {
     "accuracy_top1": 0.7806,
     "accuracy_by_category": {

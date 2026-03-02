@@ -271,7 +271,7 @@ LABELS = {
 
 
 def main():
-    with open("eval/eval_dana.json") as f:
+    with open("datasets/dana/eval_set.json") as f:
         data = json.load(f)
 
     labeled = 0
@@ -289,7 +289,7 @@ def main():
             else:
                 print(f"WARNING: No label for {key}")
 
-    with open("eval/eval_dana.json", "w") as f:
+    with open("datasets/dana/eval_set.json", "w") as f:
         json.dump(data, f, indent=2)
 
     print(f"Labeled {labeled} turns across same_flow category")

@@ -12,7 +12,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONFIGS_PATH = BASE_DIR / 'helpers' / 'configs' / 'exp2_configs.json'
-EVAL_DIR = BASE_DIR / 'eval'
+EVAL_DIR = BASE_DIR / 'datasets'
 RESULTS_BASE = BASE_DIR / 'results' / 'exp2a'
 
 DOMAINS = ['hugo', 'dana']
@@ -51,7 +51,7 @@ def load_configs() -> dict[str, dict]:
 def get_convos_per_domain() -> dict[str, int]:
     counts = {}
     for domain in DOMAINS:
-        eval_path = EVAL_DIR / f'eval_{domain}.json'
+        eval_path = EVAL_DIR / domain / 'eval_set.json'
         if eval_path.exists():
             with open(eval_path) as f:
                 counts[domain] = len(json.load(f))

@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = BASE_DIR / 'results'
 EXP1A_DIR = RESULTS_DIR / 'exp1a'
 EXP1B_DIR = RESULTS_DIR / 'exp1b'
-EVAL_DIR = BASE_DIR / 'eval'
+EVAL_DIR = BASE_DIR / 'datasets'
 CONFIGS_DIR = BASE_DIR / 'helpers' / 'configs'
 
 DOMAINS = ['dana', 'hugo']
@@ -65,7 +65,7 @@ def load_eval_sets() -> dict[str, list[dict]]:
     """Load eval sets -> {domain: [convo_dicts]}."""
     result = {}
     for domain in DOMAINS:
-        with open(EVAL_DIR / f'eval_{domain}.json') as f:
+        with open(EVAL_DIR / domain / 'eval_set.json') as f:
             result[domain] = json.load(f)
     return result
 

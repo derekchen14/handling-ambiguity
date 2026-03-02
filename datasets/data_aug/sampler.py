@@ -57,11 +57,11 @@ PERSONA_HINT_PROB = 0.3
 def _load_domain(domain: str):
     """Import FLOW_CATALOG, DACT_CATALOG, and Intent for a domain."""
     if domain == 'hugo':
-        from assistants.Hugo.schemas.ontology import (
+        from datasets.hugo.ontology import (
             DACT_CATALOG, FLOW_CATALOG, Intent,
         )
     elif domain == 'dana':
-        from assistants.Dana.schemas.ontology import (
+        from datasets.dana.ontology import (
             DACT_CATALOG, FLOW_CATALOG, Intent,
         )
     else:

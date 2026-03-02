@@ -80,7 +80,7 @@ def load_configs() -> dict[str, dict]:
 
 
 def load_eval_set(domain: str) -> list[dict]:
-    eval_path = BASE_DIR / 'eval' / f'eval_{domain}.json'
+    eval_path = BASE_DIR / 'datasets' / domain / 'eval_set.json'
     if not eval_path.exists():
         log.error('Eval set not found: %s', eval_path)
         sys.exit(1)

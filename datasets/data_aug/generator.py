@@ -437,7 +437,7 @@ def generate_batch(
 
     # Set up output path
     if output_dir is None:
-        output_dir = str(Path(__file__).parent.parent / 'eval')
+        output_dir = str(Path(__file__).parent.parent)
     output_path = Path(output_dir) / f'gen_{domain}.json'
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
