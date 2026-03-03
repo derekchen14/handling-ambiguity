@@ -1053,9 +1053,8 @@ For 1B (self-consistency runs), `config.voters` is a list of voter specs and eac
 - [x] Smoke-tested all 5 providers end-to-end
 
 ### Stage 2: Experiment 1A — Data Collection
-- [x] Run 15 configs × 2 domains × 5 seeds = 150 runs — 14/15 models complete (1280/1280 convos), Gemini 3.1 Pro pending quota (seed 1 only)
-- [ ] Backfill Gemini 3.1 Pro (1a_006) rewritten conversations + remaining seeds 2-5
-- [x] **Critical**: Store per-utterance, per-model predictions (not just accuracy summaries). This data feeds 1B bootstrapping.
+- [x] Run 15 configs × 2 domains × 5 seeds = 150 runs — 15/15 models complete (1280/1280 convos)
+- [x] **Critical**: Store per-utterance, per-model predictions (not just summaries), which feeds 1B bootstrapping.
 - [x] Relabel or re-write dataset based on review of 1A results (`experiments/eval/mislabeled.md`)
 - [x] Rescore relabeled entries across all JSONL files (`rescore_exp1a.py`)
 - [x] Re-run inference on 20 rewritten conversations across all configs/seeds (`prep_rewrites.py`, `run_rewrites.py`)

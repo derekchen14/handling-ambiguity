@@ -53,6 +53,7 @@ PRICING = {
     'claude-opus-4-6':                (15.00,  75.00),
     'gemini-3-flash-preview':          (0.15,   0.60),
     'gemini-3-pro-preview':            (1.25,  10.00),
+    'google/gemini-3.1-pro-preview':   (2.00,  12.00),
     'gemini-3-flash-preview':          (0.15,   0.60),
     'gpt-5-nano':                      (0.10,   0.40),
     'gpt-5-mini':                      (0.40,   1.60),

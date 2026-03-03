@@ -39,6 +39,7 @@ MODEL_SHORT = {
     'claude-opus-4-6': 'Opus 4.6',
     'gemini-3-flash-preview': 'Gemini 3 Flash',
     'gemini-3-pro-preview': 'Gemini 3 Pro',
+    'gemini-3.1-pro-preview': 'Gemini 3.1 Pro',
     'gpt-5-nano': 'GPT-5 nano',
     'gpt-5-mini': 'GPT-5 mini',
     'gpt-5.2': 'GPT-5.2',
@@ -306,6 +307,8 @@ def main():
     status = []
     for config_id in sorted(configs.keys(), key=lambda x: int(x.split('_')[1])):
         cfg = configs[config_id]
+        if cfg.get('label'):  # alias config — results filed under another config_id
+            continue
         if cfg.get('model_level') not in target_tiers:
             continue
         model_short = MODEL_SHORT.get(cfg['model_id'], cfg['model_id'])

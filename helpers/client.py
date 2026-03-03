@@ -554,6 +554,8 @@ class UnifiedLLMClient:
             ]
 
         resp = self.openrouter_client.chat.completions.create(**kwargs)
+        if not resp or not resp.choices:
+            raise RuntimeError('openrouter server returned empty choices (transient error)')
         choice = resp.choices[0]
 
         raw_text = choice.message.content or ''
