@@ -56,6 +56,7 @@ PRICING = {
     'Qwen/Qwen3-235B-A22B-Thinking-2507': (3.50, 3.50),
     'gemma-3-27b-it':                  (0.15,   0.60),
     'claude-sonnet-4-20250514':        (3.00,  15.00),
+    'qwen/qwen3.5-397b-a17b':           (0.55, 3.50)
 }
 
 
