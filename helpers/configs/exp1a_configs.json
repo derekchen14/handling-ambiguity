@@ -120,5 +120,14 @@
     "model_level": "low",
     "model_id": "gemma-3-27b-it",
     "temperature": 0.0
+  },
+  {
+    "config_id": "1a_027",
+    "provider": "openrouter",
+    "model_type": "qwen",
+    "model_level": "high",
+    "model_id": "qwen/qwen3.5-397b-a17b",
+    "temperature": 0.0,
+    "max_tokens": 8192
   }
 ]
