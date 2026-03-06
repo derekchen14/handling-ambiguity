@@ -889,7 +889,9 @@
             "blog",
             "substack",
             "linkedin",
-            "twitter"
+            "twitter",
+            "medium",
+            "wordpress"
           ],
           "description": "Target platform for formatting"
         },
@@ -1097,7 +1099,9 @@
             "blog",
             "substack",
             "twitter",
-            "linkedin"
+            "linkedin",
+            "medium",
+            "wordpress"
           ],
           "description": "Target platform"
         },
@@ -1106,7 +1110,8 @@
           "enum": [
             "publish",
             "pin",
-            "blurb"
+            "blurb",
+            "promote"
           ],
           "default": "publish",
           "description": "Publication action to perform"
@@ -1215,7 +1220,8 @@
           "enum": [
             "view",
             "reschedule",
-            "cancel"
+            "cancel",
+            "schedule"
           ],
           "default": "view",
           "description": "Schedule management action"
@@ -1226,7 +1232,9 @@
             "blog",
             "substack",
             "twitter",
-            "linkedin"
+            "linkedin",
+            "medium",
+            "wordpress"
           ],
           "description": "Platform to manage schedule on"
         },

@@ -248,9 +248,6 @@ def score_tool_turn(
     gold_tools: list[str],
     candidate_flows: list[str] | None = None,
     domain: str = 'hugo',
-    predicted_tools_with_args: list[dict] | None = None,
-    gold_target_tools: dict | None = None,
-    fuzzy_evaluator=None,
 ) -> dict:
     """Score a tool-calling turn with strict precision gating.
 
@@ -319,14 +316,10 @@ def score_tool_turn(
         result['correct'] = not pred_set
         result['recall'] = 1.0 if not pred_set else 0.0
         result['precision'] = 1.0 if not pred_set else 0.0
-        result['param_accuracy'] = 1.0 if not pred_set else 0.0
-        result['correct_with_params'] = result['correct']
         return result
 
     # Null calls with gold tools → always incorrect
     if not pred_set:
-        result['param_accuracy'] = 0.0
-        result['correct_with_params'] = False
         return result
 
     # handle_ambiguity on ambiguous turn → always correct
@@ -335,8 +328,6 @@ def score_tool_turn(
         result['precision'] = 1.0
         result['recall'] = 1.0
         result['hits'] = min_hits  # credit full recall
-        result['param_accuracy'] = 1.0
-        result['correct_with_params'] = True
         return result
 
     # Compute hits
@@ -368,26 +359,6 @@ def score_tool_turn(
 
     result['correct'] = precision_passes and recall_passes
 
-    # ── Optional: parameter scoring ────────────────────────────
-    if predicted_tools_with_args is not None and gold_target_tools is not None:
-        param_result = score_tool_params(
-            predicted_tools_with_args,
-            gold_target_tools,
-            fuzzy_evaluator=fuzzy_evaluator,
-        )
-        result.update(param_result)
-        result['correct_with_params'] = (
-            result['correct'] and param_result['param_accuracy'] >= 1.0
-        )
-    elif result.get('ambiguity_flagged') and candidate_flows:
-        # handle_ambiguity on ambiguous turn — params N/A, treat as perfect
-        result['param_accuracy'] = 1.0
-        result['correct_with_params'] = True
-    elif not pred_set:
-        # Null call
-        result['param_accuracy'] = 0.0
-        result['correct_with_params'] = False
-
     return result
 
 
@@ -397,16 +368,24 @@ def score_tool_params(
     predicted_tools_with_args: list[dict],
     gold_target_tools: dict,
     fuzzy_evaluator=None,
+    param_schema_index: dict | None = None,
 ) -> dict:
     """Score predicted tool parameters against gold target_tools.
 
+    Match method is determined from the tool manifest schema via
+    param_schema_index (built by build_param_schema_index). When no
+    schema is available, defaults to fuzzy matching for strings.
+
     Args:
         predicted_tools_with_args: [{'name': ..., 'args': {...}}, ...]
-        gold_target_tools: {tool_name: {param: value|{value,fuzzy}|null}}
+        gold_target_tools: {tool_name: {param: value|null}}
         fuzzy_evaluator: callable(gold, predicted) -> bool (for NL params)
+        param_schema_index: {(tool_name, param_name): property_schema}
 
     Returns dict with param_accuracy, matched/total counts, and per-param details.
     """
+    from helpers.schema_utils import classify_match_method
+
     # Build lookup: first occurrence of each tool name wins
     pred_lookup: dict[str, dict] = {}
     for t in predicted_tools_with_args:
@@ -445,53 +424,44 @@ def score_tool_params(
             if gold_val is None:
                 continue
 
-            # Detect wrapped fuzzy param: dict with "fuzzy" key
-            is_fuzzy = isinstance(gold_val, dict) and 'fuzzy' in gold_val
-            # Detect structured date: dict without "fuzzy" key
-            is_structured = isinstance(gold_val, dict) and 'fuzzy' not in gold_val
-
-            if is_fuzzy:
-                actual_gold = gold_val['value']
-            else:
-                actual_gold = gold_val
+            # Schema-driven match method dispatch
+            param_schema = (param_schema_index or {}).get((tool_name, param_name), {})
+            method = classify_match_method(param_schema)
 
             pred_val = pred_args.get(param_name)
 
             if pred_val is None:
                 total += 1
-                if is_fuzzy:
+                if method == 'fuzzy':
                     fuzzy_total += 1
                 else:
                     exact_total += 1
                 details.append({
                     'tool': tool_name, 'param': param_name,
-                    'gold': actual_gold, 'predicted': None,
+                    'gold': gold_val, 'predicted': None,
                     'match': False, 'method': 'missing',
                 })
                 continue
 
             total += 1
 
-            if is_fuzzy:
+            if method == 'fuzzy':
                 fuzzy_total += 1
                 if fuzzy_evaluator:
-                    match = fuzzy_evaluator(actual_gold, pred_val)
+                    match = fuzzy_evaluator(gold_val, pred_val)
                 else:
                     # Fallback: case-insensitive string comparison
-                    match = str(actual_gold).strip().lower() == str(pred_val).strip().lower()
-                method = 'fuzzy'
+                    match = str(gold_val).strip().lower() == str(pred_val).strip().lower()
                 if match:
                     fuzzy_matched += 1
-            elif is_structured:
-                match = _match_structured(actual_gold, pred_val)
-                method = 'structured'
+            elif method == 'structured':
+                match = _match_structured(gold_val, pred_val)
                 exact_total += 1
                 if match:
                     exact_matched += 1
             else:
-                # Exact match (strings, enums)
-                match = _normalize_for_match(actual_gold) == _normalize_for_match(pred_val)
-                method = 'exact'
+                # Exact match (enums, booleans, numbers)
+                match = _normalize_for_match(gold_val) == _normalize_for_match(pred_val)
                 exact_total += 1
                 if match:
                     exact_matched += 1
@@ -501,7 +471,7 @@ def score_tool_params(
 
             details.append({
                 'tool': tool_name, 'param': param_name,
-                'gold': actual_gold, 'predicted': pred_val,
+                'gold': gold_val, 'predicted': pred_val,
                 'match': match, 'method': method,
             })
 

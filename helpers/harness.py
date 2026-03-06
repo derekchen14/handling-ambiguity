@@ -16,15 +16,17 @@ from tqdm import tqdm
 import numpy as np
 
 from helpers.client import UnifiedLLMClient
+from helpers.schema_utils import build_param_schema_index
 from helpers.scoring import (
     score_turn, score_turn_ensemble, tally_votes_multi,
     score_intent,
     build_tool_flow_map, score_nlu_staged_funnel,
-    score_tool_turn, build_fuzzy_evaluator,
+    score_tool_turn, score_tool_params, build_fuzzy_evaluator,
 )
 from prompts.flow_detection import build_flow_detection_prompt
 from prompts.intent_classification import build_intent_classification_prompt
 from prompts.slot_filling import build_slot_filling_prompt, get_flow_slot_schema
+from prompts.param_extraction import build_param_extraction_prompt, build_batch_param_extraction_prompt
 from prompts.tool_calling import build_tool_calling_prompt, strip_tool_metadata
 
 log = logging.getLogger(__name__)
@@ -161,8 +163,6 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
-        fuzzy_eval = build_fuzzy_evaluator(self.client)
-
         for convo in remaining:
             # Build per-convo prompt with context if no fixed prompt provided
             prompt = system_prompt or build_tool_calling_prompt(
@@ -170,7 +170,7 @@ class ExperimentRunner:
             )
             convo_result = self._run_tool_convo(
                 convo, config, prompt, client_tools, tool_flow_map,
-                domain=domain, fuzzy_evaluator=fuzzy_eval,
+                domain=domain,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -212,8 +212,6 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
-        fuzzy_eval = build_fuzzy_evaluator(self.client)
-
         for convo in remaining:
             # Build per-convo prompt with context and hint mode
             prompt = system_prompt or build_tool_calling_prompt(
@@ -221,7 +219,7 @@ class ExperimentRunner:
             )
             convo_result = self._run_tool_convo(
                 convo, config, prompt, client_tools, tool_flow_map,
-                domain=domain, fuzzy_evaluator=fuzzy_eval,
+                domain=domain,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -275,20 +273,38 @@ class ExperimentRunner:
         domain: str,
         config: dict,
         eval_set: list[dict],
+        tools: list[dict],
         seed: int,
+        strategy: str = 'per_tool',
     ) -> RunResult:
-        """Run slot-filling on all eval conversations (using gold flow)."""
+        """Run param extraction eval on all eval conversations.
+
+        Given the correct tool name + schema, evaluates whether the model
+        can fill in the right parameters.
+
+        Args:
+            tools: Full tool manifest (with metadata and input_schema).
+            strategy: 'per_tool' (one LLM call per gold tool) or
+                      'batch' (one LLM call per turn listing all gold tools).
+        """
         config_id = config['config_id']
         run_id = f'exp2a_slot_{domain}_{config_id}_seed{seed}'
 
         output_path = self.results_dir / 'exp2a' / 'slots' / f'{domain}_{config_id}_seed{seed}.jsonl'
         completed = self._load_completed(output_path)
 
+        param_schema_index = build_param_schema_index(tools)
+        fuzzy_evaluator = build_fuzzy_evaluator(self.client)
+        tool_lookup = {t['name']: t for t in tools}
+
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
         for convo in remaining:
-            convo_result = self._run_slot_convo(convo, config, domain)
+            convo_result = self._run_param_convo(
+                convo, config, tool_lookup, domain,
+                fuzzy_evaluator, param_schema_index, strategy,
+            )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
 
@@ -343,8 +359,6 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
-        fuzzy_eval = build_fuzzy_evaluator(self.client)
-
         for convo in remaining:
             # Build per-convo prompt with entity context (same as flat mode)
             system_prompt = build_tool_calling_prompt(
@@ -352,7 +366,6 @@ class ExperimentRunner:
             )
             convo_result = self._run_scoped_tool_convo(
                 convo, config, system_prompt, tools, domain=domain,
-                fuzzy_evaluator=fuzzy_eval,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -538,7 +551,6 @@ class ExperimentRunner:
         tools: list[dict],
         tool_flow_map: dict[str, list[str]],
         domain: str = 'hugo',
-        fuzzy_evaluator=None,
     ) -> dict:
         """Run tool-calling flow detection on a single conversation.
 
@@ -582,16 +594,12 @@ class ExperimentRunner:
                 gold_tools = list(turn.get('target_tools', {}).keys())
                 excluded = turn.get('exclude', False)
 
-                # Score with v2 precision/recall framework + param scoring
-                gold_target_tools = turn.get('target_tools', {})
+                # Score with v2 precision/recall framework
                 score = score_tool_turn(
                     predicted_tools=predicted_tools,
                     gold_tools=gold_tools,
                     candidate_flows=turn.get('candidate_flows'),
                     domain=domain,
-                    predicted_tools_with_args=all_tools,
-                    gold_target_tools=gold_target_tools,
-                    fuzzy_evaluator=fuzzy_evaluator,
                 )
 
                 turn_result = {
@@ -616,11 +624,6 @@ class ExperimentRunner:
                     'input_tokens': result.get('input_tokens', 0),
                     'output_tokens': result.get('output_tokens', 0),
                 }
-                # Add param scoring fields if present
-                for key in ('param_accuracy', 'matched_params', 'total_scored_params',
-                            'param_details', 'correct_with_params'):
-                    if key in score:
-                        turn_result[key] = score[key]
                 turn_results.append(turn_result)
 
                 # Summarise tool calls for conversation history
@@ -664,8 +667,6 @@ class ExperimentRunner:
             'correct': correct,
             'skip_reason': skip_reason,
             'tools_offered': 1 if predicted_tool else 0,
-            'param_accuracy': None,
-            'correct_with_params': None,
             'latency_ms': 0,
             'input_tokens': 0,
             'output_tokens': 0,
@@ -678,7 +679,6 @@ class ExperimentRunner:
         system_prompt: str,
         all_tools: list[dict],
         domain: str = 'hugo',
-        fuzzy_evaluator=None,
     ) -> dict:
         """Run scoped tool-calling: tools filtered per-turn by gold flow.
 
@@ -758,17 +758,13 @@ class ExperimentRunner:
                     else ([tool_called] if tool_called else [])
                 )
 
-                gold_target_tools = turn.get('target_tools', {})
-                gold_tools = list(gold_target_tools.keys())
+                gold_tools = list(turn.get('target_tools', {}).keys())
 
                 score = score_tool_turn(
                     predicted_tools=predicted_tools,
                     gold_tools=gold_tools,
                     candidate_flows=turn.get('candidate_flows'),
                     domain=domain,
-                    predicted_tools_with_args=all_tools_called,
-                    gold_target_tools=gold_target_tools,
-                    fuzzy_evaluator=fuzzy_evaluator,
                 )
 
                 turn_result = {
@@ -793,10 +789,6 @@ class ExperimentRunner:
                     'input_tokens': result.get('input_tokens', 0),
                     'output_tokens': result.get('output_tokens', 0),
                 }
-                for key in ('param_accuracy', 'matched_params', 'total_scored_params',
-                            'param_details', 'correct_with_params'):
-                    if key in score:
-                        turn_result[key] = score[key]
                 turn_results.append(turn_result)
 
                 message_history.append({
@@ -814,6 +806,226 @@ class ExperimentRunner:
             'category': category,
             'turns': turn_results,
         }
+
+    def _run_param_convo(
+        self,
+        convo: dict,
+        config: dict,
+        tool_lookup: dict[str, dict],
+        domain: str,
+        fuzzy_evaluator,
+        param_schema_index: dict,
+        strategy: str = 'per_tool',
+    ) -> dict:
+        """Run param extraction eval on a single conversation.
+
+        For each user turn, uses the gold tool names from target_tools to
+        build a param extraction prompt, calls the LLM, and scores the
+        predicted params against gold.
+        """
+        convo_id = convo['convo_id']
+        category = convo.get('category', 'unknown')
+        turns_spec = convo.get('turns', [])
+        context = convo.get('context')
+
+        message_history: list[dict] = []
+        turn_results = []
+
+        for turn in turns_spec:
+            if turn.get('speaker') == 'user':
+                utterance = turn['utterance']
+                message_history.append({'role': 'user', 'content': utterance})
+
+                gold_target_tools = turn.get('target_tools', {})
+
+                # Skip ambiguous turns — resolved upstream
+                if turn.get('candidate_flows'):
+                    turn_results.append({
+                        'turn_num': turn['turn_num'],
+                        'utterance': utterance,
+                        'flow': turn.get('flow'),
+                        'candidate_flows': turn.get('candidate_flows'),
+                        'correct': True,
+                        'skip_reason': 'ambiguous',
+                        'param_accuracy': None,
+                        'latency_ms': 0,
+                        'input_tokens': 0,
+                        'output_tokens': 0,
+                    })
+                    message_history.append({
+                        'role': 'assistant',
+                        'content': '[Ambiguous — skipped]',
+                    })
+                    continue
+
+                # Skip turns with no gold tools
+                if not gold_target_tools:
+                    turn_results.append({
+                        'turn_num': turn['turn_num'],
+                        'utterance': utterance,
+                        'flow': turn.get('flow'),
+                        'correct': True,
+                        'skip_reason': 'no_target_tools',
+                        'param_accuracy': None,
+                        'latency_ms': 0,
+                        'input_tokens': 0,
+                        'output_tokens': 0,
+                    })
+                    message_history.append({
+                        'role': 'assistant',
+                        'content': '[No target tools — skipped]',
+                    })
+                    continue
+
+                total_latency = 0
+                total_input = 0
+                total_output = 0
+
+                if strategy == 'batch':
+                    predicted_tools_with_args, lat, inp, out = self._extract_params_batch(
+                        config, message_history, gold_target_tools,
+                        tool_lookup, domain, context,
+                    )
+                    total_latency += lat
+                    total_input += inp
+                    total_output += out
+                else:
+                    predicted_tools_with_args = []
+                    for tool_name in gold_target_tools:
+                        tool_def = tool_lookup.get(tool_name)
+                        if not tool_def:
+                            predicted_tools_with_args.append({'name': tool_name, 'args': {}})
+                            continue
+                        prompt = build_param_extraction_prompt(
+                            domain, tool_name, tool_def, context,
+                        )
+                        result = self.client.call_flow_detection(
+                            config, prompt, list(message_history),
+                        )
+                        params = self._parse_params(result.get('raw_response', ''))
+                        predicted_tools_with_args.append({
+                            'name': tool_name, 'args': params or {},
+                        })
+                        total_latency += result.get('latency_ms', 0)
+                        total_input += result.get('input_tokens', 0)
+                        total_output += result.get('output_tokens', 0)
+
+                # Score params
+                param_score = score_tool_params(
+                    predicted_tools_with_args, gold_target_tools,
+                    fuzzy_evaluator=fuzzy_evaluator,
+                    param_schema_index=param_schema_index,
+                )
+
+                turn_results.append({
+                    'turn_num': turn['turn_num'],
+                    'utterance': utterance,
+                    'flow': turn.get('flow'),
+                    'candidate_flows': turn.get('candidate_flows'),
+                    'gold_tools': list(gold_target_tools.keys()),
+                    'predicted_tools_with_args': predicted_tools_with_args,
+                    'correct': param_score['param_accuracy'] >= 1.0,
+                    'param_accuracy': param_score['param_accuracy'],
+                    'matched_params': param_score['matched_params'],
+                    'total_scored_params': param_score['total_scored_params'],
+                    'param_details': param_score['param_details'],
+                    'latency_ms': total_latency,
+                    'input_tokens': total_input,
+                    'output_tokens': total_output,
+                })
+
+                message_history.append({
+                    'role': 'assistant',
+                    'content': f'[Params extracted for {list(gold_target_tools.keys())}]',
+                })
+            else:
+                message_history.append({
+                    'role': 'assistant',
+                    'content': turn.get('utterance', '[OK]'),
+                })
+
+        return {
+            'convo_id': convo_id,
+            'category': category,
+            'turns': turn_results,
+        }
+
+    def _extract_params_batch(
+        self,
+        config: dict,
+        message_history: list[dict],
+        gold_target_tools: dict,
+        tool_lookup: dict[str, dict],
+        domain: str,
+        context: dict | None,
+    ) -> tuple[list[dict], int, int, int]:
+        """Extract params for all gold tools in a single LLM call."""
+        tools_with_schemas = []
+        for tool_name in gold_target_tools:
+            tool_def = tool_lookup.get(tool_name, {})
+            tools_with_schemas.append({'name': tool_name, 'schema': tool_def})
+
+        prompt = build_batch_param_extraction_prompt(domain, tools_with_schemas, context)
+        result = self.client.call_flow_detection(
+            config, prompt, list(message_history),
+        )
+
+        raw = result.get('raw_response', '')
+        predicted = []
+
+        parsed = self._parse_batch_params(raw)
+        if parsed:
+            # Index by name for lookup
+            parsed_by_name = {t['name']: t.get('params', {}) for t in parsed}
+            for tool_name in gold_target_tools:
+                predicted.append({
+                    'name': tool_name,
+                    'args': parsed_by_name.get(tool_name, {}),
+                })
+        else:
+            # Fallback: try single-tool parse
+            params = self._parse_params(raw)
+            for tool_name in gold_target_tools:
+                predicted.append({'name': tool_name, 'args': params or {}})
+
+        return (
+            predicted,
+            result.get('latency_ms', 0),
+            result.get('input_tokens', 0),
+            result.get('output_tokens', 0),
+        )
+
+    @staticmethod
+    def _parse_params(raw_response: str) -> dict | None:
+        """Extract params dict from JSON response."""
+        import re
+        try:
+            cleaned = raw_response.strip()
+            cleaned = re.sub(r'^```json\s*', '', cleaned)
+            cleaned = re.sub(r'\s*```$', '', cleaned)
+            obj = json.loads(cleaned)
+            params = obj.get('params')
+            if isinstance(params, dict):
+                return params
+        except (json.JSONDecodeError, AttributeError):
+            pass
+        return None
+
+    @staticmethod
+    def _parse_batch_params(raw_response: str) -> list[dict] | None:
+        """Extract tools list from batch JSON response."""
+        import re
+        try:
+            cleaned = raw_response.strip()
+            cleaned = re.sub(r'^```json\s*', '', cleaned)
+            cleaned = re.sub(r'\s*```$', '', cleaned)
+            obj = json.loads(cleaned)
+            tools = obj.get('tools')
+            if isinstance(tools, list):
+                return tools
+        except (json.JSONDecodeError, AttributeError):
+            pass
+        return None
 
     def _run_intent_convo(
         self, convo: dict, config: dict, system_prompt: str,

@@ -116,6 +116,8 @@ def main():
     parser.add_argument('--seeds', default='1', help='Seed(s): 1, 1-5, or 1,3,5')
     parser.add_argument('--mode', choices=['tool', 'intent', 'slot', 'scoped_tool', 'hint'], default='tool',
                         help='Pipeline mode: tool (exp2b), hint (exp2c), intent/slot/scoped_tool (exp2a)')
+    parser.add_argument('--slot-strategy', choices=['per_tool', 'batch'], default='per_tool',
+                        help='Param extraction strategy for --mode slot')
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--verbose', '-v', action='store_true')
     args = parser.parse_args()
@@ -185,8 +187,10 @@ def main():
                     args.domain, config, eval_set, seed,
                 )
             elif args.mode == 'slot':
+                tools = load_tools(args.domain)
                 result = runner.run_exp2_slots(
-                    args.domain, config, eval_set, seed,
+                    args.domain, config, eval_set, tools, seed,
+                    strategy=args.slot_strategy,
                 )
 
             # Extract stats
