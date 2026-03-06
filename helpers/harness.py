@@ -20,7 +20,7 @@ from helpers.scoring import (
     score_turn, score_turn_ensemble, tally_votes_multi,
     score_intent,
     build_tool_flow_map, score_nlu_staged_funnel,
-    score_tool_turn,
+    score_tool_turn, build_fuzzy_evaluator,
 )
 from prompts.flow_detection import build_flow_detection_prompt
 from prompts.intent_classification import build_intent_classification_prompt
@@ -161,6 +161,8 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
+        fuzzy_eval = build_fuzzy_evaluator(self.client)
+
         for convo in remaining:
             # Build per-convo prompt with context if no fixed prompt provided
             prompt = system_prompt or build_tool_calling_prompt(
@@ -168,7 +170,7 @@ class ExperimentRunner:
             )
             convo_result = self._run_tool_convo(
                 convo, config, prompt, client_tools, tool_flow_map,
-                domain=domain,
+                domain=domain, fuzzy_evaluator=fuzzy_eval,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -210,6 +212,8 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
+        fuzzy_eval = build_fuzzy_evaluator(self.client)
+
         for convo in remaining:
             # Build per-convo prompt with context and hint mode
             prompt = system_prompt or build_tool_calling_prompt(
@@ -217,7 +221,7 @@ class ExperimentRunner:
             )
             convo_result = self._run_tool_convo(
                 convo, config, prompt, client_tools, tool_flow_map,
-                domain=domain,
+                domain=domain, fuzzy_evaluator=fuzzy_eval,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -339,6 +343,8 @@ class ExperimentRunner:
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
 
+        fuzzy_eval = build_fuzzy_evaluator(self.client)
+
         for convo in remaining:
             # Build per-convo prompt with entity context (same as flat mode)
             system_prompt = build_tool_calling_prompt(
@@ -346,6 +352,7 @@ class ExperimentRunner:
             )
             convo_result = self._run_scoped_tool_convo(
                 convo, config, system_prompt, tools, domain=domain,
+                fuzzy_evaluator=fuzzy_eval,
             )
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
@@ -531,6 +538,7 @@ class ExperimentRunner:
         tools: list[dict],
         tool_flow_map: dict[str, list[str]],
         domain: str = 'hugo',
+        fuzzy_evaluator=None,
     ) -> dict:
         """Run tool-calling flow detection on a single conversation.
 
@@ -574,15 +582,19 @@ class ExperimentRunner:
                 gold_tools = list(turn.get('target_tools', {}).keys())
                 excluded = turn.get('exclude', False)
 
-                # Score with v2 precision/recall framework
+                # Score with v2 precision/recall framework + param scoring
+                gold_target_tools = turn.get('target_tools', {})
                 score = score_tool_turn(
                     predicted_tools=predicted_tools,
                     gold_tools=gold_tools,
                     candidate_flows=turn.get('candidate_flows'),
                     domain=domain,
+                    predicted_tools_with_args=all_tools,
+                    gold_target_tools=gold_target_tools,
+                    fuzzy_evaluator=fuzzy_evaluator,
                 )
 
-                turn_results.append({
+                turn_result = {
                     'turn_num': turn['turn_num'],
                     'utterance': utterance,
                     'flow': turn.get('flow'),
@@ -603,7 +615,13 @@ class ExperimentRunner:
                     'latency_ms': result.get('latency_ms', 0),
                     'input_tokens': result.get('input_tokens', 0),
                     'output_tokens': result.get('output_tokens', 0),
-                })
+                }
+                # Add param scoring fields if present
+                for key in ('param_accuracy', 'matched_params', 'total_scored_params',
+                            'param_details', 'correct_with_params'):
+                    if key in score:
+                        turn_result[key] = score[key]
+                turn_results.append(turn_result)
 
                 # Summarise tool calls for conversation history
                 called_str = ', '.join(predicted_tools) if predicted_tools else 'none'
@@ -646,6 +664,8 @@ class ExperimentRunner:
             'correct': correct,
             'skip_reason': skip_reason,
             'tools_offered': 1 if predicted_tool else 0,
+            'param_accuracy': None,
+            'correct_with_params': None,
             'latency_ms': 0,
             'input_tokens': 0,
             'output_tokens': 0,
@@ -658,6 +678,7 @@ class ExperimentRunner:
         system_prompt: str,
         all_tools: list[dict],
         domain: str = 'hugo',
+        fuzzy_evaluator=None,
     ) -> dict:
         """Run scoped tool-calling: tools filtered per-turn by gold flow.
 
@@ -737,16 +758,20 @@ class ExperimentRunner:
                     else ([tool_called] if tool_called else [])
                 )
 
-                gold_tools = list(turn.get('target_tools', {}).keys())
+                gold_target_tools = turn.get('target_tools', {})
+                gold_tools = list(gold_target_tools.keys())
 
                 score = score_tool_turn(
                     predicted_tools=predicted_tools,
                     gold_tools=gold_tools,
                     candidate_flows=turn.get('candidate_flows'),
                     domain=domain,
+                    predicted_tools_with_args=all_tools_called,
+                    gold_target_tools=gold_target_tools,
+                    fuzzy_evaluator=fuzzy_evaluator,
                 )
 
-                turn_results.append({
+                turn_result = {
                     'turn_num': turn['turn_num'],
                     'utterance': utterance,
                     'flow': turn.get('flow'),
@@ -767,7 +792,12 @@ class ExperimentRunner:
                     'latency_ms': result.get('latency_ms', 0),
                     'input_tokens': result.get('input_tokens', 0),
                     'output_tokens': result.get('output_tokens', 0),
-                })
+                }
+                for key in ('param_accuracy', 'matched_params', 'total_scored_params',
+                            'param_details', 'correct_with_params'):
+                    if key in score:
+                        turn_result[key] = score[key]
+                turn_results.append(turn_result)
 
                 message_history.append({
                     'role': 'assistant',
@@ -1082,6 +1112,39 @@ class ExperimentRunner:
         errors = sum(1 for c in conversations if c.get('error'))
         failure_rate = errors / len(conversations) if conversations else 0.0
 
+        # Param accuracy (only for turns that have param scoring, excluding None/skipped)
+        param_turns = [
+            t for t in all_turns
+            if t.get('param_accuracy') is not None
+        ]
+        param_accuracy_mean = (
+            round(sum(t['param_accuracy'] for t in param_turns) / len(param_turns), 4)
+            if param_turns else None
+        )
+        cwp_turns = [
+            t for t in all_turns
+            if t.get('correct_with_params') is not None
+        ]
+        correct_with_params_rate = (
+            round(sum(1 for t in cwp_turns if t['correct_with_params']) / len(cwp_turns), 4)
+            if cwp_turns else None
+        )
+
+        summary_dict = {
+            'accuracy_top1': round(accuracy, 4),
+            'accuracy_by_category': {k: round(v, 4) for k, v in acc_by_cat.items()},
+            'accuracy_by_turn': {k: round(v, 4) for k, v in acc_by_turn.items()},
+            'latency_p50_ms': latency_p50,
+            'latency_p95_ms': latency_p95,
+            'input_tokens_total': input_tokens,
+            'output_tokens_total': output_tokens,
+            'failure_rate': round(failure_rate, 4),
+        }
+        if param_accuracy_mean is not None:
+            summary_dict['param_accuracy_mean'] = param_accuracy_mean
+        if correct_with_params_rate is not None:
+            summary_dict['correct_with_params_rate'] = correct_with_params_rate
+
         return {
             'run_id': run_id,
             'experiment': experiment,
@@ -1089,14 +1152,5 @@ class ExperimentRunner:
             'config_id': config_id,
             'seed': seed,
             'timestamp': datetime.now(timezone.utc).isoformat(),
-            'summary': {
-                'accuracy_top1': round(accuracy, 4),
-                'accuracy_by_category': {k: round(v, 4) for k, v in acc_by_cat.items()},
-                'accuracy_by_turn': {k: round(v, 4) for k, v in acc_by_turn.items()},
-                'latency_p50_ms': latency_p50,
-                'latency_p95_ms': latency_p95,
-                'input_tokens_total': input_tokens,
-                'output_tokens_total': output_tokens,
-                'failure_rate': round(failure_rate, 4),
-            },
+            'summary': summary_dict,
         }

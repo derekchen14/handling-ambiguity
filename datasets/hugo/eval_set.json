@@ -22,8 +22,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "reorder from Q/K/V intuition into scaled dot-product",
-            "focus": "self-attention"
+            "instructions": {
+              "value": "reorder from Q/K/V intuition into scaled dot-product",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "self-attention",
+              "fuzzy": true
+            }
           },
           "update_section": {
             "section": "self-attention",
@@ -50,8 +56,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "same reordering",
-            "focus": "multi-head attention"
+            "instructions": {
+              "value": "same reordering",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "multi-head attention",
+              "fuzzy": true
+            }
           },
           "update_section": {
             "section": "multi-head attention",
@@ -78,8 +90,14 @@
         "utterance": "Let's write a new post about why we decided to break apart our monolith.",
         "target_tools": {
           "create_post": {
-            "title": "Why We Broke Apart Our Monolith",
-            "topic": "monolith to microservices migration"
+            "title": {
+              "value": "Why We Broke Apart Our Monolith",
+              "fuzzy": true
+            },
+            "topic": {
+              "value": "monolith to microservices migration",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -96,8 +114,14 @@
         "utterance": "That's a terrible title, please try again.",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "monolith to microservices migration",
-            "angle": "blog post titles"
+            "topic": {
+              "value": "monolith to microservices migration",
+              "fuzzy": true
+            },
+            "angle": {
+              "value": "blog post titles",
+              "fuzzy": true
+            }
           },
           "update_metadata": {
             "title": null
@@ -164,8 +188,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "tighten, less clunky",
-            "focus": "intro"
+            "instructions": {
+              "value": "tighten, less clunky",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -183,8 +213,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "tighten, less wordy",
-            "focus": "performance benchmarks"
+            "instructions": {
+              "value": "tighten, less wordy",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "performance benchmarks",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -208,8 +244,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "restructure, argument isn't landing",
-            "focus": "async communication"
+            "instructions": {
+              "value": "restructure, argument isn't landing",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "async communication",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -227,8 +269,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "rewrite, trails off",
-            "focus": "conclusion"
+            "instructions": {
+              "value": "rewrite, trails off",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "conclusion",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -303,7 +351,11 @@
           "manage_schedule": {
             "post_id": null,
             "action": "schedule",
-            "datetime": "Friday 8:00 AM EST"
+            "datetime": {
+              "day": "friday",
+              "tz": "EST",
+              "time": "08:00"
+            }
           }
         }
       },
@@ -322,7 +374,10 @@
           "manage_schedule": {
             "post_id": null,
             "action": "reschedule",
-            "datetime": "Thursday evening"
+            "datetime": {
+              "day": "thursday",
+              "time": "evening"
+            }
           }
         }
       }
@@ -346,7 +401,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": "noise pollution",
-            "instructions": "flesh out into full paragraph"
+            "instructions": {
+              "value": "flesh out into full paragraph",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -364,7 +422,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": "commuting",
-            "instructions": "flesh out into full paragraph"
+            "instructions": {
+              "value": "flesh out into full paragraph",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -388,7 +449,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "casual first-person, like a letter to a friend"
+            "target_tone": {
+              "value": "casual first-person, like a letter to a friend",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -473,10 +537,16 @@
         "utterance": "The positional encoding section is still completely empty. Can you draft something from the heading down?",
         "target_tools": {
           "write_section": {
-            "section": "positional encoding"
+            "section": {
+              "value": "positional encoding",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "positional encoding"
+            "topic": {
+              "value": "positional encoding",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -537,7 +607,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "build Hai Van Pass notes into real paragraphs"
+            "instructions": {
+              "value": "build Hai Van Pass notes into real paragraphs",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -577,7 +650,10 @@
         "utterance": "The table's great but that new analogy is worse. Put the original opening back and keep everything else.",
         "target_tools": {
           "revise_content": {
-            "instructions": "restore original opening, keep table and everything else"
+            "instructions": {
+              "value": "restore original opening, keep table and everything else",
+              "fuzzy": true
+            }
           },
           "rollback_post": {
             "post_id": null
@@ -625,7 +701,7 @@
           },
           "publish_post": {
             "post_id": null,
-            "platform": "WordPress",
+            "platform": "wordpress",
             "action": "publish"
           }
         }
@@ -754,7 +830,10 @@
           },
           "revise_content": {
             "focus": null,
-            "instructions": "fix dryness, incorporate external content"
+            "instructions": {
+              "value": "fix dryness, incorporate external content",
+              "fuzzy": true
+            }
           },
           "search_evidence": {
             "query": null
@@ -802,7 +881,10 @@
             ]
           },
           "revise_content": {
-            "focus": "attention",
+            "focus": {
+              "value": "attention",
+              "fuzzy": true
+            },
             "instructions": null
           },
           "diff_versions": {
@@ -823,8 +905,14 @@
         "utterance": "Fix the parallel processing analogy, it got lost.",
         "target_tools": {
           "revise_content": {
-            "focus": "attention",
-            "instructions": "fix parallel processing analogy"
+            "focus": {
+              "value": "attention",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "fix parallel processing analogy",
+              "fuzzy": true
+            }
           },
           "update_section": {
             "section": "attention"
@@ -867,11 +955,20 @@
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "develop into full prose"
+            "instructions": {
+              "value": "develop into full prose",
+              "fuzzy": true
+            }
           },
           "revise_content": {
-            "focus": "overnight train",
-            "instructions": "restructure"
+            "focus": {
+              "value": "overnight train",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restructure",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -889,7 +986,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "turn into paragraphs"
+            "instructions": {
+              "value": "turn into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1054,7 +1154,10 @@
             "topic": "async communication culture"
           },
           "brainstorm_ideas": {
-            "topic": "async communication culture"
+            "topic": {
+              "value": "async communication culture",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -1071,7 +1174,10 @@
         "utterance": "Angles first. Haven't decided on a direction yet.",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "async communication culture"
+            "topic": {
+              "value": "async communication culture",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1175,12 +1281,12 @@
             "platform": "Medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           },
           "manage_schedule": {
             "action": "schedule",
-            "platform": "Medium"
+            "platform": "medium"
           }
         }
       },
@@ -1200,7 +1306,7 @@
             "platform": "Medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           }
         }
@@ -1311,15 +1417,23 @@
         "rationale": "Rewriting code examples ('rework', Revise) and scheduling publication ('schedule', Publish) are separate operations requiring different flow stacks.",
         "target_tools": {
           "revise_content": {
-            "focus": "code examples",
-            "instructions": "rewrite for Express 5"
+            "focus": {
+              "value": "code examples",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "rewrite for Express 5",
+              "fuzzy": true
+            }
           },
           "update_section": {
             "section": null
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "Friday"
+            "date": {
+              "day": "friday"
+            }
           }
         }
       }
@@ -1343,7 +1457,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "casual, conversational"
+            "target_tone": {
+              "value": "casual, conversational",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -1370,7 +1487,10 @@
         "rationale": "Generating topic ideas ('brainstorm', Draft) and creating a section outline ('outline', Draft) are two drafting operations for a new essay.",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "rent control follow-up"
+            "topic": {
+              "value": "rent control follow-up",
+              "fuzzy": true
+            }
           },
           "generate_outline": {
             "topic": "rent control follow-up"
@@ -1396,8 +1516,14 @@
         "utterance": "Can you finalize the section on alert fatigue after the Grafana walkthrough.",
         "target_tools": {
           "revise_content": {
-            "focus": "alert fatigue",
-            "instructions": "finalize"
+            "focus": {
+              "value": "alert fatigue",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "finalize",
+              "fuzzy": true
+            }
           },
           "check_grammar": {
             "section": "alert fatigue"
@@ -1462,7 +1588,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "Thursday 6pm"
+            "date": {
+              "day": "thursday",
+              "time": "18:00"
+            }
           }
         }
       },
@@ -1492,7 +1621,10 @@
             "section": null
           },
           "create_post": {
-            "title": "reasoning models"
+            "title": {
+              "value": "reasoning models",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1570,8 +1702,14 @@
         "rationale": "Improving the sourcing note ('polish', Revise) is a prerequisite for featuring the post ('promote', Publish). Two operations linked by dependency.",
         "target_tools": {
           "revise_content": {
-            "focus": "sourcing note",
-            "instructions": "improve"
+            "focus": {
+              "value": "sourcing note",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "improve",
+              "fuzzy": true
+            }
           },
           "check_grammar": {
             "section": "sourcing note"
@@ -1602,10 +1740,16 @@
         "utterance": "The performance benchmarks section is empty. Cover startup time, memory, extension load, and Copilot latency.",
         "target_tools": {
           "write_section": {
-            "section": "performance benchmarks"
+            "section": {
+              "value": "performance benchmarks",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "startup time, memory, extension load, Copilot latency"
+            "topic": {
+              "value": "startup time, memory, extension load, Copilot latency",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -1745,11 +1889,17 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out Laos section"
+            "instructions": {
+              "value": "flesh out Laos section",
+              "fuzzy": true
+            }
           },
           "revise_content": {
             "focus": null,
-            "instructions": "check grammar"
+            "instructions": {
+              "value": "check grammar",
+              "fuzzy": true
+            }
           },
           "check_grammar": {
             "section": null
@@ -1789,7 +1939,10 @@
         "utterance": "I need some fresh angles for this week's AI research roundup",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "AI research roundup"
+            "topic": {
+              "value": "AI research roundup",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -1806,8 +1959,14 @@
         "utterance": "Love 3 and 4. Dig deeper with some hooks?",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "AI safety papers nobody's reading; weird niche applications from arxiv",
-            "angle": "hooks"
+            "topic": {
+              "value": "AI safety papers nobody's reading; weird niche applications from arxiv",
+              "fuzzy": true
+            },
+            "angle": {
+              "value": "hooks",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1994,7 +2153,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "professional technical"
+            "target_tone": {
+              "value": "professional technical",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2012,7 +2174,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "professional but accessible",
+            "target_tone": {
+              "value": "professional but accessible",
+              "fuzzy": true
+            },
             "intensity": "lighter"
           }
         }
@@ -2037,8 +2202,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "clean up, less clunky",
-            "focus": "intro"
+            "instructions": {
+              "value": "clean up, less clunky",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2056,8 +2227,14 @@
         "target_tools": {
           "revise_content": {
             "source_content": null,
-            "instructions": "clean up",
-            "focus": "sourcing ingredients locally"
+            "instructions": {
+              "value": "clean up",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "sourcing ingredients locally",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2207,8 +2384,11 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "platform": "Substack",
-            "datetime": "next Tuesday morning"
+            "platform": "substack",
+            "datetime": {
+              "day": "tuesday",
+              "time": "morning"
+            }
           }
         }
       },
@@ -2226,7 +2406,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "datetime": "8am EST"
+            "datetime": {
+              "tz": "EST",
+              "time": "08:00"
+            }
           }
         }
       }
@@ -2296,10 +2479,16 @@
         "utterance": "Draft me a section on multi-head attention for the transformer post",
         "target_tools": {
           "write_section": {
-            "section": "multi-head attention"
+            "section": {
+              "value": "multi-head attention",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "multi-head attention"
+            "topic": {
+              "value": "multi-head attention",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2316,12 +2505,21 @@
         "utterance": "Nice. Now do the same for positional encoding, focus on sinusoidal vs learned embeddings",
         "target_tools": {
           "write_section": {
-            "section": "positional encoding",
+            "section": {
+              "value": "positional encoding",
+              "fuzzy": true
+            },
             "instructions": "focus on sinusoidal vs learned embeddings"
           },
           "generate_prose": {
-            "topic": "positional encoding",
-            "instructions": "focus on sinusoidal vs learned embeddings"
+            "topic": {
+              "value": "positional encoding",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "focus on sinusoidal vs learned embeddings",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2346,7 +2544,7 @@
         "target_tools": {
           "publish_post": {
             "post_id": null,
-            "platform": "WordPress",
+            "platform": "wordpress",
             "action": "publish"
           }
         }
@@ -2601,7 +2799,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out bullet points in authentication section"
+            "instructions": {
+              "value": "flesh out bullet points in authentication section",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2619,7 +2820,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out notes in error handling section"
+            "instructions": {
+              "value": "flesh out notes in error handling section",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2644,7 +2848,10 @@
         "target_tools": {
           "create_post": {
             "title": null,
-            "topic": "AI research roundup"
+            "topic": {
+              "value": "AI research roundup",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2689,8 +2896,14 @@
         ],
         "target_tools": {
           "revise_content": {
-            "instructions": "move safety stats before walkability, drop parking subsection",
-            "focus": "neighborhood comparison"
+            "instructions": {
+              "value": "move safety stats before walkability, drop parking subsection",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "neighborhood comparison",
+              "fuzzy": true
+            }
           },
           "reorder_sections": {
             "order": null
@@ -2715,8 +2928,14 @@
         ],
         "target_tools": {
           "revise_content": {
-            "instructions": "fold parking into walkability section",
-            "focus": "walkability"
+            "instructions": {
+              "value": "fold parking into walkability section",
+              "fuzzy": true
+            },
+            "focus": {
+              "value": "walkability",
+              "fuzzy": true
+            }
           },
           "update_section": {
             "section": "walkability",
@@ -2830,7 +3049,10 @@
         "utterance": "Nah, skip that",
         "target_tools": {
           "conversational_response": {
-            "reason": "user dismissed suggestion"
+            "reason": {
+              "value": "user dismissed suggestion",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2848,7 +3070,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "datetime": "Thursday 8am"
+            "datetime": {
+              "day": "thursday",
+              "time": "08:00"
+            }
           }
         }
       }
@@ -2871,8 +3096,14 @@
         "utterance": "I'm kinda stuck on my urban living essay, any ideas what I should work on next?",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "urban living essay",
-            "angle": "what to work on next"
+            "topic": {
+              "value": "urban living essay",
+              "fuzzy": true
+            },
+            "angle": {
+              "value": "what to work on next",
+              "fuzzy": true
+            }
           },
           "detect_issues": {
             "content": null
@@ -2892,8 +3123,14 @@
         "utterance": "Ok yeah can you clean up that section then? just tighten the writing, don't change what I'm saying",
         "target_tools": {
           "revise_content": {
-            "focus": "Noise as Neighbors",
-            "instructions": "tighten writing, don't change meaning"
+            "focus": {
+              "value": "Noise as Neighbors",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "tighten writing, don't change meaning",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2917,7 +3154,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out bullet points into paragraphs"
+            "instructions": {
+              "value": "flesh out bullet points into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2977,8 +3217,14 @@
         "utterance": "Yeah clean up that Khao San Road section then, smooth out the flow a bit",
         "target_tools": {
           "revise_content": {
-            "focus": "Khao San Road",
-            "instructions": "smooth out the flow"
+            "focus": {
+              "value": "Khao San Road",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "smooth out the flow",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3018,7 +3264,10 @@
         "utterance": "Option B looks solid. Go ahead and start a fresh post with that topic so I can begin filling it in.",
         "target_tools": {
           "create_post": {
-            "topic": "beginner investing strategies"
+            "topic": {
+              "value": "beginner investing strategies",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3065,7 +3314,7 @@
         "target_tools": {
           "publish_post": {
             "post_id": null,
-            "platform": "LinkedIn",
+            "platform": "linkedin",
             "action": "publish"
           },
           "format_content": {
@@ -3094,7 +3343,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "turn winter squash bullet points into paragraphs"
+            "instructions": {
+              "value": "turn winter squash bullet points into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3133,7 +3385,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "casual, conversational"
+            "target_tone": {
+              "value": "casual, conversational",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3276,8 +3531,14 @@
         "utterance": "Yeah clean that intro up, just tighten the wording without changing what it says.",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
-            "instructions": "tighten wording, don't change meaning"
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "tighten wording, don't change meaning",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3408,7 +3669,10 @@
         "utterance": "Nah I'm good, leave the order as is",
         "target_tools": {
           "conversational_response": {
-            "reason": "user declined suggestion to reorder sections"
+            "reason": {
+              "value": "user declined suggestion to reorder sections",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3449,8 +3713,14 @@
         "utterance": "Yeah if people are hitting that first, clean up the transitions and tighten the wording in that intro section",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
-            "instructions": "clean up transitions, tighten wording"
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "clean up transitions, tighten wording",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3513,8 +3783,14 @@
         "utterance": "Can you clean up the intro on the summer squash post? Just smooth it out a bit, don't change anything major",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
-            "instructions": "smooth it out"
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "smooth it out",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3531,8 +3807,14 @@
         "utterance": "Yeah that's not great. Go ahead and tear that whole intro apart and rebuild it so it gets to the recipe faster",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
-            "instructions": "restructure, get to recipe faster"
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restructure, get to recipe faster",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3555,7 +3837,10 @@
         "utterance": "Bring back the old intro on the JetBrains review, the rewrite was worse.",
         "target_tools": {
           "revise_content": {
-            "instructions": "restore previous version of intro"
+            "instructions": {
+              "value": "restore previous version of intro",
+              "fuzzy": true
+            }
           },
           "rollback_post": {
             "post_id": null
@@ -3646,7 +3931,10 @@
         "utterance": "The authentication section lost the whole point about JWT vs session tokens. Bring that back.",
         "target_tools": {
           "revise_content": {
-            "instructions": "restore JWT vs session token comparison in authentication section"
+            "instructions": {
+              "value": "restore JWT vs session token comparison in authentication section",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3664,7 +3952,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "conversational, walking someone through it"
+            "target_tone": {
+              "value": "conversational, walking someone through it",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3689,7 +3980,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "turn bullet points into paragraphs"
+            "instructions": {
+              "value": "turn bullet points into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3706,8 +4000,14 @@
         "utterance": "Yeah that diffusion section needs a heavier pass then. Restructure the argument and cut the fluff, it should be tight like the others.",
         "target_tools": {
           "revise_content": {
-            "focus": "diffusion models",
-            "instructions": "restructure argument, cut fluff"
+            "focus": {
+              "value": "diffusion models",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restructure argument, cut fluff",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3731,7 +4031,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "turn neighborhood sounds notes into paragraphs"
+            "instructions": {
+              "value": "turn neighborhood sounds notes into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3964,7 +4267,10 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "conversational, loose"
+            "target_tone": {
+              "value": "conversational, loose",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4002,7 +4308,10 @@
             ]
           },
           "revise_content": {
-            "instructions": "major revision"
+            "instructions": {
+              "value": "major revision",
+              "fuzzy": true
+            }
           },
           "normalize_structure": {
             "post_id": null
@@ -4022,8 +4331,14 @@
         "utterance": "The content. The argument doesn't build on the self-attention part.",
         "target_tools": {
           "revise_content": {
-            "focus": "self-attention",
-            "instructions": "restructure argument"
+            "focus": {
+              "value": "self-attention",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restructure argument",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4064,8 +4379,14 @@
             "post_id": null
           },
           "revise_content": {
-            "focus": "Thailand",
-            "instructions": "fix last change"
+            "focus": {
+              "value": "Thailand",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "fix last change",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4125,7 +4446,7 @@
             "platform": "Medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           },
           "manage_schedule": {
@@ -4149,7 +4470,7 @@
             "platform": "Medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           }
         }
@@ -4188,7 +4509,10 @@
             ]
           },
           "revise_content": {
-            "focus": "database migration",
+            "focus": {
+              "value": "database migration",
+              "fuzzy": true
+            },
             "instructions": null
           },
           "diff_versions": {
@@ -4209,8 +4533,14 @@
         "utterance": "Just tighten it up. Transitions are clunky and some sentences run way too long.",
         "target_tools": {
           "revise_content": {
-            "focus": "database migration",
-            "instructions": "tighten transitions, shorten sentences"
+            "focus": {
+              "value": "database migration",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "tighten transitions, shorten sentences",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4249,10 +4579,16 @@
             ]
           },
           "write_section": {
-            "section": "preserving summer tomatoes"
+            "section": {
+              "value": "preserving summer tomatoes",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "preserving summer tomatoes"
+            "topic": {
+              "value": "preserving summer tomatoes",
+              "fuzzy": true
+            }
           },
           "insert_section": {
             "title": "Preserving Summer Tomatoes"
@@ -4272,10 +4608,16 @@
         "utterance": "Go ahead and draft it, maybe 200 words covering water bath canning and freezing methods",
         "target_tools": {
           "write_section": {
-            "section": "preserving summer tomatoes"
+            "section": {
+              "value": "preserving summer tomatoes",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "water bath canning and freezing methods"
+            "topic": {
+              "value": "water bath canning and freezing methods",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4314,7 +4656,10 @@
             ]
           },
           "brainstorm_ideas": {
-            "topic": "VS Code review"
+            "topic": {
+              "value": "VS Code review",
+              "fuzzy": true
+            }
           },
           "detect_issues": {
             "content": null
@@ -4337,8 +4682,14 @@
         "utterance": "Yeah recommend something, I'm kinda stuck on where to go from here",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "VS Code review",
-            "angle": "what to work on next"
+            "topic": {
+              "value": "VS Code review",
+              "fuzzy": true
+            },
+            "angle": {
+              "value": "what to work on next",
+              "fuzzy": true
+            }
           },
           "detect_issues": {
             "content": null
@@ -4386,7 +4737,10 @@
           },
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "authoritative, less casual"
+            "target_tone": {
+              "value": "authoritative, less casual",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4445,14 +4799,23 @@
             ]
           },
           "write_section": {
-            "section": "authentication"
+            "section": {
+              "value": "authentication",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "authentication"
+            "topic": {
+              "value": "authentication",
+              "fuzzy": true
+            }
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "develop authentication section"
+            "instructions": {
+              "value": "develop authentication section",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4469,10 +4832,16 @@
         "utterance": "Nah that section is empty, just go for it",
         "target_tools": {
           "write_section": {
-            "section": "authentication"
+            "section": {
+              "value": "authentication",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "authentication"
+            "topic": {
+              "value": "authentication",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4628,7 +4997,10 @@
             ]
           },
           "brainstorm_ideas": {
-            "topic": "transformer section"
+            "topic": {
+              "value": "transformer section",
+              "fuzzy": true
+            }
           },
           "detect_issues": {
             "content": null
@@ -4651,8 +5023,14 @@
         "utterance": "No I want fresh ideas, what angles am I missing",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "transformer section",
-            "angle": "missing angles"
+            "topic": {
+              "value": "transformer section",
+              "fuzzy": true
+            },
+            "angle": {
+              "value": "missing angles",
+              "fuzzy": true
+            }
           }
         },
         "exclude": true
@@ -4755,7 +5133,10 @@
             ]
           },
           "brainstorm_ideas": {
-            "topic": "beginner investing"
+            "topic": {
+              "value": "beginner investing",
+              "fuzzy": true
+            }
           },
           "generate_outline": {
             "topic": "beginner investing"
@@ -4775,7 +5156,10 @@
         "utterance": "Angles and hooks first.",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "beginner investing"
+            "topic": {
+              "value": "beginner investing",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4911,7 +5295,7 @@
             "platform": "Substack"
           },
           "publish_post": {
-            "platform": "Substack",
+            "platform": "substack",
             "action": "publish"
           }
         }
@@ -4935,8 +5319,14 @@
         "utterance": "the VS Code section reads kinda rough, it needs some major revision",
         "target_tools": {
           "revise_content": {
-            "focus": "VS Code",
-            "instructions": "major revision"
+            "focus": {
+              "value": "VS Code",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "major revision",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4953,8 +5343,14 @@
         "utterance": "nah the structure is fine, just make the sentences read better by making them more concise",
         "target_tools": {
           "revise_content": {
-            "focus": "VS Code",
-            "instructions": "make sentences more concise"
+            "focus": {
+              "value": "VS Code",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "make sentences more concise",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5041,7 +5437,10 @@
             "action": "publish"
           },
           "conversational_response": {
-            "reason": "user venting about missed deadline"
+            "reason": {
+              "value": "user venting about missed deadline",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5156,7 +5555,10 @@
             ]
           },
           "revise_content": {
-            "instructions": "major revision"
+            "instructions": {
+              "value": "major revision",
+              "fuzzy": true
+            }
           },
           "normalize_structure": {
             "post_id": null
@@ -5176,8 +5578,14 @@
         "utterance": "Rewrite. The whole argument about commuter isolation falls apart in section 3",
         "target_tools": {
           "revise_content": {
-            "focus": "commuter isolation",
-            "instructions": "rewrite, argument falls apart in section 3"
+            "focus": {
+              "value": "commuter isolation",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "rewrite, argument falls apart in section 3",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5217,10 +5625,16 @@
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "fill in skeleton"
+            "instructions": {
+              "value": "fill in skeleton",
+              "fuzzy": true
+            }
           },
           "revise_content": {
-            "instructions": "structural overhaul"
+            "instructions": {
+              "value": "structural overhaul",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5238,7 +5652,10 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out into full content"
+            "instructions": {
+              "value": "flesh out into full content",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5331,7 +5748,7 @@
             "platform": "Substack"
           },
           "publish_post": {
-            "platform": "Substack",
+            "platform": "substack",
             "action": "publish"
           }
         }
@@ -5389,7 +5806,10 @@
         "utterance": "Do personal essays about city life do well on blogs or is that too niche",
         "target_tools": {
           "conversational_response": {
-            "reason": "conversational question about blog niche"
+            "reason": {
+              "value": "conversational question about blog niche",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5442,8 +5862,14 @@
         "utterance": "The attention mechanism section lost the whole point about computational complexity. You rewrote it into some generic overview",
         "target_tools": {
           "revise_content": {
-            "focus": "attention mechanism",
-            "instructions": "restore computational complexity argument"
+            "focus": {
+              "value": "attention mechanism",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restore computational complexity argument",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5533,12 +5959,17 @@
         "rationale": "('dismiss', Converse) and ('schedule', Publish) are operations from different intents.",
         "target_tools": {
           "conversational_response": {
-            "reason": "user declined idea"
+            "reason": {
+              "value": "user declined idea",
+              "fuzzy": true
+            }
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday",
-            "platform": "WordPress"
+            "date": {
+              "day": "tuesday"
+            },
+            "platform": "wordpress"
           }
         }
       }
@@ -5592,10 +6023,16 @@
         "rationale": "('write', Draft) and ('preference', Converse) are operations from different intents.",
         "target_tools": {
           "write_section": {
-            "section": "DCA"
+            "section": {
+              "value": "DCA",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "dollar cost averaging"
+            "topic": {
+              "value": "dollar cost averaging",
+              "fuzzy": true
+            }
           },
           "manage_memory": {
             "operation": "write",
@@ -5624,7 +6061,10 @@
         "utterance": "What's the right posting frequency for a deep technical series? Don't want to burn out readers.",
         "target_tools": {
           "conversational_response": {
-            "reason": "conversational question about posting frequency"
+            "reason": {
+              "value": "conversational question about posting frequency",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5652,7 +6092,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday 9am"
+            "date": {
+              "day": "tuesday",
+              "time": "09:00"
+            }
           },
           "audit_style": {
             "post_id": null,
@@ -5682,7 +6125,10 @@
         "utterance": "The spring asparagus post needs a complete overhaul, structure is off and the intro is weak.",
         "target_tools": {
           "revise_content": {
-            "instructions": "complete overhaul, fix structure and intro"
+            "instructions": {
+              "value": "complete overhaul, fix structure and intro",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5768,13 +6214,22 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "casual, developer-friendly"
+            "target_tone": {
+              "value": "casual, developer-friendly",
+              "fuzzy": true
+            }
           },
           "write_section": {
-            "section": "Pricing Breakdown"
+            "section": {
+              "value": "Pricing Breakdown",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "free vs paid, student discounts"
+            "topic": {
+              "value": "free vs paid, student discounts",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5834,7 +6289,10 @@
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "turn bullet points into paragraphs"
+            "instructions": {
+              "value": "turn bullet points into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5890,11 +6348,17 @@
         "rationale": "Generating ideas ('brainstorm', Draft) and expanding notes into prose ('expand', Draft) are two drafting operations triggered by the inspection results.",
         "target_tools": {
           "brainstorm_ideas": {
-            "topic": "error handling"
+            "topic": {
+              "value": "error handling",
+              "fuzzy": true
+            }
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out auth bullets"
+            "instructions": {
+              "value": "flesh out auth bullets",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5949,12 +6413,14 @@
             "platform": "LinkedIn"
           },
           "publish_post": {
-            "platform": "LinkedIn",
+            "platform": "linkedin",
             "action": "publish"
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "Thursday"
+            "date": {
+              "day": "thursday"
+            }
           }
         }
       }
@@ -6030,10 +6496,16 @@
         "utterance": "Write me a section on self-attention mechanisms, like 400 words, cover the QKV matrices and how scaled dot product works",
         "target_tools": {
           "write_section": {
-            "section": "self-attention mechanisms"
+            "section": {
+              "value": "self-attention mechanisms",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "QKV matrices, scaled dot product"
+            "topic": {
+              "value": "QKV matrices, scaled dot product",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6061,13 +6533,22 @@
         "target_tools": {
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out positional encoding notes"
+            "instructions": {
+              "value": "flesh out positional encoding notes",
+              "fuzzy": true
+            }
           },
           "write_section": {
-            "section": "sparse attention"
+            "section": {
+              "value": "sparse attention",
+              "fuzzy": true
+            }
           },
           "generate_prose": {
-            "topic": "sparse attention"
+            "topic": {
+              "value": "sparse attention",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6090,7 +6571,10 @@
         "utterance": "Nah, skip it",
         "target_tools": {
           "conversational_response": {
-            "reason": "user declining/skipping"
+            "reason": {
+              "value": "user declining/skipping",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6146,8 +6630,11 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday 9am",
-            "platform": "WordPress"
+            "date": {
+              "day": "tuesday",
+              "time": "09:00"
+            },
+            "platform": "wordpress"
           }
         }
       },
@@ -6233,7 +6720,10 @@
         "rationale": "('chat', Converse) and ('create', Draft) are operations from different intents.",
         "target_tools": {
           "create_post": {
-            "title": "Kubernetes"
+            "title": {
+              "value": "Kubernetes",
+              "fuzzy": true
+            }
           },
           "audit_style": {
             "post_id": null,
@@ -6318,7 +6808,10 @@
         "utterance": "do ppl actually care about IDE comparison posts or is that oversaturated at this point",
         "target_tools": {
           "conversational_response": {
-            "reason": "conversational question about IDE comparison posts"
+            "reason": {
+              "value": "conversational question about IDE comparison posts",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6345,7 +6838,10 @@
         "rationale": "Major revision ('rework', Revise) and tone adjustment ('tone', Revise) are two revision operations on different reviews.",
         "target_tools": {
           "revise_content": {
-            "instructions": "complete rebuild"
+            "instructions": {
+              "value": "complete rebuild",
+              "fuzzy": true
+            }
           },
           "adjust_tone": {
             "source_content": null,
@@ -6377,8 +6873,14 @@
         ],
         "target_tools": {
           "revise_content": {
-            "focus": "hybrid models",
-            "instructions": "trim and reorder"
+            "focus": {
+              "value": "hybrid models",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "trim and reorder",
+              "fuzzy": true
+            }
           },
           "reorder_sections": {}
         }
@@ -6406,8 +6908,14 @@
         "rationale": "('amend', Revise) and ('release', Publish) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "timezone equity",
-            "instructions": "restore nuance"
+            "focus": {
+              "value": "timezone equity",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restore nuance",
+              "fuzzy": true
+            }
           },
           "publish_post": {
             "post_id": null,
@@ -6434,8 +6942,14 @@
         "utterance": "The authentication section you rewrote lost the bit about JWT expiration. Put that back and keep the rest.",
         "target_tools": {
           "revise_content": {
-            "focus": "authentication",
-            "instructions": "restore JWT expiration"
+            "focus": {
+              "value": "authentication",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restore JWT expiration",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6531,14 +7045,23 @@
         "rationale": "('polish', Revise) and ('brainstorm', Draft) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
-            "instructions": "match usual style"
+            "focus": {
+              "value": "intro",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "match usual style",
+              "fuzzy": true
+            }
           },
           "check_grammar": {
             "section": "intro"
           },
           "brainstorm_ideas": {
-            "topic": "AI roundup next week"
+            "topic": {
+              "value": "AI roundup next week",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6589,11 +7112,17 @@
         "target_tools": {
           "adjust_tone": {
             "source_content": null,
-            "target_tone": "conversational"
+            "target_tone": {
+              "value": "conversational",
+              "fuzzy": true
+            }
           },
           "expand_content": {
             "source_content": null,
-            "instructions": "flesh out rent section bullets into paragraphs"
+            "instructions": {
+              "value": "flesh out rent section bullets into paragraphs",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6643,11 +7172,20 @@
         "rationale": "('amend', Revise) and ('suggest', Converse) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "self-attention",
-            "instructions": "restore math notation"
+            "focus": {
+              "value": "self-attention",
+              "fuzzy": true
+            },
+            "instructions": {
+              "value": "restore math notation",
+              "fuzzy": true
+            }
           },
           "brainstorm_ideas": {
-            "topic": "math notation in blog posts"
+            "topic": {
+              "value": "math notation in blog posts",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6697,7 +7235,10 @@
         "rationale": "('dismiss', Converse) and ('check', Research) are operations from different intents.",
         "target_tools": {
           "conversational_response": {
-            "reason": "user declined idea"
+            "reason": {
+              "value": "user declined idea",
+              "fuzzy": true
+            }
           },
           "search_posts": {
             "query": "Southeast Asia"

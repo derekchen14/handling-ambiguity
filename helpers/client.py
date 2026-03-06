@@ -136,6 +136,20 @@ class UnifiedLLMClient:
 
     # ── Public API ────────────────────────────────────────────────
 
+    def call_simple(
+        self,
+        model: str,
+        prompt: str,
+        max_tokens: int = 64,
+    ) -> str:
+        """Lightweight text-in/text-out call (used for fuzzy eval)."""
+        resp = self.anthropic_client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        return resp.content[0].text if resp.content else ''
+
     def call_flow_detection(
         self,
         config: dict,

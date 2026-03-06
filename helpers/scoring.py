@@ -248,6 +248,9 @@ def score_tool_turn(
     gold_tools: list[str],
     candidate_flows: list[str] | None = None,
     domain: str = 'hugo',
+    predicted_tools_with_args: list[dict] | None = None,
+    gold_target_tools: dict | None = None,
+    fuzzy_evaluator=None,
 ) -> dict:
     """Score a tool-calling turn with strict precision gating.
 
@@ -316,10 +319,14 @@ def score_tool_turn(
         result['correct'] = not pred_set
         result['recall'] = 1.0 if not pred_set else 0.0
         result['precision'] = 1.0 if not pred_set else 0.0
+        result['param_accuracy'] = 1.0 if not pred_set else 0.0
+        result['correct_with_params'] = result['correct']
         return result
 
     # Null calls with gold tools → always incorrect
     if not pred_set:
+        result['param_accuracy'] = 0.0
+        result['correct_with_params'] = False
         return result
 
     # handle_ambiguity on ambiguous turn → always correct
@@ -328,6 +335,8 @@ def score_tool_turn(
         result['precision'] = 1.0
         result['recall'] = 1.0
         result['hits'] = min_hits  # credit full recall
+        result['param_accuracy'] = 1.0
+        result['correct_with_params'] = True
         return result
 
     # Compute hits
@@ -359,7 +368,198 @@ def score_tool_turn(
 
     result['correct'] = precision_passes and recall_passes
 
+    # ── Optional: parameter scoring ────────────────────────────
+    if predicted_tools_with_args is not None and gold_target_tools is not None:
+        param_result = score_tool_params(
+            predicted_tools_with_args,
+            gold_target_tools,
+            fuzzy_evaluator=fuzzy_evaluator,
+        )
+        result.update(param_result)
+        result['correct_with_params'] = (
+            result['correct'] and param_result['param_accuracy'] >= 1.0
+        )
+    elif result.get('ambiguity_flagged') and candidate_flows:
+        # handle_ambiguity on ambiguous turn — params N/A, treat as perfect
+        result['param_accuracy'] = 1.0
+        result['correct_with_params'] = True
+    elif not pred_set:
+        # Null call
+        result['param_accuracy'] = 0.0
+        result['correct_with_params'] = False
+
     return result
+
+
+# ── Exp 2: Tool parameter scoring ─────────────────────────────
+
+def score_tool_params(
+    predicted_tools_with_args: list[dict],
+    gold_target_tools: dict,
+    fuzzy_evaluator=None,
+) -> dict:
+    """Score predicted tool parameters against gold target_tools.
+
+    Args:
+        predicted_tools_with_args: [{'name': ..., 'args': {...}}, ...]
+        gold_target_tools: {tool_name: {param: value|{value,fuzzy}|null}}
+        fuzzy_evaluator: callable(gold, predicted) -> bool (for NL params)
+
+    Returns dict with param_accuracy, matched/total counts, and per-param details.
+    """
+    # Build lookup: first occurrence of each tool name wins
+    pred_lookup: dict[str, dict] = {}
+    for t in predicted_tools_with_args:
+        name = t.get('name', '')
+        if name and name not in pred_lookup:
+            pred_lookup[name] = t.get('args') or {}
+
+    details = []
+    matched = 0
+    total = 0
+    fuzzy_matched = 0
+    fuzzy_total = 0
+    exact_matched = 0
+    exact_total = 0
+
+    for tool_name, gold_params in gold_target_tools.items():
+        if not isinstance(gold_params, dict):
+            continue
+        if tool_name not in pred_lookup:
+            # Tool not predicted — all non-null params are misses
+            for param_name, gold_val in gold_params.items():
+                if gold_val is None:
+                    continue
+                total += 1
+                exact_total += 1
+                details.append({
+                    'tool': tool_name, 'param': param_name,
+                    'gold': gold_val, 'predicted': None,
+                    'match': False, 'method': 'missing_tool',
+                })
+            continue
+
+        pred_args = pred_lookup[tool_name]
+
+        for param_name, gold_val in gold_params.items():
+            if gold_val is None:
+                continue
+
+            # Detect wrapped fuzzy param: dict with "fuzzy" key
+            is_fuzzy = isinstance(gold_val, dict) and 'fuzzy' in gold_val
+            # Detect structured date: dict without "fuzzy" key
+            is_structured = isinstance(gold_val, dict) and 'fuzzy' not in gold_val
+
+            if is_fuzzy:
+                actual_gold = gold_val['value']
+            else:
+                actual_gold = gold_val
+
+            pred_val = pred_args.get(param_name)
+
+            if pred_val is None:
+                total += 1
+                if is_fuzzy:
+                    fuzzy_total += 1
+                else:
+                    exact_total += 1
+                details.append({
+                    'tool': tool_name, 'param': param_name,
+                    'gold': actual_gold, 'predicted': None,
+                    'match': False, 'method': 'missing',
+                })
+                continue
+
+            total += 1
+
+            if is_fuzzy:
+                fuzzy_total += 1
+                if fuzzy_evaluator:
+                    match = fuzzy_evaluator(actual_gold, pred_val)
+                else:
+                    # Fallback: case-insensitive string comparison
+                    match = str(actual_gold).strip().lower() == str(pred_val).strip().lower()
+                method = 'fuzzy'
+                if match:
+                    fuzzy_matched += 1
+            elif is_structured:
+                match = _match_structured(actual_gold, pred_val)
+                method = 'structured'
+                exact_total += 1
+                if match:
+                    exact_matched += 1
+            else:
+                # Exact match (strings, enums)
+                match = _normalize_for_match(actual_gold) == _normalize_for_match(pred_val)
+                method = 'exact'
+                exact_total += 1
+                if match:
+                    exact_matched += 1
+
+            if match:
+                matched += 1
+
+            details.append({
+                'tool': tool_name, 'param': param_name,
+                'gold': actual_gold, 'predicted': pred_val,
+                'match': match, 'method': method,
+            })
+
+    return {
+        'param_accuracy': matched / total if total > 0 else 1.0,
+        'matched_params': matched,
+        'total_scored_params': total,
+        'fuzzy_matched': fuzzy_matched,
+        'fuzzy_total': fuzzy_total,
+        'exact_matched': exact_matched,
+        'exact_total': exact_total,
+        'param_details': details,
+    }
+
+
+def _normalize_for_match(val) -> str:
+    """Normalize a value for exact comparison."""
+    if val is None:
+        return ''
+    return str(val).strip().lower()
+
+
+def _match_structured(gold: dict, predicted) -> bool:
+    """Match a structured gold object against a predicted value.
+
+    The predicted value may be a dict (ideal) or a string (model didn't
+    follow structured format).  For dicts, all gold keys must match.
+    """
+    if not isinstance(predicted, dict):
+        return False
+    for k, v in gold.items():
+        pred_v = predicted.get(k)
+        if pred_v is None:
+            return False
+        if str(v).strip().lower() != str(pred_v).strip().lower():
+            return False
+    return True
+
+
+def build_fuzzy_evaluator(client) -> callable:
+    """Build a fuzzy evaluator using Haiku for NL param comparison."""
+    def evaluate(gold_value, predicted_value) -> bool:
+        if gold_value == predicted_value:
+            return True
+        # Quick normalization check before calling LLM
+        if str(gold_value).strip().lower() == str(predicted_value).strip().lower():
+            return True
+        prompt = (
+            'Are these two tool parameter values semantically equivalent? '
+            'They do not need to be word-for-word identical, but must convey '
+            'the same intent/instruction.\n'
+            f'Expected: {gold_value}\n'
+            f'Predicted: {predicted_value}\n'
+            'Reply YES or NO only.'
+        )
+        resp = client.call_simple(model='claude-haiku-4-5-20251001', prompt=prompt)
+        return resp.strip().upper().startswith('YES')
+    return evaluate
 
 
 # ── Exp 2 Pipeline A: Staged NLU funnel scorer ──────────────────

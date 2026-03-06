@@ -300,7 +300,10 @@
         "utterance": "I'd like to see the anomaly report refreshed every Monday showing at-risk accounts and biggest support ticket that came in over the week.",
         "target_tools": {
           "compose_dashboard": {
-            "title": "Weekly Anomaly Report",
+            "title": {
+              "value": "Weekly Anomaly Report",
+              "fuzzy": true
+            },
             "panels": null
           }
         }
@@ -689,11 +692,17 @@
         "target_tools": {
           "insert_columns": {
             "column": "pct_change",
-            "expression": "percent change of operating_expenses"
+            "expression": {
+              "value": "percent change of operating_expenses",
+              "fuzzy": true
+            }
           },
           "apply_formula": {
             "column": "pct_change",
-            "formula": "pct_change(operating_expenses)"
+            "formula": {
+              "value": "pct_change(operating_expenses)",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -740,7 +749,10 @@
         "utterance": "Which sites?",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT site FROM patients WHERE icd_code_invalid GROUP BY site"
+            "query": {
+              "value": "SELECT site FROM patients WHERE icd_code_invalid GROUP BY site",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -820,7 +832,10 @@
         "utterance": "Do we have any records for the Phoenix warehouse?",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT COUNT(*) FROM shipping WHERE warehouse = 'Phoenix'"
+            "query": {
+              "value": "SELECT COUNT(*) FROM shipping WHERE warehouse = 'Phoenix'",
+              "fuzzy": true
+            }
           },
           "describe_stats": {
             "table": "shipping"
@@ -840,7 +855,10 @@
         "utterance": "What are the top 5 items by volume there?",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT item, SUM(volume) FROM shipping WHERE warehouse = 'Phoenix' GROUP BY item ORDER BY 2 DESC LIMIT 5"
+            "query": {
+              "value": "SELECT item, SUM(volume) FROM shipping WHERE warehouse = 'Phoenix' GROUP BY item ORDER BY 2 DESC LIMIT 5",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1358,7 +1376,10 @@
           },
           "define_metric": {
             "name": null,
-            "formula": "avg(days_to_ship) / total_inventory"
+            "formula": {
+              "value": "avg(days_to_ship) / total_inventory",
+              "fuzzy": true
+            }
           },
           "execute_sql": {
             "query": null
@@ -1379,7 +1400,10 @@
         "target_tools": {
           "define_metric": {
             "name": null,
-            "formula": "avg(days_to_ship) / total_inventory"
+            "formula": {
+              "value": "avg(days_to_ship) / total_inventory",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -1787,7 +1811,10 @@
             "type": "date"
           },
           "compose_dashboard": {
-            "title": "Weekly Readmission Report",
+            "title": {
+              "value": "Weekly Readmission Report",
+              "fuzzy": true
+            },
             "panels": null
           }
         }
@@ -2496,7 +2523,10 @@
         "target_tools": {
           "define_metric": {
             "name": "engagement_rate",
-            "formula": "(likes + comments + shares) / impressions"
+            "formula": {
+              "value": "(likes + comments + shares) / impressions",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2519,7 +2549,10 @@
         "target_tools": {
           "define_metric": {
             "name": "virality",
-            "formula": "shares / impressions * 100"
+            "formula": {
+              "value": "shares / impressions * 100",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2814,7 +2847,10 @@
         "utterance": "Walk me through how you calculated the consolidated P&L numbers",
         "target_tools": {
           "explain_content": {
-            "topic": "consolidated P&L calculation"
+            "topic": {
+              "value": "consolidated P&L calculation",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2831,7 +2867,10 @@
         "utterance": "The intercompany eliminations part, how'd you decide what to net out",
         "target_tools": {
           "explain_content": {
-            "topic": "intercompany eliminations"
+            "topic": {
+              "value": "intercompany eliminations",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2862,7 +2901,10 @@
         "target_tools": {
           "insert_columns": {
             "column": "risk_flag",
-            "expression": "IF(age > 65, 'High Risk', 'Standard')"
+            "expression": {
+              "value": "IF(age > 65, 'High Risk', 'Standard')",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2880,7 +2922,10 @@
         "target_tools": {
           "insert_columns": {
             "column": "readmission_flag",
-            "expression": "IF(readmission_days < 30, 'Critical', 'Standard')"
+            "expression": {
+              "value": "IF(readmission_days < 30, 'Critical', 'Standard')",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -2910,7 +2955,10 @@
         "target_tools": {
           "summarize_content": {
             "artifact_type": "chart",
-            "focus": "churn by plan tier"
+            "focus": {
+              "value": "churn by plan tier",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -2928,7 +2976,10 @@
         "target_tools": {
           "summarize_content": {
             "artifact_type": "table",
-            "focus": "usage metrics"
+            "focus": {
+              "value": "usage metrics",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3432,7 +3483,10 @@
         "utterance": "Nah skip that, the casing doesn't matter for our attrition analysis",
         "target_tools": {
           "conversational_response": {
-            "reason": "user declined the agent's suggestion to standardize casing"
+            "reason": {
+              "value": "user declined the agent's suggestion to standardize casing",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -3521,7 +3575,10 @@
         "target_tools": {
           "define_metric": {
             "name": "gross_margin",
-            "formula": "revenue_total - cogs_total"
+            "formula": {
+              "value": "revenue_total - cogs_total",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -3673,7 +3730,10 @@
         "utterance": "Can you set up a weekly report that pulls together the stock levels and shipping delays charts for all 8 warehouses? Should refresh every Monday.",
         "target_tools": {
           "compose_dashboard": {
-            "title": "Weekly Stock & Shipping Report",
+            "title": {
+              "value": "Weekly Stock & Shipping Report",
+              "fuzzy": true
+            },
             "panels": null
           }
         }
@@ -3940,11 +4000,17 @@
         "target_tools": {
           "define_metric": {
             "name": "attrition_cost",
-            "formula": "annual_salary * 0.33"
+            "formula": {
+              "value": "annual_salary * 0.33",
+              "fuzzy": true
+            }
           },
           "apply_formula": {
             "column": "attrition_cost",
-            "formula": "annual_salary * 0.33"
+            "formula": {
+              "value": "annual_salary * 0.33",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4086,7 +4152,10 @@
             "method": "model"
           },
           "execute_python": {
-            "code": "df['BMI'] = df['weight_kg'] / (df['height_cm']/100)**2"
+            "code": {
+              "value": "df['BMI'] = df['weight_kg'] / (df['height_cm']/100)**2",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4293,7 +4362,10 @@
         "utterance": "How many users touched the export feature more than 5 times last month?",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT COUNT(*) FROM telemetry WHERE feature='export' AND use_count > 5"
+            "query": {
+              "value": "SELECT COUNT(*) FROM telemetry WHERE feature='export' AND use_count > 5",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -4364,7 +4436,10 @@
         "utterance": "That 55+ group is rough. Pull all their responses where the score was 1 or 2 and show me the open-ended comment text",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT * FROM survey WHERE age_group = '55+' AND score <= 2"
+            "query": {
+              "value": "SELECT * FROM survey WHERE age_group = '55+' AND score <= 2",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4412,7 +4487,10 @@
         "utterance": "whoa thats a lot more than i expected. can you give me a plain english rundown of how that region stacks up against the others",
         "target_tools": {
           "summarize_content": {
-            "focus": "West region vs other regions"
+            "focus": {
+              "value": "West region vs other regions",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -4776,7 +4854,10 @@
         "utterance": "OK, but what about just the Coding Agents campaign?",
         "target_tools": {
           "execute_sql": {
-            "query": "SELECT bounce_rate FROM campaigns WHERE campaign = 'Coding Agents'"
+            "query": {
+              "value": "SELECT bounce_rate FROM campaigns WHERE campaign = 'Coding Agents'",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5076,7 +5157,10 @@
         "target_tools": {
           "define_metric": {
             "name": "engagement_rate",
-            "formula": "(likes + comments + shares) / impressions"
+            "formula": {
+              "value": "(likes + comments + shares) / impressions",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5099,7 +5183,10 @@
         "target_tools": {
           "define_metric": {
             "name": "engagement_rate",
-            "formula": "(likes + comments + shares) / impressions"
+            "formula": {
+              "value": "(likes + comments + shares) / impressions",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5346,7 +5433,10 @@
             "dimension": "month"
           },
           "summarize_content": {
-            "focus": "attrition"
+            "focus": {
+              "value": "attrition",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -5364,7 +5454,10 @@
         "target_tools": {
           "summarize_content": {
             "artifact_type": "table",
-            "focus": "attrition patterns"
+            "focus": {
+              "value": "attrition patterns",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -5411,7 +5504,10 @@
             "table": null
           },
           "conversational_response": {
-            "reason": "conversational question about next steps"
+            "reason": {
+              "value": "conversational question about next steps",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6079,7 +6175,10 @@
         "target_tools": {
           "summarize_content": {
             "artifact_type": "table",
-            "focus": "attrition by department"
+            "focus": {
+              "value": "attrition by department",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6348,7 +6447,10 @@
         "rationale": "('reject', Converse) and ('lookup', Analyze) are operations from different intents.",
         "target_tools": {
           "conversational_response": {
-            "reason": "user rejected suggestion to fix 13 unparsed rows"
+            "reason": {
+              "value": "user rejected suggestion to fix 13 unparsed rows",
+              "fuzzy": true
+            }
           },
           "lookup_metric": {
             "term": "attrition_risk_score"
@@ -6582,7 +6684,10 @@
         "target_tools": {
           "define_metric": {
             "name": "churn_rate",
-            "formula": "cancelled_subscriptions / total_subscriptions"
+            "formula": {
+              "value": "cancelled_subscriptions / total_subscriptions",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6855,10 +6960,16 @@
         "utterance": "What's a good sample size for drawing conclusions from satisfaction surveys? We got 5k responses but wondering if that's enough",
         "target_tools": {
           "conversational_response": {
-            "reason": "conversational question about sample size"
+            "reason": {
+              "value": "conversational question about sample size",
+              "fuzzy": true
+            }
           },
           "explain_content": {
-            "topic": "sample size adequacy"
+            "topic": {
+              "value": "sample size adequacy",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6921,11 +7032,17 @@
         "target_tools": {
           "insert_columns": {
             "column": "profit",
-            "expression": "revenue - cost"
+            "expression": {
+              "value": "revenue - cost",
+              "fuzzy": true
+            }
           },
           "apply_formula": {
             "column": "profit",
-            "formula": "revenue - cost"
+            "formula": {
+              "value": "revenue - cost",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -6965,7 +7082,10 @@
             "color": "region"
           },
           "summarize_content": {
-            "focus": "monthly revenue by region"
+            "focus": {
+              "value": "monthly revenue by region",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -6995,7 +7115,10 @@
         "utterance": "Set up a weekly report for the leadership team with attrition rate, avg tenure, and exit reasons broken down by department. Every Monday morning.",
         "target_tools": {
           "compose_dashboard": {
-            "title": "Weekly Attrition Report",
+            "title": {
+              "value": "Weekly Attrition Report",
+              "fuzzy": true
+            },
             "panels": null
           }
         }
@@ -7027,10 +7150,16 @@
             "type": "date"
           },
           "conversational_response": {
-            "reason": "conversational question about attrition benchmarks"
+            "reason": {
+              "value": "conversational question about attrition benchmarks",
+              "fuzzy": true
+            }
           },
           "explain_content": {
-            "topic": "healthy attrition rate"
+            "topic": {
+              "value": "healthy attrition rate",
+              "fuzzy": true
+            }
           }
         }
       }
@@ -7126,7 +7255,10 @@
         "target_tools": {
           "summarize_content": {
             "artifact_type": "table",
-            "focus": "monthly P&L"
+            "focus": {
+              "value": "monthly P&L",
+              "fuzzy": true
+            }
           }
         }
       },
@@ -7219,11 +7351,17 @@
         "target_tools": {
           "insert_columns": {
             "column": "length_of_stay_days",
-            "expression": "discharge_date - admission_date"
+            "expression": {
+              "value": "discharge_date - admission_date",
+              "fuzzy": true
+            }
           },
           "apply_formula": {
             "column": "length_of_stay_days",
-            "formula": "discharge_date - admission_date"
+            "formula": {
+              "value": "discharge_date - admission_date",
+              "fuzzy": true
+            }
           },
           "delete_rows": {
             "condition": null
@@ -7292,7 +7430,10 @@
             "separator": " "
           },
           "explain_content": {
-            "topic": "why 23 entries were left unchanged"
+            "topic": {
+              "value": "why 23 entries were left unchanged",
+              "fuzzy": true
+            }
           }
         }
       }

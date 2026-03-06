@@ -1231,9 +1231,22 @@
           "description": "Platform to manage schedule on"
         },
         "datetime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "New datetime for reschedule action (ISO 8601)"
+          "type": "object",
+          "description": "Structured date/time for reschedule action. Use lowercase day names, 24h time, and timezone abbreviation.",
+          "properties": {
+            "day": {
+              "type": "string",
+              "description": "Lowercase day name (e.g. \"friday\", \"tuesday\")"
+            },
+            "time": {
+              "type": "string",
+              "description": "24h time (e.g. \"08:00\", \"18:00\") or period (\"morning\", \"evening\")"
+            },
+            "tz": {
+              "type": "string",
+              "description": "Timezone abbreviation (e.g. \"EST\", \"PST\")"
+            }
+          }
         }
       },
       "required": [
