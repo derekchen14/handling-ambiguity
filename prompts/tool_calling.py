@@ -15,7 +15,8 @@ _HUGO_DISAMBIGUATION = """- revise_content (rewrite or edit existing text) vs ad
 
 _HUGO_MISTAKES = """- "Fix the tone here" → adjust_tone — the operation is clear even without specifying the target tone. Do NOT call handle_ambiguity.
 - "Make this section shorter" → revise_content with shortening instructions — length is about content, not voice. Do NOT call adjust_tone.
-- "Tighten up the intro" → revise_content — do NOT call read_post first. Action tools (revise_content, expand_content, adjust_tone, etc.) already receive the post content internally. Only call read_post when the user explicitly asks to see or review content without making changes."""
+- "Tighten up the intro" → revise_content — do NOT call read_post first. Action tools (revise_content, expand_content, adjust_tone, etc.) already receive the post content internally. Only call read_post when the user explicitly asks to see or review content without making changes.
+- "Schedule for Friday 8am EST" → manage_schedule with datetime={"day": "friday", "time": "08:00", "tz": "EST"}. Always use structured datetime objects, not raw strings."""
 
 _HUGO_TOOL_EXEMPLARS = """### Example 1 — Research
 User: "Have I written anything about container orchestration before?"
@@ -46,6 +47,12 @@ User: "Push it live to the blog."
 
 __Output__
 publish_post(post_id=null, platform=null)
+
+### Example 4b — Schedule
+User: "The roundup needs to go out Friday at 8am EST."
+
+__Output__
+manage_schedule(post_id=null, action="schedule", datetime={"day": "friday", "time": "08:00", "tz": "EST"})
 
 ### Example 5 — Plan
 Starting a multi-step research plan; first step is searching existing content.
@@ -98,7 +105,8 @@ _DANA_MISTAKES = """- "Clean up the dates" → format_column(type="date") — th
 - "Chart the results" → render_chart — do NOT call execute_sql or execute_python. You have specialized tools for charting (render_chart), pivoting (pivot_tables), comparing metrics (compare_metrics), and decomposing by dimension (dimension_breakdown). Prefer these over execute_sql when the operation matches.
 - "Cross-tab X by Y and Z" → pivot_tables — do NOT use execute_sql. Any request involving two grouping dimensions, cross-tabulation, or pivot-style analysis uses pivot_tables.
 - "Smooth out the values with a rolling average" → flash_fill — do NOT use execute_python. Requests for gap-filling, carry-forward, interpolation, and smoothing use flash_fill.
-- "How has X trended over time?" → compare_metrics + render_chart — trend analysis typically requires computing the comparison AND visualizing it. Do NOT use semantic_layer or describe_stats for this — those are metadata/profiling tools, not computation tools."""
+- "How has X trended over time?" → compare_metrics + render_chart — trend analysis typically requires computing the comparison AND visualizing it. Do NOT use semantic_layer or describe_stats for this — those are metadata/profiling tools, not computation tools.
+- SQL queries and Python code should closely match the user's request. Column names should reference the active dataset's actual column names."""
 
 _DANA_TOOL_EXEMPLARS = """### Example 1 — Analyze
 User: "Show me average order value by customer tier."
@@ -257,6 +265,13 @@ Given a user utterance and conversation history, call the appropriate tool(s) fr
 6. Always respond by making tool calls using the provided tool definitions. Never respond with text alone — your response must include at least one tool call.
 7. Return all tools you will need to fulfill the request. Many tasks require multiple tools — call them all in a single turn rather than just the first step.
 8. Fill tool parameters from what is stated or clearly implied in the conversation. Use `null` for parameters whose values are not stated and cannot be inferred.{context_section}
+
+## Parameter Format Guidelines
+
+- **Dates/times**: Use a structured object: {{"day": "friday", "time": "08:00", "tz": "EST"}}. Use lowercase day names. Use 24h time format (e.g. "08:00", "18:00"). Omit fields you cannot infer.
+- **Enums**: Use the exact enum value from the tool schema (lowercase where specified).
+- **IDs**: Use null when not explicitly stated.
+- **Platform names**: Use lowercase (e.g. "substack", not "Substack").
 
 ## Tool Disambiguation
 
