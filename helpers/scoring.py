@@ -512,7 +512,7 @@ def _match_structured(gold: dict, predicted) -> bool:
 
 
 def build_fuzzy_evaluator(client) -> callable:
-    """Build a fuzzy evaluator using Haiku for NL param comparison."""
+    """Build a fuzzy evaluator using Sonnet for NL param comparison."""
     def evaluate(gold_value, predicted_value) -> bool:
         if gold_value == predicted_value:
             return True
@@ -520,14 +520,17 @@ def build_fuzzy_evaluator(client) -> callable:
         if str(gold_value).strip().lower() == str(predicted_value).strip().lower():
             return True
         prompt = (
-            'Are these two tool parameter values semantically equivalent? '
-            'They do not need to be word-for-word identical, but must convey '
-            'the same intent/instruction.\n'
+            'You are judging whether a predicted tool parameter value matches the expected value.\n'
+            'The predicted value may be more verbose or use different wording, but should convey '
+            'the SAME core action or intent as the expected value. A verbose expansion of the '
+            'expected value still counts as a match. However, if the predicted value is missing '
+            'a key part of the expected value, or refers to something different entirely, it is NOT a match.\n\n'
             f'Expected: {gold_value}\n'
-            f'Predicted: {predicted_value}\n'
+            f'Predicted: {predicted_value}\n\n'
+            'Does the predicted value capture ALL the key elements of the expected value? '
             'Reply YES or NO only.'
         )
-        resp = client.call_simple(model='claude-haiku-4-5-20251001', prompt=prompt)
+        resp = client.call_simple(model='claude-sonnet-4-6', prompt=prompt)
         return resp.strip().upper().startswith('YES')
     return evaluate
 
