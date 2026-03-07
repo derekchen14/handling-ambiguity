@@ -299,8 +299,9 @@ class ExperimentRunner:
 
         remaining = [c for c in eval_set if c['convo_id'] not in completed]
         results = list(completed.values())
+        log.info('Run %s: %d conversations, %d already done', run_id, len(eval_set), len(completed))
 
-        for convo in remaining:
+        for convo in tqdm(remaining, desc='Conversations', unit='convo'):
             convo_result = self._run_param_convo(
                 convo, config, tool_lookup, domain,
                 fuzzy_evaluator, param_schema_index, strategy,

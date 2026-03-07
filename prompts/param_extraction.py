@@ -96,7 +96,11 @@ def build_param_extraction_prompt(
                     context_section += f' with columns [{", ".join(columns)}]'
                 context_section += '.'
 
-    return f"""{intro}
+    return f"""You are a parameter extraction system. You will be given a conversation transcript between a user and an assistant. Your job is to extract the parameter values for a specific tool call from the conversation.
+
+Do NOT respond to the user. Do NOT continue the conversation. Only output JSON.
+
+{intro}
 
 The correct tool to call is `{tool_name}`. Here are its parameters:
 {param_list}
@@ -116,7 +120,7 @@ Extract parameter values from the most recent user message and conversation hist
 
 ---
 
-Now extract the parameters. Respond with JSON only — no other text.
+IMPORTANT: You are analyzing a transcript. Do NOT respond to the user or continue the conversation. Output only the JSON object described above.
 Output format: {{"reasoning": "...", "params": {{"param_name": value}}}}
 """
 
@@ -161,7 +165,11 @@ def build_batch_param_extraction_prompt(
         tool_sections.append(f'### `{name}`\n{param_list}')
     tools_block = '\n\n'.join(tool_sections)
 
-    return f"""{intro}
+    return f"""You are a parameter extraction system. You will be given a conversation transcript between a user and an assistant. Your job is to extract the parameter values for specific tool calls from the conversation.
+
+Do NOT respond to the user. Do NOT continue the conversation. Only output JSON.
+
+{intro}
 
 The correct tools to call are listed below with their parameters:
 
@@ -182,6 +190,6 @@ Extract parameter values for each tool from the most recent user message and con
 
 ---
 
-Now extract the parameters for all tools. Respond with JSON only — no other text.
+IMPORTANT: You are analyzing a transcript. Do NOT respond to the user or continue the conversation. Output only the JSON object described above.
 Output format: {{"tools": [{{"name": "tool_name", "params": {{...}}}}, ...]}}
 """
