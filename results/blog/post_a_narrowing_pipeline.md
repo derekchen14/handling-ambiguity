@@ -169,11 +169,9 @@ Counterpoint three: the pipeline provides **theory of mind** that direct tool-ca
 
 ### c. Doesn't building ontologies go against the Bitter Lesson?
 
-A fair challenge. The Bitter Lesson argues that hand-crafted structure loses to learned representations at scale. Building intent taxonomies by hand looks like the kind of manual feature engineering the lesson warns against.
+A fair challenge. The Bitter Lesson argues that hand-crafted structure loses to learned representations at scale. Building intent taxonomies by hand looks like the kind of manual feature engineering the lesson warns against. However, building ontologies is no longer a matter of manual feature engineering anymore.
 
-Two responses.
-
-First, this is now largely automated. The actor-critic pattern works well here: a frontier LLM proposes an ontology, a second LLM acting as critic — given a rubric of common failure modes (slots masquerading as flows, near-synonym flows, trivially simple flows that should be merged) — iterates toward convergence. This process typically resolves in less than a day for a new domain. The upfront cost is real but substantially lower than it appears.
+Building ontologies can now largely automated by providing guidelines for what makes a good ontology. Furthermore, we apply the actor-critic pattern: a frontier LLM proposes an set of intents and flows, while a second LLM acting as critic — given a rubric of common failure modes (slots masquerading as flows, near-synonym flows, trivially simple flows that should be merged) — iterates toward convergence. This process typically resolves in less than a day for a new domain. The upfront cost is real but substantially lower than it appears.
 
 Second, the pipeline does not resist scale — it benefits from it. Better models mean better ontology proposals from the actor. More compute means more thorough critique. More data means better coverage of real user request distributions. The structure is a scaffold for directing scale, not a barrier to it.
 
@@ -209,13 +207,8 @@ Together, these properties give the agent something like theory of mind: a repre
 
 The practical recommendation for multi-intent agent builders: if your system has an ambiguity or clarification tool, make it **structurally reachable** through an upstream routing decision — not just mentioned in the prompt. A prompt that says "ask when uncertain" gives the model an instruction it cannot reliably follow without the structural context to know when it applies. A flow detection stage gives it that context.
 
-Structural problems require structural solutions. Intent disambiguation that relies purely on the model's internal calibration will not scale reliably to the full diversity of real user requests. A pipeline that explicitly models user intent uncertainty — and routes accordingly — will.
+Structural problems require structural solutions. Intent disambiguation that relies purely on the model's internal calibration will not scale reliably to the full diversity of real user requests. A pipeline that explicitly models user intent uncertainty (and routes accordingly) will.
 
----
-
-*This work is part of our preprint on conversational tool-use accuracy in multi-stage NLU pipelines. Code and eval data available at [repo]. See also: [Post A — Draft 1].*
-
----
 
 ## 5. Why Narrowing Works
 
