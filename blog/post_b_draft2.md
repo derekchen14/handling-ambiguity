@@ -38,6 +38,8 @@ Categories three and four are not edge cases. They emerge from the basic fact th
 
 ---
 
+@Pranav: Better segway from 2 to 3, goes from pretty high level to low level problem formulation.
+
 ## 3. Problem Setup
 
 We evaluated direct tool-calling against a multi-stage pipeline on a conversational tool-use benchmark.
@@ -45,6 +47,8 @@ We evaluated direct tool-calling against a multi-stage pipeline on a conversatio
 **Domains**:
 - **Hugo** — a blog-writing assistant with ~56 tools spanning Research, Draft, Revise, and Publish workflows
 - **Dana** — a data analysis assistant with a comparable tool inventory spanning Clean, Transform, Analyze, and Report workflows
+
+@Pranav maybe a better description of Hugo and Dana and their difference matter (they both involve semantically similar operations)
 
 We chose these domains for their structural differences: Hugo tools cluster around semantically similar content operations; Dana tools cover a broader range of data manipulation primitives. We wanted to test whether any pipeline benefit was domain-specific or architectural.
 
@@ -70,6 +74,8 @@ The first hypothesis to test: maybe good models with good instructions already h
 
 **Figure 1**: *Direct tool-calling accuracy by turn category across 8 models. The drop on ambiguous-first is consistent regardless of provider or capability tier.*
 
+@Pranav: Maybe show for top n models individuall instead of averaging
+
 The per-category accuracy under direct tool-calling:
 
 | Turn category | Avg accuracy | Range |
@@ -79,7 +85,7 @@ The per-category accuracy under direct tool-calling:
 | ambiguous-second | 63.9% | 45.1%–78.1% |
 | **ambiguous-first** | **47.2%** | **37.5%–57.3%** |
 
-The gap is not model-specific. Gemini 3.1 Pro — the strongest model in our benchmark — achieves 55.2% on ambiguous-first. DeepSeek R1 (a high-tier reasoning model) reaches 40.4%. Haiku 4.5 falls to 37.5%. The consistent pattern across eight models from five providers rules out the "weak model" explanation. This is a structural problem.
+The gap is not model-specific. @Pranav: "this point especially is better if we see this tabl for multiple models" Gemini 3.1 Pro — the strongest model in our benchmark — achieves 55.2% on ambiguous-first. DeepSeek R1 (a high-tier reasoning model) reaches 40.4%. Haiku 4.5 falls to 37.5%. The consistent pattern across eight models from five providers rules out the "weak model" explanation. This is a structural problem.
 
 The structural issue: the model must simultaneously detect ambiguity *and* select the right tool in a single inference step. It has no access to information that would tell it whether the current situation warrants hesitation. It sees an underspecified utterance, generates logits over a 56-item vocabulary, and picks the argmax.
 
@@ -93,7 +99,7 @@ What happens when you add an explicit hint? We added this to the system prompt: 
 | Gemini 3 Flash | 73.0% | 74.2% | +1.3% |
 | Sonnet 4.6 | 61.5% | 63.7% | +2.1% |
 
-Ambiguous-first improves modestly (Haiku +11.7 pp, Flash +4.5 pp, Sonnet +4.9 pp). But the hint also causes regression on unambiguous turns: Gemini Flash's ambiguous-second accuracy dropped 4.9 points. The model over-triggers ambiguity handling on turns that don't need it.
+Ambiguous-first improves modestly (Haiku +11.7 pp, Flash +4.5 pp, Sonnet +4.9 pp). But the hint also causes regression on unambiguous turns: Gemini Flash's ambiguous-second accuracy dropped 4.9 points. The model over-triggers ambiguity handling on turns that don't need it. @Pranav: "this in table"
 
 This is the fundamental limitation of prompt-level intervention: the model doesn't have the information it would need to know when the instruction applies. Telling it to be cautious makes it globally more cautious — not selectively cautious where caution is warranted. For that, you need a prior classification stage.
 
