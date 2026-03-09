@@ -598,6 +598,13 @@ def main():
     pipeline_results = compute_pipeline_e2e(scoped_convos, exp2_configs)
 
     # ── Cross-experiment model comparison ──────────────────────────
+    # Some Exp2 configs use OpenRouter prefixes (e.g. 'google/gemini-3.1-pro-preview')
+    # while Exp1A used the bare model ID. Map them for the flow_acc lookup.
+    EXP2_TO_EXP1A_MODEL_ID = {
+        'google/gemini-3.1-pro-preview': 'gemini-3.1-pro-preview',
+        'qwen/qwen3.5-397b-a17b': 'Qwen/Qwen3-235B-A22B-Thinking-2507',
+    }
+
     exp1a_by_model = defaultdict(lambda: {'hugo': [], 'dana': []})
     for domain, config_id, seed, stats in exp1a_runs:
         model_id = stats['model_id']
@@ -609,7 +616,8 @@ def main():
         model_id = entry['model_id']
         flat_entry = next((f for f in flat_ranking if f['model_id'] == model_id), None)
         scoped_entry = next((s for s in scoped_ranking if s['model_id'] == model_id), None)
-        e1_runs = exp1a_by_model[model_id]['hugo'] + exp1a_by_model[model_id]['dana']
+        e1_model_id = EXP2_TO_EXP1A_MODEL_ID.get(model_id, model_id)
+        e1_runs = exp1a_by_model[e1_model_id]['hugo'] + exp1a_by_model[e1_model_id]['dana']
         e1_accs = [s['accuracy'] for s in e1_runs]
 
         comparison_rows.append({
