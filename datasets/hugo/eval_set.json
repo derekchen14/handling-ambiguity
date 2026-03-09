@@ -23,7 +23,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "reorder from Q/K/V intuition into scaled dot-product",
-            "focus": "self-attention"
+            "focus": "general"
           },
           "update_section": {
             "section": "self-attention",
@@ -51,7 +51,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "same reordering",
-            "focus": "multi-head attention"
+            "focus": "general"
           },
           "update_section": {
             "section": "multi-head attention",
@@ -165,7 +165,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "tighten, less clunky",
-            "focus": "intro"
+            "focus": "general"
           }
         }
       },
@@ -184,7 +184,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "tighten, less wordy",
-            "focus": "performance benchmarks"
+            "focus": "general"
           }
         }
       }
@@ -209,7 +209,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "restructure, argument isn't landing",
-            "focus": "async communication"
+            "focus": "general"
           }
         }
       },
@@ -228,7 +228,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "rewrite, trails off",
-            "focus": "conclusion"
+            "focus": "general"
           }
         }
       }
@@ -303,7 +303,11 @@
           "manage_schedule": {
             "post_id": null,
             "action": "schedule",
-            "datetime": "Friday 8:00 AM EST"
+            "datetime": {
+              "day": "friday",
+              "tz": "EST",
+              "time": "08:00"
+            }
           }
         }
       },
@@ -322,7 +326,10 @@
           "manage_schedule": {
             "post_id": null,
             "action": "reschedule",
-            "datetime": "Thursday evening"
+            "datetime": {
+              "day": "thursday",
+              "time": "evening"
+            }
           }
         }
       }
@@ -621,11 +628,11 @@
           },
           "format_content": {
             "post_id": null,
-            "platform": "WordPress"
+            "platform": "wordpress"
           },
           "publish_post": {
             "post_id": null,
-            "platform": "WordPress",
+            "platform": "wordpress",
             "action": "publish"
           }
         }
@@ -802,7 +809,7 @@
             ]
           },
           "revise_content": {
-            "focus": "attention",
+            "focus": "general",
             "instructions": null
           },
           "diff_versions": {
@@ -823,7 +830,7 @@
         "utterance": "Fix the parallel processing analogy, it got lost.",
         "target_tools": {
           "revise_content": {
-            "focus": "attention",
+            "focus": "general",
             "instructions": "fix parallel processing analogy"
           },
           "update_section": {
@@ -870,7 +877,7 @@
             "instructions": "develop into full prose"
           },
           "revise_content": {
-            "focus": "overnight train",
+            "focus": "general",
             "instructions": "restructure"
           }
         }
@@ -1172,15 +1179,15 @@
             ]
           },
           "format_content": {
-            "platform": "Medium"
+            "platform": "medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           },
           "manage_schedule": {
             "action": "schedule",
-            "platform": "Medium"
+            "platform": "medium"
           }
         }
       },
@@ -1197,10 +1204,10 @@
         "utterance": "Adapt it. It's a cross-post.",
         "target_tools": {
           "format_content": {
-            "platform": "Medium"
+            "platform": "medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           }
         }
@@ -1311,7 +1318,7 @@
         "rationale": "Rewriting code examples ('rework', Revise) and scheduling publication ('schedule', Publish) are separate operations requiring different flow stacks.",
         "target_tools": {
           "revise_content": {
-            "focus": "code examples",
+            "focus": "general",
             "instructions": "rewrite for Express 5"
           },
           "update_section": {
@@ -1319,7 +1326,9 @@
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "Friday"
+            "date": {
+              "day": "friday"
+            }
           }
         }
       }
@@ -1396,7 +1405,7 @@
         "utterance": "Can you finalize the section on alert fatigue after the Grafana walkthrough.",
         "target_tools": {
           "revise_content": {
-            "focus": "alert fatigue",
+            "focus": "general",
             "instructions": "finalize"
           },
           "check_grammar": {
@@ -1462,7 +1471,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "Thursday 6pm"
+            "date": {
+              "day": "thursday",
+              "time": "18:00"
+            }
           }
         }
       },
@@ -1570,7 +1582,7 @@
         "rationale": "Improving the sourcing note ('polish', Revise) is a prerequisite for featuring the post ('promote', Publish). Two operations linked by dependency.",
         "target_tools": {
           "revise_content": {
-            "focus": "sourcing note",
+            "focus": "general",
             "instructions": "improve"
           },
           "check_grammar": {
@@ -1846,7 +1858,7 @@
         "utterance": "What's wrong with the Substack one exactly? When did it stop working",
         "target_tools": {
           "check_platform": {
-            "platform": "Substack"
+            "platform": "substack"
           }
         }
       }
@@ -2013,7 +2025,7 @@
           "adjust_tone": {
             "source_content": null,
             "target_tone": "professional but accessible",
-            "intensity": "lighter"
+            "intensity": "subtle"
           }
         }
       }
@@ -2038,7 +2050,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "clean up, less clunky",
-            "focus": "intro"
+            "focus": "general"
           }
         }
       },
@@ -2057,7 +2069,7 @@
           "revise_content": {
             "source_content": null,
             "instructions": "clean up",
-            "focus": "sourcing ingredients locally"
+            "focus": "general"
           }
         }
       }
@@ -2182,7 +2194,7 @@
         "target_tools": {
           "explain_action": {
             "topic": "endpoint routing changes",
-            "scope": "routing section"
+            "scope": "detailed"
           }
         }
       }
@@ -2207,8 +2219,11 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "platform": "Substack",
-            "datetime": "next Tuesday morning"
+            "platform": "substack",
+            "datetime": {
+              "day": "tuesday",
+              "time": "morning"
+            }
           }
         }
       },
@@ -2226,7 +2241,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "datetime": "8am EST"
+            "datetime": {
+              "tz": "EST",
+              "time": "08:00"
+            }
           }
         }
       }
@@ -2269,7 +2287,7 @@
         "target_tools": {
           "format_content": {
             "post_id": null,
-            "platform": "Medium"
+            "platform": "medium"
           },
           "update_metadata": {
             "excerpt": null,
@@ -2339,15 +2357,19 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "release",
+        "flow": "syndicate",
         "intent": "Publish",
         "speaker": "user",
         "utterance": "Push the Bangkok street food post live",
         "target_tools": {
           "publish_post": {
             "post_id": null,
-            "platform": "WordPress",
+            "platform": "wordpress",
             "action": "publish"
+          },
+          "format_content": {
+            "post_id": null,
+            "platform": "wordpress"
           }
         }
       },
@@ -2358,14 +2380,19 @@
       },
       {
         "turn_num": 3,
-        "flow": "release",
+        "flow": "syndicate",
         "intent": "Publish",
         "speaker": "user",
         "utterance": "Nice, do the same for the Chiang Mai temples one",
         "target_tools": {
           "publish_post": {
             "post_id": null,
+            "platform": "wordpress",
             "action": "publish"
+          },
+          "format_content": {
+            "post_id": null,
+            "platform": "wordpress"
           }
         }
       }
@@ -2577,7 +2604,7 @@
           },
           "update_metadata": {
             "post_id": null,
-            "status": "pinned"
+            "status": "published"
           }
         }
       }
@@ -2690,7 +2717,7 @@
         "target_tools": {
           "revise_content": {
             "instructions": "move safety stats before walkability, drop parking subsection",
-            "focus": "neighborhood comparison"
+            "focus": "general"
           },
           "reorder_sections": {
             "order": null
@@ -2716,7 +2743,7 @@
         "target_tools": {
           "revise_content": {
             "instructions": "fold parking into walkability section",
-            "focus": "walkability"
+            "focus": "general"
           },
           "update_section": {
             "section": "walkability",
@@ -2848,7 +2875,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "datetime": "Thursday 8am"
+            "datetime": {
+              "day": "thursday",
+              "time": "08:00"
+            }
           }
         }
       }
@@ -2892,7 +2922,7 @@
         "utterance": "Ok yeah can you clean up that section then? just tighten the writing, don't change what I'm saying",
         "target_tools": {
           "revise_content": {
-            "focus": "Noise as Neighbors",
+            "focus": "general",
             "instructions": "tighten writing, don't change meaning"
           }
         }
@@ -2977,7 +3007,7 @@
         "utterance": "Yeah clean up that Khao San Road section then, smooth out the flow a bit",
         "target_tools": {
           "revise_content": {
-            "focus": "Khao San Road",
+            "focus": "general",
             "instructions": "smooth out the flow"
           }
         }
@@ -3047,7 +3077,7 @@
           },
           "update_metadata": {
             "post_id": null,
-            "status": "featured"
+            "status": "published"
           }
         }
       },
@@ -3065,12 +3095,12 @@
         "target_tools": {
           "publish_post": {
             "post_id": null,
-            "platform": "LinkedIn",
+            "platform": "linkedin",
             "action": "publish"
           },
           "format_content": {
             "post_id": null,
-            "platform": "LinkedIn"
+            "platform": "linkedin"
           }
         }
       }
@@ -3259,7 +3289,7 @@
         "target_tools": {
           "format_content": {
             "post_id": null,
-            "platform": "Substack"
+            "platform": "substack"
           }
         }
       },
@@ -3276,7 +3306,7 @@
         "utterance": "Yeah clean that intro up, just tighten the wording without changing what it says.",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
+            "focus": "general",
             "instructions": "tighten wording, don't change meaning"
           }
         }
@@ -3449,7 +3479,7 @@
         "utterance": "Yeah if people are hitting that first, clean up the transitions and tighten the wording in that intro section",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
+            "focus": "general",
             "instructions": "clean up transitions, tighten wording"
           }
         }
@@ -3513,7 +3543,7 @@
         "utterance": "Can you clean up the intro on the summer squash post? Just smooth it out a bit, don't change anything major",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
+            "focus": "general",
             "instructions": "smooth it out"
           }
         }
@@ -3531,7 +3561,7 @@
         "utterance": "Yeah that's not great. Go ahead and tear that whole intro apart and rebuild it so it gets to the recipe faster",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
+            "focus": "general",
             "instructions": "restructure, get to recipe faster"
           }
         }
@@ -3620,7 +3650,7 @@
         "target_tools": {
           "format_content": {
             "post_id": null,
-            "platform": "Medium"
+            "platform": "medium"
           },
           "update_metadata": {
             "tags": null
@@ -3706,7 +3736,7 @@
         "utterance": "Yeah that diffusion section needs a heavier pass then. Restructure the argument and cut the fluff, it should be tight like the others.",
         "target_tools": {
           "revise_content": {
-            "focus": "diffusion models",
+            "focus": "general",
             "instructions": "restructure argument, cut fluff"
           }
         }
@@ -3774,7 +3804,7 @@
         "target_tools": {
           "format_content": {
             "post_id": null,
-            "platform": "Medium"
+            "platform": "medium"
           }
         }
       },
@@ -3879,11 +3909,11 @@
             ]
           },
           "check_platform": {
-            "platform": "Substack"
+            "platform": "substack"
           },
           "list_platforms": {},
           "format_content": {
-            "platform": "Substack"
+            "platform": "substack"
           }
         }
       },
@@ -3900,7 +3930,7 @@
         "utterance": "Just checking if the connection's still good, last sync seemed off",
         "target_tools": {
           "check_platform": {
-            "platform": "Substack"
+            "platform": "substack"
           },
           "list_platforms": {}
         }
@@ -4022,7 +4052,7 @@
         "utterance": "The content. The argument doesn't build on the self-attention part.",
         "target_tools": {
           "revise_content": {
-            "focus": "self-attention",
+            "focus": "general",
             "instructions": "restructure argument"
           }
         }
@@ -4064,7 +4094,7 @@
             "post_id": null
           },
           "revise_content": {
-            "focus": "Thailand",
+            "focus": "general",
             "instructions": "fix last change"
           }
         }
@@ -4122,10 +4152,10 @@
             ]
           },
           "format_content": {
-            "platform": "Medium"
+            "platform": "medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           },
           "manage_schedule": {
@@ -4146,10 +4176,10 @@
         "utterance": "Now is fine, just reformat it for Medium's layout",
         "target_tools": {
           "format_content": {
-            "platform": "Medium"
+            "platform": "medium"
           },
           "publish_post": {
-            "platform": "Medium",
+            "platform": "medium",
             "action": "publish"
           }
         }
@@ -4188,7 +4218,7 @@
             ]
           },
           "revise_content": {
-            "focus": "database migration",
+            "focus": "general",
             "instructions": null
           },
           "diff_versions": {
@@ -4209,7 +4239,7 @@
         "utterance": "Just tighten it up. Transitions are clunky and some sentences run way too long.",
         "target_tools": {
           "revise_content": {
-            "focus": "database migration",
+            "focus": "general",
             "instructions": "tighten transitions, shorten sentences"
           }
         }
@@ -4714,7 +4744,7 @@
         "target_tools": {
           "format_content": {
             "post_id": null,
-            "platform": "Medium"
+            "platform": "medium"
           },
           "update_metadata": {
             "tags": null
@@ -4908,10 +4938,10 @@
         "utterance": "put it on substack, reformat it for there",
         "target_tools": {
           "format_content": {
-            "platform": "Substack"
+            "platform": "substack"
           },
           "publish_post": {
-            "platform": "Substack",
+            "platform": "substack",
             "action": "publish"
           }
         }
@@ -4935,7 +4965,7 @@
         "utterance": "the VS Code section reads kinda rough, it needs some major revision",
         "target_tools": {
           "revise_content": {
-            "focus": "VS Code",
+            "focus": "general",
             "instructions": "major revision"
           }
         }
@@ -4953,7 +4983,7 @@
         "utterance": "nah the structure is fine, just make the sentences read better by making them more concise",
         "target_tools": {
           "revise_content": {
-            "focus": "VS Code",
+            "focus": "general",
             "instructions": "make sentences more concise"
           }
         }
@@ -5176,7 +5206,7 @@
         "utterance": "Rewrite. The whole argument about commuter isolation falls apart in section 3",
         "target_tools": {
           "revise_content": {
-            "focus": "commuter isolation",
+            "focus": "general",
             "instructions": "rewrite, argument falls apart in section 3"
           }
         }
@@ -5328,10 +5358,10 @@
         "utterance": "Push this week's AI roundup over to Substack too",
         "target_tools": {
           "format_content": {
-            "platform": "Substack"
+            "platform": "substack"
           },
           "publish_post": {
-            "platform": "Substack",
+            "platform": "substack",
             "action": "publish"
           }
         }
@@ -5442,7 +5472,7 @@
         "utterance": "The attention mechanism section lost the whole point about computational complexity. You rewrote it into some generic overview",
         "target_tools": {
           "revise_content": {
-            "focus": "attention mechanism",
+            "focus": "general",
             "instructions": "restore computational complexity argument"
           }
         }
@@ -5537,8 +5567,10 @@
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday",
-            "platform": "WordPress"
+            "date": {
+              "day": "tuesday"
+            },
+            "platform": "wordpress"
           }
         }
       }
@@ -5652,7 +5684,10 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday 9am"
+            "date": {
+              "day": "tuesday",
+              "time": "09:00"
+            }
           },
           "audit_style": {
             "post_id": null,
@@ -5946,15 +5981,17 @@
         "rationale": "Cross-posting ('syndicate', Publish) and scheduling the next edition ('schedule', Publish) are two publishing operations.",
         "target_tools": {
           "format_content": {
-            "platform": "LinkedIn"
+            "platform": "linkedin"
           },
           "publish_post": {
-            "platform": "LinkedIn",
+            "platform": "linkedin",
             "action": "publish"
           },
           "manage_schedule": {
             "action": "schedule",
-            "date": "Thursday"
+            "date": {
+              "day": "thursday"
+            }
           }
         }
       }
@@ -6146,8 +6183,11 @@
         "target_tools": {
           "manage_schedule": {
             "action": "schedule",
-            "date": "next Tuesday 9am",
-            "platform": "WordPress"
+            "date": {
+              "day": "tuesday",
+              "time": "09:00"
+            },
+            "platform": "wordpress"
           }
         }
       },
@@ -6377,7 +6417,7 @@
         ],
         "target_tools": {
           "revise_content": {
-            "focus": "hybrid models",
+            "focus": "general",
             "instructions": "trim and reorder"
           },
           "reorder_sections": {}
@@ -6406,7 +6446,7 @@
         "rationale": "('amend', Revise) and ('release', Publish) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "timezone equity",
+            "focus": "general",
             "instructions": "restore nuance"
           },
           "publish_post": {
@@ -6434,7 +6474,7 @@
         "utterance": "The authentication section you rewrote lost the bit about JWT expiration. Put that back and keep the rest.",
         "target_tools": {
           "revise_content": {
-            "focus": "authentication",
+            "focus": "general",
             "instructions": "restore JWT expiration"
           }
         }
@@ -6531,7 +6571,7 @@
         "rationale": "('polish', Revise) and ('brainstorm', Draft) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "intro",
+            "focus": "general",
             "instructions": "match usual style"
           },
           "check_grammar": {
@@ -6643,7 +6683,7 @@
         "rationale": "('amend', Revise) and ('suggest', Converse) are operations from different intents.",
         "target_tools": {
           "revise_content": {
-            "focus": "self-attention",
+            "focus": "general",
             "instructions": "restore math notation"
           },
           "brainstorm_ideas": {

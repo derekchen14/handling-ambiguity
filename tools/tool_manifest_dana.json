@@ -5,13 +5,30 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "seed"], "description": "Filter by data format"},
-        "source": {"type": "string", "description": "Filter by source type or origin"}
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "json",
+            "excel",
+            "parquet",
+            "seed"
+          ],
+          "description": "Filter by data format",
+          "match_method": "exact"
+        },
+        "source": {
+          "type": "string",
+          "description": "Filter by source type or origin",
+          "match_method": "exact"
+        }
       },
       "required": []
     },
     "internal_component": false,
-    "_flows": ["exist"]
+    "_flows": [
+      "exist"
+    ]
   },
   {
     "name": "load_dataset",
@@ -19,14 +36,38 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "source_id": {"type": "string", "description": "Unique source identifier for the dataset"},
-        "name": {"type": "string", "description": "Display name for the dataset in the workspace"},
-        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "seed"], "description": "Data format"}
+        "source_id": {
+          "type": "string",
+          "description": "Unique source identifier for the dataset",
+          "match_method": "exact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name for the dataset in the workspace",
+          "match_method": "exact"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "json",
+            "excel",
+            "parquet",
+            "seed"
+          ],
+          "description": "Data format",
+          "match_method": "exact"
+        }
       },
-      "required": ["source_id"]
+      "required": [
+        "source_id"
+      ]
     },
     "internal_component": false,
-    "_flows": ["pipeline", "insert"]
+    "_flows": [
+      "pipeline",
+      "insert"
+    ]
   },
   {
     "name": "save_dataset",
@@ -34,28 +75,68 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "dataset": {"type": "string", "description": "Dataset (spreadsheet) to save"},
-        "name": {"type": "string", "description": "Save-as name (defaults to current name)"},
-        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet"], "description": "Output format"}
+        "dataset": {
+          "type": "string",
+          "description": "Dataset (spreadsheet) to save",
+          "match_method": "exact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Save-as name (defaults to current name)",
+          "match_method": "exact"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "json",
+            "excel",
+            "parquet"
+          ],
+          "description": "Output format",
+          "match_method": "exact"
+        }
       },
-      "required": ["dataset"]
+      "required": [
+        "dataset"
+      ]
     },
     "internal_component": false,
-    "_flows": ["export"]
+    "_flows": [
+      "export"
+    ]
   },
   {
     "name": "execute_sql",
-    "description": "Execute a raw SQL query when no specialized tool fits \u2014 SELECT, aggregate, filter, or join using SQL syntax. Prefer specialized tools when available: render_chart for visualization, dimension_breakdown for metric decomposition, pivot_tables for reshaping, compare_metrics for statistical tests",
+    "description": "Execute a raw SQL query when no specialized tool fits — SELECT, aggregate, filter, or join using SQL syntax. Prefer specialized tools when available: render_chart for visualization, dimension_breakdown for metric decomposition, pivot_tables for reshaping, compare_metrics for statistical tests",
     "input_schema": {
       "type": "object",
       "properties": {
-        "query": {"type": "string", "description": "SQL query to execute against loaded tables"},
-        "table": {"type": "string", "description": "Primary table name for the query context"}
+        "query": {
+          "type": "string",
+          "description": "SQL query to execute against loaded tables",
+          "match_method": "exact"
+        },
+        "table": {
+          "type": "string",
+          "description": "Primary table name for the query context",
+          "match_method": "exact"
+        }
       },
-      "required": ["query"]
+      "required": [
+        "query"
+      ]
     },
     "internal_component": false,
-    "_flows": ["query", "describe", "exist", "segment", "pivot", "recommend", "plot"]
+    "_flows": [
+      "query",
+      "describe",
+      "exist",
+      "segment",
+      "pivot",
+      "recommend",
+      "plot"
+    ]
   },
   {
     "name": "execute_python",
@@ -63,13 +144,39 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "code": {"type": "string", "description": "Python expression or statement to execute"},
-        "table": {"type": "string", "description": "Table name available as 'df' variable"}
+        "code": {
+          "type": "string",
+          "description": "Python expression or statement to execute",
+          "match_method": "exact"
+        },
+        "table": {
+          "type": "string",
+          "description": "Table name available as 'df' variable",
+          "match_method": "exact"
+        }
       },
-      "required": ["code"]
+      "required": [
+        "code"
+      ]
     },
     "internal_component": false,
-    "_flows": ["calculate", "query", "lookup", "pivot", "describe", "compare", "exist", "segment", "plot", "trend", "update", "dedupe", "fill", "interpolate", "replace"]
+    "_flows": [
+      "calculate",
+      "query",
+      "lookup",
+      "pivot",
+      "describe",
+      "compare",
+      "exist",
+      "segment",
+      "plot",
+      "trend",
+      "update",
+      "dedupe",
+      "fill",
+      "interpolate",
+      "replace"
+    ]
   },
   {
     "name": "modify_column",
@@ -77,15 +184,37 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column name or comma-separated column names"},
-        "value": {"type": "string", "description": "New value or expression to apply"},
-        "condition": {"type": "string", "description": "Row filter — only update rows matching this condition"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column name or comma-separated column names",
+          "match_method": "exact"
+        },
+        "value": {
+          "type": "string",
+          "description": "New value or expression to apply",
+          "match_method": "exact"
+        },
+        "condition": {
+          "type": "string",
+          "description": "Row filter — only update rows matching this condition",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "value"]
+      "required": [
+        "table",
+        "column",
+        "value"
+      ]
     },
     "internal_component": false,
-    "_flows": ["update"]
+    "_flows": [
+      "update"
+    ]
   },
   {
     "name": "modify_row",
@@ -93,15 +222,38 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "row": {"type": "string", "description": "Row selector — index, range ('3:7'), or condition ('name == \"Alice\"')"},
-        "values": {"type": "object", "description": "Column-to-value pairs to set (e.g., {\"city\": \"NYC\", \"state\": \"NY\"})"},
-        "is_header": {"type": "boolean", "default": false, "description": "When true, treats the row as a header row — renames column labels instead of modifying data values"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "row": {
+          "type": "string",
+          "description": "Row selector — index, range ('3:7'), or condition ('name == \"Alice\"')",
+          "match_method": "exact"
+        },
+        "values": {
+          "type": "object",
+          "description": "Column-to-value pairs to set (e.g., {\"city\": \"NYC\", \"state\": \"NY\"})",
+          "match_method": "structured"
+        },
+        "is_header": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, treats the row as a header row — renames column labels instead of modifying data values",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "row", "values"]
+      "required": [
+        "table",
+        "row",
+        "values"
+      ]
     },
     "internal_component": false,
-    "_flows": ["update"]
+    "_flows": [
+      "update"
+    ]
   },
   {
     "name": "modify_cell",
@@ -109,15 +261,38 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "row": {"type": "string", "description": "Row selector — index or condition"},
-        "column": {"type": "string", "description": "Column name"},
-        "value": {"type": "string", "description": "New cell value"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "row": {
+          "type": "string",
+          "description": "Row selector — index or condition",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column name",
+          "match_method": "exact"
+        },
+        "value": {
+          "type": "string",
+          "description": "New cell value",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "row", "column", "value"]
+      "required": [
+        "table",
+        "row",
+        "column",
+        "value"
+      ]
     },
     "internal_component": false,
-    "_flows": ["update"]
+    "_flows": [
+      "update"
+    ]
   },
   {
     "name": "modify_table",
@@ -125,15 +300,45 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "operation": {"type": "string", "enum": ["sort", "reorder_columns", "set_index", "reset_index", "clear"], "description": "Table-level operation"},
-        "column": {"type": "string", "description": "Column for sort or index operations"},
-        "ascending": {"type": "boolean", "default": true, "description": "Sort direction (when operation=sort)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "sort",
+            "reorder_columns",
+            "set_index",
+            "reset_index",
+            "clear"
+          ],
+          "description": "Table-level operation",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column for sort or index operations",
+          "match_method": "exact"
+        },
+        "ascending": {
+          "type": "boolean",
+          "default": true,
+          "description": "Sort direction (when operation=sort)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "operation"]
+      "required": [
+        "table",
+        "operation"
+      ]
     },
     "internal_component": false,
-    "_flows": ["update", "reshape"]
+    "_flows": [
+      "update",
+      "reshape"
+    ]
   },
   {
     "name": "insert_rows",
@@ -141,14 +346,31 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "values": {"type": "object", "description": "Column-to-value pairs for one row, or array of such dicts for multiple rows"},
-        "position": {"type": "integer", "description": "Index to insert at (appends to end if omitted)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "values": {
+          "type": "object",
+          "description": "Column-to-value pairs for one row, or array of such dicts for multiple rows",
+          "match_method": "structured"
+        },
+        "position": {
+          "type": "integer",
+          "description": "Index to insert at (appends to end if omitted)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "values"]
+      "required": [
+        "table",
+        "values"
+      ]
     },
     "internal_component": false,
-    "_flows": ["insert"]
+    "_flows": [
+      "insert"
+    ]
   },
   {
     "name": "insert_columns",
@@ -156,16 +378,41 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "New column name"},
-        "expression": {"type": "string", "description": "Python expression for computed column (e.g., 'price * quantity')"},
-        "default": {"type": "string", "description": "Default value for all rows (used when no expression)"},
-        "position": {"type": "integer", "description": "Column position index (appends to right if omitted)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "New column name",
+          "match_method": "exact"
+        },
+        "expression": {
+          "type": "string",
+          "description": "Python expression for computed column (e.g., 'price * quantity')",
+          "match_method": "exact"
+        },
+        "default": {
+          "type": "string",
+          "description": "Default value for all rows (used when no expression)",
+          "match_method": "exact"
+        },
+        "position": {
+          "type": "integer",
+          "description": "Column position index (appends to right if omitted)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column"]
+      "required": [
+        "table",
+        "column"
+      ]
     },
     "internal_component": false,
-    "_flows": ["insert"]
+    "_flows": [
+      "insert"
+    ]
   },
   {
     "name": "delete_rows",
@@ -173,14 +420,36 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "condition": {"type": "string", "description": "Row selector — index, range ('3:7'), or boolean condition ('revenue IS NULL')"},
-        "keep": {"type": "string", "enum": ["matching", "non_matching"], "default": "non_matching", "description": "Keep matching rows (filter) or remove them (delete)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "condition": {
+          "type": "string",
+          "description": "Row selector — index, range ('3:7'), or boolean condition ('revenue IS NULL')",
+          "match_method": "exact"
+        },
+        "keep": {
+          "type": "string",
+          "enum": [
+            "matching",
+            "non_matching"
+          ],
+          "default": "non_matching",
+          "description": "Keep matching rows (filter) or remove them (delete)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "condition"]
+      "required": [
+        "table",
+        "condition"
+      ]
     },
     "internal_component": false,
-    "_flows": ["delete"]
+    "_flows": [
+      "delete"
+    ]
   },
   {
     "name": "delete_columns",
@@ -188,14 +457,33 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "columns": {"type": "array", "items": {"type": "string"}, "description": "Column names to remove"},
-        "pattern": {"type": "string", "description": "Regex pattern to match column names (alternative to explicit list)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Column names to remove",
+          "match_method": "structured"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regex pattern to match column names (alternative to explicit list)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table"]
+      "required": [
+        "table"
+      ]
     },
     "internal_component": false,
-    "_flows": ["delete"]
+    "_flows": [
+      "delete"
+    ]
   },
   {
     "name": "rollback_dataset",
@@ -203,13 +491,26 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "dataset": {"type": "string", "description": "Dataset to roll back"},
-        "steps": {"type": "integer", "default": 1, "description": "Number of mutations to undo"}
+        "dataset": {
+          "type": "string",
+          "description": "Dataset to roll back",
+          "match_method": "exact"
+        },
+        "steps": {
+          "type": "integer",
+          "default": 1,
+          "description": "Number of mutations to undo",
+          "match_method": "exact"
+        }
       },
-      "required": ["dataset"]
+      "required": [
+        "dataset"
+      ]
     },
     "internal_component": false,
-    "_flows": ["undo"]
+    "_flows": [
+      "undo"
+    ]
   },
   {
     "name": "cast_column",
@@ -217,16 +518,56 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to cast"},
-        "target_type": {"type": "string", "enum": ["int", "float", "str", "bool", "datetime", "category"], "description": "Target data type"},
-        "format": {"type": "string", "description": "Parse format string (e.g., '%Y-%m-%d' for dates)"},
-        "errors": {"type": "string", "enum": ["raise", "coerce", "ignore"], "default": "coerce", "description": "How to handle values that cannot be cast"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to cast",
+          "match_method": "exact"
+        },
+        "target_type": {
+          "type": "string",
+          "enum": [
+            "int",
+            "float",
+            "str",
+            "bool",
+            "datetime",
+            "category"
+          ],
+          "description": "Target data type",
+          "match_method": "exact"
+        },
+        "format": {
+          "type": "string",
+          "description": "Parse format string (e.g., '%Y-%m-%d' for dates)",
+          "match_method": "exact"
+        },
+        "errors": {
+          "type": "string",
+          "enum": [
+            "raise",
+            "coerce",
+            "ignore"
+          ],
+          "default": "coerce",
+          "description": "How to handle values that cannot be cast",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "target_type"]
+      "required": [
+        "table",
+        "column",
+        "target_type"
+      ]
     },
     "internal_component": false,
-    "_flows": ["datatype"]
+    "_flows": [
+      "datatype"
+    ]
   },
   {
     "name": "dedupe_single_col",
@@ -234,14 +575,37 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to check for duplicate values"},
-        "keep": {"type": "string", "enum": ["first", "last", "none"], "default": "first", "description": "Which duplicate to keep"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to check for duplicate values",
+          "match_method": "exact"
+        },
+        "keep": {
+          "type": "string",
+          "enum": [
+            "first",
+            "last",
+            "none"
+          ],
+          "default": "first",
+          "description": "Which duplicate to keep",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column"]
+      "required": [
+        "table",
+        "column"
+      ]
     },
     "internal_component": false,
-    "_flows": ["dedupe"]
+    "_flows": [
+      "dedupe"
+    ]
   },
   {
     "name": "dedupe_columns",
@@ -249,14 +613,40 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns that together define uniqueness"},
-        "keep": {"type": "string", "enum": ["first", "last", "none"], "default": "first", "description": "Which duplicate to keep"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Columns that together define uniqueness",
+          "match_method": "structured"
+        },
+        "keep": {
+          "type": "string",
+          "enum": [
+            "first",
+            "last",
+            "none"
+          ],
+          "default": "first",
+          "description": "Which duplicate to keep",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "columns"]
+      "required": [
+        "table",
+        "columns"
+      ]
     },
     "internal_component": false,
-    "_flows": ["dedupe"]
+    "_flows": [
+      "dedupe"
+    ]
   },
   {
     "name": "flash_fill",
@@ -264,15 +654,44 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to fill (all columns if omitted)"},
-        "strategy": {"type": "string", "enum": ["ffill", "bfill", "mean", "median", "mode", "constant"], "description": "Fill strategy"},
-        "value": {"type": "string", "description": "Constant value when strategy=constant"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to fill (all columns if omitted)",
+          "match_method": "exact"
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "ffill",
+            "bfill",
+            "mean",
+            "median",
+            "mode",
+            "constant"
+          ],
+          "description": "Fill strategy",
+          "match_method": "exact"
+        },
+        "value": {
+          "type": "string",
+          "description": "Constant value when strategy=constant",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "strategy"]
+      "required": [
+        "table",
+        "strategy"
+      ]
     },
     "internal_component": false,
-    "_flows": ["fill"]
+    "_flows": [
+      "fill"
+    ]
   },
   {
     "name": "run_interpolation",
@@ -280,16 +699,48 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to interpolate"},
-        "method": {"type": "string", "enum": ["linear", "spline", "nearest", "polynomial"], "default": "linear", "description": "Interpolation method"},
-        "order": {"type": "integer", "description": "Polynomial or spline order (when applicable)"},
-        "limit": {"type": "integer", "description": "Maximum consecutive NaN values to fill"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to interpolate",
+          "match_method": "exact"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "spline",
+            "nearest",
+            "polynomial"
+          ],
+          "default": "linear",
+          "description": "Interpolation method",
+          "match_method": "exact"
+        },
+        "order": {
+          "type": "integer",
+          "description": "Polynomial or spline order (when applicable)",
+          "match_method": "exact"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum consecutive NaN values to fill",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column"]
+      "required": [
+        "table",
+        "column"
+      ]
     },
     "internal_component": false,
-    "_flows": ["interpolate"]
+    "_flows": [
+      "interpolate"
+    ]
   },
   {
     "name": "replace_values",
@@ -297,16 +748,49 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to search"},
-        "find": {"type": "string", "description": "Value or pattern to find"},
-        "replacement": {"type": "string", "description": "Value to replace with"},
-        "mode": {"type": "string", "enum": ["exact", "regex", "case_insensitive"], "default": "exact", "description": "Matching mode"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to search",
+          "match_method": "exact"
+        },
+        "find": {
+          "type": "string",
+          "description": "Value or pattern to find",
+          "match_method": "exact"
+        },
+        "replacement": {
+          "type": "string",
+          "description": "Value to replace with",
+          "match_method": "exact"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "exact",
+            "regex",
+            "case_insensitive"
+          ],
+          "default": "exact",
+          "description": "Matching mode",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "find", "replacement"]
+      "required": [
+        "table",
+        "column",
+        "find",
+        "replacement"
+      ]
     },
     "internal_component": false,
-    "_flows": ["replace"]
+    "_flows": [
+      "replace"
+    ]
   },
   {
     "name": "validate_column",
@@ -314,16 +798,59 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to validate"},
-        "check": {"type": "string", "enum": ["not_null", "unique", "in_range", "in_list", "regex", "min_length", "max_length"], "description": "Validation check type"},
-        "value": {"type": "string", "description": "Check parameter — range 'min,max', list 'a,b,c', regex pattern, or length limit"},
-        "action": {"type": "string", "enum": ["flag", "drop", "fill"], "default": "flag", "description": "What to do with failing rows"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to validate",
+          "match_method": "exact"
+        },
+        "check": {
+          "type": "string",
+          "enum": [
+            "not_null",
+            "unique",
+            "in_range",
+            "in_list",
+            "regex",
+            "min_length",
+            "max_length"
+          ],
+          "description": "Validation check type",
+          "match_method": "exact"
+        },
+        "value": {
+          "type": "string",
+          "description": "Check parameter — range 'min,max', list 'a,b,c', regex pattern, or length limit",
+          "match_method": "exact"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "flag",
+            "drop",
+            "fill"
+          ],
+          "default": "flag",
+          "description": "What to do with failing rows",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "check"]
+      "required": [
+        "table",
+        "column",
+        "check"
+      ]
     },
     "internal_component": false,
-    "_flows": ["validate", "issue", "datatype"]
+    "_flows": [
+      "validate",
+      "issue",
+      "datatype"
+    ]
   },
   {
     "name": "format_column",
@@ -331,15 +858,48 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to format"},
-        "type": {"type": "string", "enum": ["email", "phone", "date", "currency", "percentage", "title_case", "lower", "upper", "trim"], "description": "Built-in format type"},
-        "locale": {"type": "string", "description": "Locale for formatting (e.g., 'en_US')"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to format",
+          "match_method": "exact"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "email",
+            "phone",
+            "date",
+            "currency",
+            "percentage",
+            "title_case",
+            "lower",
+            "upper",
+            "trim"
+          ],
+          "description": "Built-in format type",
+          "match_method": "exact"
+        },
+        "locale": {
+          "type": "string",
+          "description": "Locale for formatting (e.g., 'en_US')",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "type"]
+      "required": [
+        "table",
+        "column",
+        "type"
+      ]
     },
     "internal_component": false,
-    "_flows": ["format"]
+    "_flows": [
+      "format"
+    ]
   },
   {
     "name": "format_custom",
@@ -347,16 +907,43 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to format"},
-        "pattern": {"type": "string", "description": "Custom format pattern or template string"},
-        "preview": {"type": "boolean", "default": true, "description": "Show preview of changes before applying (recommended: true)"},
-        "validation": {"type": "string", "description": "Regex to validate the pattern output — rejects if result does not match"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to format",
+          "match_method": "exact"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Custom format pattern or template string",
+          "match_method": "exact"
+        },
+        "preview": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show preview of changes before applying (recommended: true)",
+          "match_method": "exact"
+        },
+        "validation": {
+          "type": "string",
+          "description": "Regex to validate the pattern output — rejects if result does not match",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "pattern"]
+      "required": [
+        "table",
+        "column",
+        "pattern"
+      ]
     },
     "internal_component": false,
-    "_flows": ["format"]
+    "_flows": [
+      "format"
+    ]
   },
   {
     "name": "merge_tables",
@@ -364,15 +951,44 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "left": {"type": "string", "description": "Left table name"},
-        "right": {"type": "string", "description": "Right table name"},
-        "key": {"type": "string", "description": "Column name to join on"},
-        "how": {"type": "string", "enum": ["inner", "left", "right", "outer", "cross"], "description": "Join type"}
+        "left": {
+          "type": "string",
+          "description": "Left table name",
+          "match_method": "exact"
+        },
+        "right": {
+          "type": "string",
+          "description": "Right table name",
+          "match_method": "exact"
+        },
+        "key": {
+          "type": "string",
+          "description": "Column name to join on",
+          "match_method": "exact"
+        },
+        "how": {
+          "type": "string",
+          "enum": [
+            "inner",
+            "left",
+            "right",
+            "outer",
+            "cross"
+          ],
+          "description": "Join type",
+          "match_method": "exact"
+        }
       },
-      "required": ["left", "right", "key"]
+      "required": [
+        "left",
+        "right",
+        "key"
+      ]
     },
     "internal_component": false,
-    "_flows": ["join"]
+    "_flows": [
+      "join"
+    ]
   },
   {
     "name": "merge_by_key",
@@ -380,14 +996,32 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "left": {"type": "string", "description": "Left table name (the 'many' side)"},
-        "right": {"type": "string", "description": "Right table name (the 'one' side / lookup table)"},
-        "key": {"type": "string", "description": "Foreign key column name (must exist in both tables)"}
+        "left": {
+          "type": "string",
+          "description": "Left table name (the 'many' side)",
+          "match_method": "exact"
+        },
+        "right": {
+          "type": "string",
+          "description": "Right table name (the 'one' side / lookup table)",
+          "match_method": "exact"
+        },
+        "key": {
+          "type": "string",
+          "description": "Foreign key column name (must exist in both tables)",
+          "match_method": "exact"
+        }
       },
-      "required": ["left", "right", "key"]
+      "required": [
+        "left",
+        "right",
+        "key"
+      ]
     },
     "internal_component": false,
-    "_flows": ["join"]
+    "_flows": [
+      "join"
+    ]
   },
   {
     "name": "pivot_tables",
@@ -395,16 +1029,52 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "index": {"type": "string", "description": "Column for row labels"},
-        "columns": {"type": "string", "description": "Column for column headers"},
-        "values": {"type": "string", "description": "Column for cell values"},
-        "aggfunc": {"type": "string", "enum": ["sum", "mean", "count", "min", "max", "first"], "description": "Aggregation function for duplicate entries"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "index": {
+          "type": "string",
+          "description": "Column for row labels",
+          "match_method": "exact"
+        },
+        "columns": {
+          "type": "string",
+          "description": "Column for column headers",
+          "match_method": "exact"
+        },
+        "values": {
+          "type": "string",
+          "description": "Column for cell values",
+          "match_method": "exact"
+        },
+        "aggfunc": {
+          "type": "string",
+          "enum": [
+            "sum",
+            "mean",
+            "count",
+            "min",
+            "max",
+            "first"
+          ],
+          "description": "Aggregation function for duplicate entries",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "index", "columns", "values"]
+      "required": [
+        "table",
+        "index",
+        "columns",
+        "values"
+      ]
     },
     "internal_component": false,
-    "_flows": ["pivot", "reshape"]
+    "_flows": [
+      "pivot",
+      "reshape"
+    ]
   },
   {
     "name": "append_tables",
@@ -412,14 +1082,36 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "source": {"type": "string", "description": "Table to append rows from"},
-        "target": {"type": "string", "description": "Table to append rows to"},
-        "align_by": {"type": "string", "enum": ["name", "position"], "default": "name", "description": "How to align columns between tables"}
+        "source": {
+          "type": "string",
+          "description": "Table to append rows from",
+          "match_method": "exact"
+        },
+        "target": {
+          "type": "string",
+          "description": "Table to append rows to",
+          "match_method": "exact"
+        },
+        "align_by": {
+          "type": "string",
+          "enum": [
+            "name",
+            "position"
+          ],
+          "default": "name",
+          "description": "How to align columns between tables",
+          "match_method": "exact"
+        }
       },
-      "required": ["source", "target"]
+      "required": [
+        "source",
+        "target"
+      ]
     },
     "internal_component": false,
-    "_flows": ["append"]
+    "_flows": [
+      "append"
+    ]
   },
   {
     "name": "split_column",
@@ -427,16 +1119,44 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to split"},
-        "delimiter": {"type": "string", "description": "Delimiter string (e.g., ',', ' ', '-')"},
-        "pattern": {"type": "string", "description": "Regex pattern with capture groups (alternative to delimiter)"},
-        "names": {"type": "array", "items": {"type": "string"}, "description": "Names for resulting columns (auto-generated if omitted)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to split",
+          "match_method": "exact"
+        },
+        "delimiter": {
+          "type": "string",
+          "description": "Delimiter string (e.g., ',', ' ', '-')",
+          "match_method": "exact"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regex pattern with capture groups (alternative to delimiter)",
+          "match_method": "exact"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Names for resulting columns (auto-generated if omitted)",
+          "match_method": "structured"
+        }
       },
-      "required": ["table", "column"]
+      "required": [
+        "table",
+        "column"
+      ]
     },
     "internal_component": false,
-    "_flows": ["split"]
+    "_flows": [
+      "split"
+    ]
   },
   {
     "name": "merge_columns",
@@ -444,16 +1164,46 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns to combine"},
-        "name": {"type": "string", "description": "Name for the resulting column"},
-        "separator": {"type": "string", "default": " ", "description": "Separator between values"},
-        "expression": {"type": "string", "description": "Python expression for custom combination (overrides separator)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Columns to combine",
+          "match_method": "structured"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the resulting column",
+          "match_method": "exact"
+        },
+        "separator": {
+          "type": "string",
+          "default": " ",
+          "description": "Separator between values",
+          "match_method": "exact"
+        },
+        "expression": {
+          "type": "string",
+          "description": "Python expression for custom combination (overrides separator)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "columns", "name"]
+      "required": [
+        "table",
+        "columns",
+        "name"
+      ]
     },
     "internal_component": false,
-    "_flows": ["merge"]
+    "_flows": [
+      "merge"
+    ]
   },
   {
     "name": "cut_n_paste",
@@ -461,15 +1211,39 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "source_table": {"type": "string", "description": "Table to cut from"},
-        "source_ref": {"type": "string", "description": "What to cut — 'column:name', 'row:5', or 'A5:B10' range"},
-        "target_table": {"type": "string", "description": "Table to paste into"},
-        "target_ref": {"type": "string", "description": "Where to paste — 'column:name', 'row:5', or cell reference"}
+        "source_table": {
+          "type": "string",
+          "description": "Table to cut from",
+          "match_method": "exact"
+        },
+        "source_ref": {
+          "type": "string",
+          "description": "What to cut — 'column:name', 'row:5', or 'A5:B10' range",
+          "match_method": "exact"
+        },
+        "target_table": {
+          "type": "string",
+          "description": "Table to paste into",
+          "match_method": "exact"
+        },
+        "target_ref": {
+          "type": "string",
+          "description": "Where to paste — 'column:name', 'row:5', or cell reference",
+          "match_method": "exact"
+        }
       },
-      "required": ["source_table", "source_ref", "target_table", "target_ref"]
+      "required": [
+        "source_table",
+        "source_ref",
+        "target_table",
+        "target_ref"
+      ]
     },
     "internal_component": false,
-    "_flows": ["reshape", "replace"]
+    "_flows": [
+      "reshape",
+      "replace"
+    ]
   },
   {
     "name": "define_metric",
@@ -477,16 +1251,44 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "name": {"type": "string", "description": "Metric name (snake_case identifier)"},
-        "formula": {"type": "string", "description": "Formula expression using column names"},
-        "description": {"type": "string", "description": "What the metric measures"},
-        "columns": {"type": "array", "items": {"type": "string"}, "description": "Columns referenced in the formula"},
-        "unit": {"type": "string", "description": "Unit of measurement (e.g., 'USD', 'percent', 'count')"}
+        "name": {
+          "type": "string",
+          "description": "Metric name (snake_case identifier)",
+          "match_method": "exact"
+        },
+        "formula": {
+          "type": "string",
+          "description": "Formula expression using column names",
+          "match_method": "exact"
+        },
+        "description": {
+          "type": "string",
+          "description": "What the metric measures",
+          "match_method": "fuzzy"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Columns referenced in the formula",
+          "match_method": "structured"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measurement (e.g., 'USD', 'percent', 'count')",
+          "match_method": "exact"
+        }
       },
-      "required": ["name", "formula"]
+      "required": [
+        "name",
+        "formula"
+      ]
     },
     "internal_component": false,
-    "_flows": ["define"]
+    "_flows": [
+      "define"
+    ]
   },
   {
     "name": "lookup_metric",
@@ -494,13 +1296,25 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "term": {"type": "string", "description": "Metric name or search term"},
-        "source": {"type": "string", "description": "Filter by dataset or data source"}
+        "term": {
+          "type": "string",
+          "description": "Metric name or search term",
+          "match_method": "exact"
+        },
+        "source": {
+          "type": "string",
+          "description": "Filter by dataset or data source",
+          "match_method": "exact"
+        }
       },
-      "required": ["term"]
+      "required": [
+        "term"
+      ]
     },
     "internal_component": false,
-    "_flows": ["lookup"]
+    "_flows": [
+      "lookup"
+    ]
   },
   {
     "name": "apply_formula",
@@ -508,14 +1322,32 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column name for the result"},
-        "formula": {"type": "string", "description": "Python expression using column names (e.g., 'price * quantity')"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column name for the result",
+          "match_method": "exact"
+        },
+        "formula": {
+          "type": "string",
+          "description": "Python expression using column names (e.g., 'price * quantity')",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column", "formula"]
+      "required": [
+        "table",
+        "column",
+        "formula"
+      ]
     },
     "internal_component": false,
-    "_flows": ["define"]
+    "_flows": [
+      "define"
+    ]
   },
   {
     "name": "semantic_layer",
@@ -523,13 +1355,53 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "scope": {"type": "string", "enum": ["columns", "tables", "datasets"], "description": "Level of schema to describe — columns within a table, tables within a dataset, or all datasets"},
-        "name": {"type": "string", "description": "Specific table or dataset name (returns all at scope level if omitted)"}
+        "scope": {
+          "type": "string",
+          "enum": [
+            "columns",
+            "tables",
+            "datasets"
+          ],
+          "description": "Level of schema to describe — columns within a table, tables within a dataset, or all datasets",
+          "match_method": "exact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Specific table or dataset name (returns all at scope level if omitted)",
+          "match_method": "exact"
+        }
       },
-      "required": ["scope"]
+      "required": [
+        "scope"
+      ]
     },
     "internal_component": false,
-    "_flows": ["query", "lookup", "pivot", "describe", "compare", "exist", "segment", "update", "datatype", "dedupe", "fill", "interpolate", "replace", "validate", "format", "insert", "delete", "join", "append", "reshape", "merge", "split", "define", "summarize"]
+    "_flows": [
+      "query",
+      "lookup",
+      "pivot",
+      "describe",
+      "compare",
+      "exist",
+      "segment",
+      "update",
+      "datatype",
+      "dedupe",
+      "fill",
+      "interpolate",
+      "replace",
+      "validate",
+      "format",
+      "insert",
+      "delete",
+      "join",
+      "append",
+      "reshape",
+      "merge",
+      "split",
+      "define",
+      "summarize"
+    ]
   },
   {
     "name": "heads_or_tails",
@@ -537,14 +1409,36 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "end": {"type": "string", "enum": ["head", "tail"], "default": "head", "description": "Which end of the table to preview"},
-        "n": {"type": "integer", "default": 5, "description": "Number of rows to return"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "end": {
+          "type": "string",
+          "enum": [
+            "head",
+            "tail"
+          ],
+          "default": "head",
+          "description": "Which end of the table to preview",
+          "match_method": "exact"
+        },
+        "n": {
+          "type": "integer",
+          "default": 5,
+          "description": "Number of rows to return",
+          "match_method": "exact"
+        }
       },
-      "required": ["table"]
+      "required": [
+        "table"
+      ]
     },
     "internal_component": false,
-    "_flows": ["peek"]
+    "_flows": [
+      "peek"
+    ]
   },
   {
     "name": "describe_stats",
@@ -552,14 +1446,63 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to analyze (profiles full table if omitted)"},
-        "metrics": {"type": "array", "items": {"type": "string"}, "description": "Metrics to compute: min, max, mean, median, std, nulls, unique, dtype"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to analyze (profiles full table if omitted)",
+          "match_method": "exact"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Metrics to compute: min, max, mean, median, std, nulls, unique, dtype",
+          "match_method": "structured"
+        }
       },
-      "required": ["table"]
+      "required": [
+        "table"
+      ]
     },
     "internal_component": false,
-    "_flows": ["query", "lookup", "pivot", "describe", "compare", "exist", "segment", "recommend", "blank", "issue", "peek", "update", "datatype", "dedupe", "fill", "interpolate", "replace", "validate", "format", "insert", "delete", "join", "append", "reshape", "merge", "split", "define", "plot", "trend", "summarize", "style"]
+    "_flows": [
+      "query",
+      "lookup",
+      "pivot",
+      "describe",
+      "compare",
+      "exist",
+      "segment",
+      "recommend",
+      "blank",
+      "issue",
+      "peek",
+      "update",
+      "datatype",
+      "dedupe",
+      "fill",
+      "interpolate",
+      "replace",
+      "validate",
+      "format",
+      "insert",
+      "delete",
+      "join",
+      "append",
+      "reshape",
+      "merge",
+      "split",
+      "define",
+      "plot",
+      "trend",
+      "summarize",
+      "style"
+    ]
   },
   {
     "name": "compare_metrics",
@@ -567,16 +1510,51 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column_a": {"type": "string", "description": "First column or group for comparison"},
-        "column_b": {"type": "string", "description": "Second column or group for comparison"},
-        "method": {"type": "string", "enum": ["chi_square", "anova", "mann_whitney", "distribution", "summary"], "description": "Statistical method"},
-        "group_by": {"type": "string", "description": "Column to segment by for group-level comparisons"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column_a": {
+          "type": "string",
+          "description": "First column or group for comparison",
+          "match_method": "exact"
+        },
+        "column_b": {
+          "type": "string",
+          "description": "Second column or group for comparison",
+          "match_method": "exact"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "chi_square",
+            "anova",
+            "mann_whitney",
+            "distribution",
+            "summary"
+          ],
+          "description": "Statistical method",
+          "match_method": "exact"
+        },
+        "group_by": {
+          "type": "string",
+          "description": "Column to segment by for group-level comparisons",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column_a", "column_b", "method"]
+      "required": [
+        "table",
+        "column_a",
+        "column_b",
+        "method"
+      ]
     },
     "internal_component": false,
-    "_flows": ["compare", "trend"]
+    "_flows": [
+      "compare",
+      "trend"
+    ]
   },
   {
     "name": "root_cause_analysis",
@@ -584,16 +1562,45 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "metric": {"type": "string", "description": "Metric column to analyze"},
-        "dimensions": {"type": "array", "items": {"type": "string"}, "description": "Dimension columns to decompose by"},
-        "baseline": {"type": "string", "description": "Baseline period or condition for comparison (e.g., 'quarter == Q1')"},
-        "current": {"type": "string", "description": "Current period or condition to compare against baseline"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "metric": {
+          "type": "string",
+          "description": "Metric column to analyze",
+          "match_method": "exact"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Dimension columns to decompose by",
+          "match_method": "structured"
+        },
+        "baseline": {
+          "type": "string",
+          "description": "Baseline period or condition for comparison (e.g., 'quarter == Q1')",
+          "match_method": "exact"
+        },
+        "current": {
+          "type": "string",
+          "description": "Current period or condition to compare against baseline",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "metric", "dimensions"]
+      "required": [
+        "table",
+        "metric",
+        "dimensions"
+      ]
     },
     "internal_component": false,
-    "_flows": ["segment"]
+    "_flows": [
+      "segment"
+    ]
   },
   {
     "name": "dimension_breakdown",
@@ -601,16 +1608,51 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "metric": {"type": "string", "description": "Metric column to break down"},
-        "dimension": {"type": "string", "description": "Dimension column to segment by"},
-        "aggregation": {"type": "string", "enum": ["sum", "mean", "count", "median", "min", "max"], "default": "sum", "description": "How to aggregate the metric per segment"},
-        "top_n": {"type": "integer", "description": "Limit to top N segments by value"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "metric": {
+          "type": "string",
+          "description": "Metric column to break down",
+          "match_method": "exact"
+        },
+        "dimension": {
+          "type": "string",
+          "description": "Dimension column to segment by",
+          "match_method": "exact"
+        },
+        "aggregation": {
+          "type": "string",
+          "enum": [
+            "sum",
+            "mean",
+            "count",
+            "median",
+            "min",
+            "max"
+          ],
+          "default": "sum",
+          "description": "How to aggregate the metric per segment",
+          "match_method": "exact"
+        },
+        "top_n": {
+          "type": "integer",
+          "description": "Limit to top N segments by value",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "metric", "dimension"]
+      "required": [
+        "table",
+        "metric",
+        "dimension"
+      ]
     },
     "internal_component": false,
-    "_flows": ["segment"]
+    "_flows": [
+      "segment"
+    ]
   },
   {
     "name": "compute_correlation",
@@ -618,15 +1660,43 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column_a": {"type": "string", "description": "First column"},
-        "column_b": {"type": "string", "description": "Second column"},
-        "method": {"type": "string", "enum": ["pearson", "spearman", "kendall"], "default": "pearson", "description": "Correlation method"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column_a": {
+          "type": "string",
+          "description": "First column",
+          "match_method": "exact"
+        },
+        "column_b": {
+          "type": "string",
+          "description": "Second column",
+          "match_method": "exact"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "pearson",
+            "spearman",
+            "kendall"
+          ],
+          "default": "pearson",
+          "description": "Correlation method",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "column_a", "column_b"]
+      "required": [
+        "table",
+        "column_a",
+        "column_b"
+      ]
     },
     "internal_component": false,
-    "_flows": ["compare"]
+    "_flows": [
+      "compare"
+    ]
   },
   {
     "name": "render_chart",
@@ -634,16 +1704,51 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Source table"},
-        "chart_type": {"type": "string", "enum": ["bar", "line", "pie", "scatter", "histogram", "heatmap"], "description": "Type of chart"},
-        "x": {"type": "string", "description": "Column for x-axis"},
-        "y": {"type": "string", "description": "Column for y-axis"},
-        "color": {"type": "string", "description": "Column for color grouping"}
+        "table": {
+          "type": "string",
+          "description": "Source table",
+          "match_method": "exact"
+        },
+        "chart_type": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "line",
+            "pie",
+            "scatter",
+            "histogram",
+            "heatmap"
+          ],
+          "description": "Type of chart",
+          "match_method": "exact"
+        },
+        "x": {
+          "type": "string",
+          "description": "Column for x-axis",
+          "match_method": "exact"
+        },
+        "y": {
+          "type": "string",
+          "description": "Column for y-axis",
+          "match_method": "exact"
+        },
+        "color": {
+          "type": "string",
+          "description": "Column for color grouping",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "chart_type"]
+      "required": [
+        "table",
+        "chart_type"
+      ]
     },
     "internal_component": false,
-    "_flows": ["plot", "trend", "dashboard"]
+    "_flows": [
+      "plot",
+      "trend",
+      "dashboard"
+    ]
   },
   {
     "name": "modify_chart",
@@ -651,16 +1756,49 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "chart_id": {"type": "string", "description": "Identifier of the chart to modify"},
-        "title": {"type": "string", "description": "New chart title"},
-        "x_label": {"type": "string", "description": "X-axis label"},
-        "y_label": {"type": "string", "description": "Y-axis label"},
-        "chart_type": {"type": "string", "enum": ["bar", "line", "pie", "scatter", "histogram", "heatmap"], "description": "Change chart type"}
+        "chart_id": {
+          "type": "string",
+          "description": "Identifier of the chart to modify",
+          "match_method": "exact"
+        },
+        "title": {
+          "type": "string",
+          "description": "New chart title",
+          "match_method": "fuzzy"
+        },
+        "x_label": {
+          "type": "string",
+          "description": "X-axis label",
+          "match_method": "fuzzy"
+        },
+        "y_label": {
+          "type": "string",
+          "description": "Y-axis label",
+          "match_method": "fuzzy"
+        },
+        "chart_type": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "line",
+            "pie",
+            "scatter",
+            "histogram",
+            "heatmap"
+          ],
+          "description": "Change chart type",
+          "match_method": "exact"
+        }
       },
-      "required": ["chart_id"]
+      "required": [
+        "chart_id"
+      ]
     },
     "internal_component": false,
-    "_flows": ["design", "dashboard"]
+    "_flows": [
+      "design",
+      "dashboard"
+    ]
   },
   {
     "name": "style_chart",
@@ -668,15 +1806,45 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "chart_id": {"type": "string", "description": "Identifier of the chart to style"},
-        "colors": {"type": "array", "items": {"type": "string"}, "description": "Color palette (hex codes)"},
-        "legend": {"type": "string", "enum": ["top", "bottom", "left", "right", "none"], "description": "Legend position"},
-        "gridlines": {"type": "boolean", "description": "Show or hide gridlines"}
+        "chart_id": {
+          "type": "string",
+          "description": "Identifier of the chart to style",
+          "match_method": "exact"
+        },
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Color palette (hex codes)",
+          "match_method": "structured"
+        },
+        "legend": {
+          "type": "string",
+          "enum": [
+            "top",
+            "bottom",
+            "left",
+            "right",
+            "none"
+          ],
+          "description": "Legend position",
+          "match_method": "exact"
+        },
+        "gridlines": {
+          "type": "boolean",
+          "description": "Show or hide gridlines",
+          "match_method": "exact"
+        }
       },
-      "required": ["chart_id"]
+      "required": [
+        "chart_id"
+      ]
     },
     "internal_component": false,
-    "_flows": ["design"]
+    "_flows": [
+      "design"
+    ]
   },
   {
     "name": "compose_dashboard",
@@ -684,16 +1852,68 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Primary source table"},
-        "panels": {"type": "array", "items": {"type": "object", "properties": {"type": {"type": "string", "enum": ["chart", "table", "metric"]}, "config": {"type": "object"}}, "required": ["type", "config"]}, "description": "Panel definitions"},
-        "title": {"type": "string", "description": "Dashboard title"},
-        "layout": {"type": "string", "enum": ["grid", "vertical", "horizontal"], "default": "grid", "description": "Layout arrangement"},
-        "grid_columns": {"type": "integer", "default": 2, "description": "Number of columns in grid layout"}
+        "table": {
+          "type": "string",
+          "description": "Primary source table",
+          "match_method": "exact"
+        },
+        "panels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "chart",
+                  "table",
+                  "metric"
+                ]
+              },
+              "config": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "type",
+              "config"
+            ]
+          },
+          "description": "Panel definitions",
+          "match_method": "structured"
+        },
+        "title": {
+          "type": "string",
+          "description": "Dashboard title",
+          "match_method": "fuzzy"
+        },
+        "layout": {
+          "type": "string",
+          "enum": [
+            "grid",
+            "vertical",
+            "horizontal"
+          ],
+          "default": "grid",
+          "description": "Layout arrangement",
+          "match_method": "exact"
+        },
+        "grid_columns": {
+          "type": "integer",
+          "default": 2,
+          "description": "Number of columns in grid layout",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "panels"]
+      "required": [
+        "table",
+        "panels"
+      ]
     },
     "internal_component": false,
-    "_flows": ["dashboard"]
+    "_flows": [
+      "dashboard"
+    ]
   },
   {
     "name": "apply_style",
@@ -701,16 +1921,49 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Target table"},
-        "column": {"type": "string", "description": "Column to style (all columns if omitted)"},
-        "condition": {"type": "string", "description": "Condition expression (e.g., 'value < 0', 'value == max')"},
-        "format": {"type": "string", "enum": ["highlight", "color_scale", "data_bar", "icon_set", "number_format"], "description": "Formatting type"},
-        "color": {"type": "string", "description": "Color for highlight or scale endpoint (hex code)"}
+        "table": {
+          "type": "string",
+          "description": "Target table",
+          "match_method": "exact"
+        },
+        "column": {
+          "type": "string",
+          "description": "Column to style (all columns if omitted)",
+          "match_method": "exact"
+        },
+        "condition": {
+          "type": "string",
+          "description": "Condition expression (e.g., 'value < 0', 'value == max')",
+          "match_method": "exact"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "highlight",
+            "color_scale",
+            "data_bar",
+            "icon_set",
+            "number_format"
+          ],
+          "description": "Formatting type",
+          "match_method": "exact"
+        },
+        "color": {
+          "type": "string",
+          "description": "Color for highlight or scale endpoint (hex code)",
+          "match_method": "exact"
+        }
       },
-      "required": ["table", "condition", "format"]
+      "required": [
+        "table",
+        "condition",
+        "format"
+      ]
     },
     "internal_component": false,
-    "_flows": ["style"]
+    "_flows": [
+      "style"
+    ]
   },
   {
     "name": "export_dataset",
@@ -718,14 +1971,38 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "dataset": {"type": "string", "description": "Dataset to export"},
-        "format": {"type": "string", "enum": ["csv", "json", "excel", "parquet", "clipboard"], "description": "Export format"},
-        "path": {"type": "string", "description": "Output file path (optional for clipboard)"}
+        "dataset": {
+          "type": "string",
+          "description": "Dataset to export",
+          "match_method": "exact"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "json",
+            "excel",
+            "parquet",
+            "clipboard"
+          ],
+          "description": "Export format",
+          "match_method": "exact"
+        },
+        "path": {
+          "type": "string",
+          "description": "Output file path (optional for clipboard)",
+          "match_method": "exact"
+        }
       },
-      "required": ["dataset", "format"]
+      "required": [
+        "dataset",
+        "format"
+      ]
     },
     "internal_component": false,
-    "_flows": ["export"]
+    "_flows": [
+      "export"
+    ]
   },
   {
     "name": "summarize_content",
@@ -733,15 +2010,40 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "table": {"type": "string", "description": "Source table for context"},
-        "artifact_type": {"type": "string", "enum": ["chart", "table", "query_result"], "description": "Type of artifact to summarize"},
-        "artifact_id": {"type": "string", "description": "Identifier of the specific chart or query result"},
-        "focus": {"type": "string", "description": "Aspect to focus on (e.g., 'trends', 'outliers', 'distribution')"}
+        "table": {
+          "type": "string",
+          "description": "Source table for context",
+          "match_method": "exact"
+        },
+        "artifact_type": {
+          "type": "string",
+          "enum": [
+            "chart",
+            "table",
+            "query_result"
+          ],
+          "description": "Type of artifact to summarize",
+          "match_method": "exact"
+        },
+        "artifact_id": {
+          "type": "string",
+          "description": "Identifier of the specific chart or query result",
+          "match_method": "exact"
+        },
+        "focus": {
+          "type": "string",
+          "description": "Aspect to focus on (e.g., 'trends', 'outliers', 'distribution')",
+          "match_method": "fuzzy"
+        }
       },
-      "required": ["table"]
+      "required": [
+        "table"
+      ]
     },
     "internal_component": false,
-    "_flows": ["summarize"]
+    "_flows": [
+      "summarize"
+    ]
   },
   {
     "name": "explain_content",
@@ -749,13 +2051,29 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "topic": {"type": "string", "description": "What to explain — a method, a result, a decision, or a process step"},
-        "scope": {"type": "string", "enum": ["last_action", "full_session", "methodology"], "default": "last_action", "description": "Scope of the explanation"}
+        "topic": {
+          "type": "string",
+          "description": "What to explain — a method, a result, a decision, or a process step",
+          "match_method": "fuzzy"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "last_action",
+            "full_session",
+            "methodology"
+          ],
+          "default": "last_action",
+          "description": "Scope of the explanation",
+          "match_method": "exact"
+        }
       },
       "required": []
     },
     "internal_component": false,
-    "_flows": ["explain"]
+    "_flows": [
+      "explain"
+    ]
   },
   {
     "name": "search_reference",
@@ -763,14 +2081,39 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "query": {"type": "string", "description": "Search term or question"},
-        "category": {"type": "string", "enum": ["sql", "statistics", "visualization", "cleaning", "general"], "description": "Filter by topic category"},
-        "limit": {"type": "integer", "default": 5, "description": "Maximum number of results"}
+        "query": {
+          "type": "string",
+          "description": "Search term or question",
+          "match_method": "fuzzy"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "sql",
+            "statistics",
+            "visualization",
+            "cleaning",
+            "general"
+          ],
+          "description": "Filter by topic category",
+          "match_method": "exact"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5,
+          "description": "Maximum number of results",
+          "match_method": "exact"
+        }
       },
-      "required": ["query"]
+      "required": [
+        "query"
+      ]
     },
     "internal_component": false,
-    "_flows": ["search", "summarize"]
+    "_flows": [
+      "search",
+      "summarize"
+    ]
   },
   {
     "name": "coordinate_context",
@@ -778,13 +2121,31 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "scope": {"type": "string", "enum": ["last_turn", "last_n", "full", "summary"], "default": "last_turn", "description": "How much context to retrieve"},
-        "turns": {"type": "integer", "default": 3, "description": "Number of turns when scope=last_n"}
+        "scope": {
+          "type": "string",
+          "enum": [
+            "last_turn",
+            "last_n",
+            "full",
+            "summary"
+          ],
+          "default": "last_turn",
+          "description": "How much context to retrieve",
+          "match_method": "exact"
+        },
+        "turns": {
+          "type": "integer",
+          "default": 3,
+          "description": "Number of turns when scope=last_n",
+          "match_method": "exact"
+        }
       },
       "required": []
     },
     "internal_component": true,
-    "_flows": ["*"]
+    "_flows": [
+      "*"
+    ]
   },
   {
     "name": "manage_memory",
@@ -792,15 +2153,49 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "operation": {"type": "string", "enum": ["read", "write", "delete"], "description": "Memory operation"},
-        "level": {"type": "string", "enum": ["L1", "L2", "L3"], "description": "L1=session scratchpad, L2=persistent preferences, L3=business context (documents, reports, domain knowledge)"},
-        "key": {"type": "string", "description": "Memory key to read, write, or delete"},
-        "value": {"type": "string", "description": "Value to store (when operation=write)"}
+        "operation": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "delete"
+          ],
+          "description": "Memory operation",
+          "match_method": "exact"
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "description": "L1=session scratchpad, L2=persistent preferences, L3=business context (documents, reports, domain knowledge)",
+          "match_method": "exact"
+        },
+        "key": {
+          "type": "string",
+          "description": "Memory key to read, write, or delete",
+          "match_method": "exact"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value to store (when operation=write)",
+          "match_method": "exact"
+        }
       },
-      "required": ["operation", "level"]
+      "required": [
+        "operation",
+        "level"
+      ]
     },
     "internal_component": true,
-    "_flows": ["recap", "recall", "preference", "retrieve"]
+    "_flows": [
+      "recap",
+      "recall",
+      "preference",
+      "retrieve"
+    ]
   },
   {
     "name": "read_flow_stack",
@@ -808,13 +2203,30 @@
     "input_schema": {
       "type": "object",
       "properties": {
-        "operation": {"type": "string", "enum": ["get_slots", "get_flow", "list_active"], "description": "What to read from the flow stack"},
-        "flow_name": {"type": "string", "description": "Specific flow to query (current flow if omitted)"}
+        "operation": {
+          "type": "string",
+          "enum": [
+            "get_slots",
+            "get_flow",
+            "list_active"
+          ],
+          "description": "What to read from the flow stack",
+          "match_method": "exact"
+        },
+        "flow_name": {
+          "type": "string",
+          "description": "Specific flow to query (current flow if omitted)",
+          "match_method": "exact"
+        }
       },
-      "required": ["operation"]
+      "required": [
+        "operation"
+      ]
     },
     "internal_component": true,
-    "_flows": ["*"]
+    "_flows": [
+      "*"
+    ]
   },
   {
     "name": "handle_ambiguity",
@@ -824,18 +2236,26 @@
       "properties": {
         "clarification": {
           "type": "string",
-          "description": "The clarifying question to ask the user to disambiguate their request"
+          "description": "The clarifying question to ask the user to disambiguate their request",
+          "match_method": "fuzzy"
         },
         "candidates": {
           "type": "array",
-          "items": {"type": "string"},
-          "description": "List of plausible tool names that could apply"
+          "items": {
+            "type": "string"
+          },
+          "description": "List of plausible tool names that could apply",
+          "match_method": "structured"
         }
       },
-      "required": ["clarification"]
+      "required": [
+        "clarification"
+      ]
     },
     "internal_component": true,
-    "_flows": ["*"]
+    "_flows": [
+      "*"
+    ]
   },
   {
     "name": "conversational_response",
@@ -845,12 +2265,17 @@
       "properties": {
         "reason": {
           "type": "string",
-          "description": "Brief explanation of why a conversational response is appropriate"
+          "description": "Brief explanation of why a conversational response is appropriate",
+          "match_method": "fuzzy"
         }
       },
-      "required": ["reason"]
+      "required": [
+        "reason"
+      ]
     },
     "internal_component": true,
-    "_flows": ["*"]
+    "_flows": [
+      "*"
+    ]
   }
 ]

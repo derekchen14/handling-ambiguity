@@ -125,7 +125,7 @@
         "target_tools": {
           "validate_column": {
             "column": "segment",
-            "check": "enum",
+            "check": "in_list",
             "value": null
           }
         }
@@ -144,7 +144,7 @@
         "target_tools": {
           "validate_column": {
             "column": "segment",
-            "check": "enum",
+            "check": "in_list",
             "value": [
               "active",
               "paused",
@@ -181,7 +181,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "weekly_spend",
-            "strategy": "rolling_average"
+            "strategy": "mean"
           }
         }
       },
@@ -199,7 +199,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "weekly_spend",
-            "strategy": "rolling_average",
+            "strategy": "mean",
             "value": 3
           }
         }
@@ -598,7 +598,7 @@
           },
           "compare_metrics": {
             "column_a": "CTR",
-            "method": "trend"
+            "method": "summary"
           },
           "lookup_metric": {
             "term": "CTR"
@@ -629,7 +629,7 @@
           },
           "compare_metrics": {
             "column_a": "CTR",
-            "method": "trend"
+            "method": "summary"
           }
         }
       }
@@ -670,7 +670,7 @@
           },
           "compare_metrics": {
             "column_a": "operating_expenses",
-            "method": "trend",
+            "method": "summary",
             "group_by": "business_unit"
           }
         }
@@ -723,7 +723,7 @@
         "target_tools": {
           "validate_column": {
             "column": "icd_code",
-            "check": "format"
+            "check": "regex"
           }
         }
       },
@@ -791,7 +791,7 @@
             "column": null
           },
           "semantic_layer": {
-            "scope": "table"
+            "scope": "tables"
           }
         }
       }
@@ -872,7 +872,7 @@
             "table": null
           },
           "modify_table": {
-            "operation": "transpose"
+            "operation": "reorder_columns"
           }
         }
       },
@@ -1034,7 +1034,7 @@
         "target_tools": {
           "run_interpolation": {
             "column": "salary",
-            "method": "model"
+            "method": "linear"
           }
         }
       }
@@ -1526,7 +1526,7 @@
           },
           "compare_metrics": {
             "column_a": "session_duration",
-            "method": "trend"
+            "method": "summary"
           }
         }
       }
@@ -2074,7 +2074,7 @@
           },
           "validate_column": {
             "column": null,
-            "check": "type"
+            "check": "in_range"
           }
         }
       },
@@ -2092,7 +2092,7 @@
         "target_tools": {
           "cast_column": {
             "column": "satisfaction_score",
-            "target_type": "integer"
+            "target_type": "int"
           }
         }
       }
@@ -2225,7 +2225,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "open_rate",
-            "strategy": "forward_fill"
+            "strategy": "ffill"
           }
         }
       },
@@ -2243,7 +2243,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "click_through_rate",
-            "strategy": "rolling_average",
+            "strategy": "mean",
             "value": 3
           }
         }
@@ -2393,7 +2393,7 @@
           "compare_metrics": {
             "column_a": "churn_rate",
             "column_b": null,
-            "method": "trend"
+            "method": "summary"
           }
         }
       },
@@ -2959,7 +2959,7 @@
           "dimension_breakdown": {
             "metric": "shipping_delay",
             "dimension": "warehouse",
-            "aggregation": "avg"
+            "aggregation": "mean"
           }
         }
       },
@@ -2978,7 +2978,7 @@
           "dimension_breakdown": {
             "metric": "shipping_delay",
             "dimension": "carrier",
-            "aggregation": "avg"
+            "aggregation": "mean"
           }
         }
       }
@@ -3115,7 +3115,7 @@
         "target_tools": {
           "run_interpolation": {
             "column": "age",
-            "method": "model"
+            "method": "linear"
           }
         }
       },
@@ -3163,7 +3163,7 @@
         "target_tools": {
           "validate_column": {
             "column": "region",
-            "check": "enum"
+            "check": "in_list"
           }
         }
       },
@@ -3181,7 +3181,7 @@
         "target_tools": {
           "validate_column": {
             "column": "order_status",
-            "check": "enum",
+            "check": "in_list",
             "value": [
               "shipped",
               "delivered",
@@ -3218,7 +3218,7 @@
         "target_tools": {
           "cast_column": {
             "column": "revenue_total",
-            "target_type": "numeric"
+            "target_type": "float"
           }
         }
       },
@@ -3236,7 +3236,7 @@
         "target_tools": {
           "cast_column": {
             "column": "cost",
-            "target_type": "numeric"
+            "target_type": "float"
           }
         }
       }
@@ -3284,7 +3284,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "days_active_last_30",
-            "strategy": "forward_fill"
+            "strategy": "ffill"
           }
         }
       }
@@ -3568,7 +3568,7 @@
         "utterance": "Can you save the patient outcomes table as an Excel file so I can send it to the site leads?",
         "target_tools": {
           "export_dataset": {
-            "format": "xlsx"
+            "format": "excel"
           }
         }
       },
@@ -3692,7 +3692,7 @@
         "target_tools": {
           "apply_style": {
             "condition": "inventory < 500",
-            "format": "bold",
+            "format": "highlight",
             "color": "red"
           }
         }
@@ -3743,7 +3743,7 @@
         "target_tools": {
           "flash_fill": {
             "column": "engagement",
-            "strategy": "forward_fill"
+            "strategy": "ffill"
           }
         }
       }
@@ -3841,7 +3841,7 @@
         "utterance": "Bigger than expected. Send that as Excel, leadership meeting tomorrow.",
         "target_tools": {
           "export_dataset": {
-            "format": "xlsx"
+            "format": "excel"
           }
         }
       }
@@ -4083,7 +4083,7 @@
         "target_tools": {
           "run_interpolation": {
             "column": "BMI",
-            "method": "model"
+            "method": "linear"
           },
           "execute_python": {
             "code": "df['BMI'] = df['weight_kg'] / (df['height_cm']/100)**2"
@@ -4163,7 +4163,7 @@
         "target_tools": {
           "validate_column": {
             "column": "contact",
-            "check": "format"
+            "check": "regex"
           }
         }
       }
@@ -4342,7 +4342,7 @@
           "dimension_breakdown": {
             "metric": "satisfaction_score",
             "dimension": "age_group",
-            "aggregation": "avg"
+            "aggregation": "mean"
           }
         }
       },
@@ -4755,7 +4755,7 @@
         "utterance": "Do we have bounce rate in the email campaign data?",
         "target_tools": {
           "semantic_layer": {
-            "scope": "column",
+            "scope": "columns",
             "name": "bounce_rate"
           },
           "describe_stats": {
@@ -5046,7 +5046,7 @@
           },
           "compare_metrics": {
             "column_a": "fulfillment_rate",
-            "method": "trend"
+            "method": "summary"
           }
         }
       }
@@ -5487,7 +5487,7 @@
           },
           "flash_fill": {
             "column": "contracted_spend",
-            "strategy": "rolling_average"
+            "strategy": "mean"
           }
         }
       },
@@ -6186,7 +6186,7 @@
           },
           "compare_metrics": {
             "column_a": "satisfaction_score",
-            "method": "trend"
+            "method": "summary"
           }
         }
       },
@@ -6486,7 +6486,7 @@
           },
           "compare_metrics": {
             "column_a": "net_income",
-            "method": "trend"
+            "method": "summary"
           }
         }
       }

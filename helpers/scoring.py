@@ -362,6 +362,179 @@ def score_tool_turn(
     return result
 
 
+# ── Exp 2: Tool parameter scoring ─────────────────────────────
+
+def score_tool_params(
+    predicted_tools_with_args: list[dict],
+    gold_target_tools: dict,
+    fuzzy_evaluator=None,
+    param_schema_index: dict | None = None,
+) -> dict:
+    """Score predicted tool parameters against gold target_tools.
+
+    Match method is determined from the tool manifest schema via
+    param_schema_index (built by build_param_schema_index). When no
+    schema is available, defaults to fuzzy matching for strings.
+
+    Args:
+        predicted_tools_with_args: [{'name': ..., 'args': {...}}, ...]
+        gold_target_tools: {tool_name: {param: value|null}}
+        fuzzy_evaluator: callable(gold, predicted) -> bool (for NL params)
+        param_schema_index: {(tool_name, param_name): property_schema}
+
+    Returns dict with param_accuracy, matched/total counts, and per-param details.
+    """
+    from helpers.schema_utils import classify_match_method
+
+    # Build lookup: first occurrence of each tool name wins
+    pred_lookup: dict[str, dict] = {}
+    for t in predicted_tools_with_args:
+        name = t.get('name', '')
+        if name and name not in pred_lookup:
+            pred_lookup[name] = t.get('args') or {}
+
+    details = []
+    matched = 0
+    total = 0
+    fuzzy_matched = 0
+    fuzzy_total = 0
+    exact_matched = 0
+    exact_total = 0
+
+    for tool_name, gold_params in gold_target_tools.items():
+        if not isinstance(gold_params, dict):
+            continue
+        if tool_name not in pred_lookup:
+            # Tool not predicted — all non-null params are misses
+            for param_name, gold_val in gold_params.items():
+                if gold_val is None:
+                    continue
+                total += 1
+                exact_total += 1
+                details.append({
+                    'tool': tool_name, 'param': param_name,
+                    'gold': gold_val, 'predicted': None,
+                    'match': False, 'method': 'missing_tool',
+                })
+            continue
+
+        pred_args = pred_lookup[tool_name]
+
+        for param_name, gold_val in gold_params.items():
+            if gold_val is None:
+                continue
+
+            # Schema-driven match method dispatch
+            param_schema = (param_schema_index or {}).get((tool_name, param_name), {})
+            method = classify_match_method(param_schema)
+
+            pred_val = pred_args.get(param_name)
+
+            if pred_val is None:
+                total += 1
+                if method == 'fuzzy':
+                    fuzzy_total += 1
+                else:
+                    exact_total += 1
+                details.append({
+                    'tool': tool_name, 'param': param_name,
+                    'gold': gold_val, 'predicted': None,
+                    'match': False, 'method': 'missing',
+                })
+                continue
+
+            total += 1
+
+            if method == 'fuzzy':
+                fuzzy_total += 1
+                if fuzzy_evaluator:
+                    match = fuzzy_evaluator(gold_val, pred_val)
+                else:
+                    # Fallback: case-insensitive string comparison
+                    match = str(gold_val).strip().lower() == str(pred_val).strip().lower()
+                if match:
+                    fuzzy_matched += 1
+            elif method == 'structured':
+                match = _match_structured(gold_val, pred_val)
+                exact_total += 1
+                if match:
+                    exact_matched += 1
+            else:
+                # Exact match (enums, booleans, numbers)
+                match = _normalize_for_match(gold_val) == _normalize_for_match(pred_val)
+                exact_total += 1
+                if match:
+                    exact_matched += 1
+
+            if match:
+                matched += 1
+
+            details.append({
+                'tool': tool_name, 'param': param_name,
+                'gold': gold_val, 'predicted': pred_val,
+                'match': match, 'method': method,
+            })
+
+    return {
+        'param_accuracy': matched / total if total > 0 else 1.0,
+        'matched_params': matched,
+        'total_scored_params': total,
+        'fuzzy_matched': fuzzy_matched,
+        'fuzzy_total': fuzzy_total,
+        'exact_matched': exact_matched,
+        'exact_total': exact_total,
+        'param_details': details,
+    }
+
+
+def _normalize_for_match(val) -> str:
+    """Normalize a value for exact comparison."""
+    if val is None:
+        return ''
+    return str(val).strip().lower()
+
+
+def _match_structured(gold: dict, predicted) -> bool:
+    """Match a structured gold object against a predicted value.
+
+    The predicted value may be a dict (ideal) or a string (model didn't
+    follow structured format).  For dicts, all gold keys must match.
+    """
+    if not isinstance(predicted, dict):
+        return False
+    for k, v in gold.items():
+        pred_v = predicted.get(k)
+        if pred_v is None:
+            return False
+        if str(v).strip().lower() != str(pred_v).strip().lower():
+            return False
+    return True
+
+
+def build_fuzzy_evaluator(client) -> callable:
+    """Build a fuzzy evaluator using Sonnet for NL param comparison."""
+    def evaluate(gold_value, predicted_value) -> bool:
+        if gold_value == predicted_value:
+            return True
+        # Quick normalization check before calling LLM
+        if str(gold_value).strip().lower() == str(predicted_value).strip().lower():
+            return True
+        prompt = (
+            'You are judging whether a predicted tool parameter value matches the expected value.\n'
+            'The predicted value may be more verbose or use different wording, but should convey '
+            'the SAME core action or intent as the expected value. A verbose expansion of the '
+            'expected value still counts as a match. However, if the predicted value is missing '
+            'a key part of the expected value, or refers to something different entirely, it is NOT a match.\n\n'
+            f'Expected: {gold_value}\n'
+            f'Predicted: {predicted_value}\n\n'
+            'Does the predicted value capture ALL the key elements of the expected value? '
+            'Reply YES or NO only.'
+        )
+        resp = client.call_simple(model='claude-sonnet-4-6', prompt=prompt)
+        return resp.strip().upper().startswith('YES')
+    return evaluate
+
+
 # ── Exp 2 Pipeline A: Staged NLU funnel scorer ──────────────────
 
 def score_nlu_staged_funnel(

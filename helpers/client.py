@@ -136,6 +136,51 @@ class UnifiedLLMClient:
 
     # ── Public API ────────────────────────────────────────────────
 
+    def call_simple(
+        self,
+        model: str,
+        prompt: str,
+        max_tokens: int = 64,
+    ) -> str:
+        """Lightweight text-in/text-out call (used for fuzzy eval).
+
+        Auto-detects provider from model name prefix:
+          claude-*  → Anthropic
+          gpt-*     → OpenAI
+          gemini-*  → Google
+          gemma-*   → Google (Gemma)
+        Falls back to Anthropic for unknown prefixes.
+        """
+        if model.startswith('gpt-'):
+            resp = self.openai_client.chat.completions.create(
+                model=model,
+                max_completion_tokens=max_tokens,
+                messages=[{'role': 'user', 'content': prompt}],
+            )
+            return resp.choices[0].message.content or ''
+
+        if model.startswith('gemini-') or model.startswith('gemma-'):
+            from google.genai import types
+            gen_config = types.GenerateContentConfig(max_output_tokens=max_tokens)
+            if 'gemini-3-pro' in model or 'gemini-3.1-pro' in model:
+                gen_config.thinking_config = types.ThinkingConfig(thinking_budget=0)
+            if 'gemini-3-flash' in model or 'gemma-' in model:
+                gen_config.thinking_config = types.ThinkingConfig(thinking_budget=0)
+            resp = self.google_client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=gen_config,
+            )
+            return resp.text or ''
+
+        # Default: Anthropic
+        resp = self.anthropic_client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        return resp.content[0].text if resp.content else ''
+
     def call_flow_detection(
         self,
         config: dict,
