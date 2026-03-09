@@ -2357,7 +2357,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "release",
+        "flow": "syndicate",
         "intent": "Publish",
         "speaker": "user",
         "utterance": "Push the Bangkok street food post live",
@@ -2366,6 +2366,10 @@
             "post_id": null,
             "platform": "wordpress",
             "action": "publish"
+          },
+          "format_content": {
+            "post_id": null,
+            "platform": "wordpress"
           }
         }
       },
@@ -2376,14 +2380,19 @@
       },
       {
         "turn_num": 3,
-        "flow": "release",
+        "flow": "syndicate",
         "intent": "Publish",
         "speaker": "user",
         "utterance": "Nice, do the same for the Chiang Mai temples one",
         "target_tools": {
           "publish_post": {
             "post_id": null,
+            "platform": "wordpress",
             "action": "publish"
+          },
+          "format_content": {
+            "post_id": null,
+            "platform": "wordpress"
           }
         }
       }
