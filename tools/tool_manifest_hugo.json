@@ -1,13 +1,14 @@
 [
   {
     "name": "search_posts",
-    "description": "Search posts, drafts, and topics by keyword, status, or category \u2014 returns matching titles, excerpts, and publication dates sorted by relevance",
+    "description": "Search posts, drafts, and topics by keyword, status, or category — returns matching titles, excerpts, and publication dates sorted by relevance",
     "input_schema": {
       "type": "object",
       "properties": {
         "query": {
           "type": "string",
-          "description": "Search term: keyword, topic, or phrase to match against post titles and content"
+          "description": "Search term: keyword, topic, or phrase to match against post titles and content",
+          "match_method": "fuzzy"
         },
         "status": {
           "type": "string",
@@ -18,16 +19,19 @@
             "all"
           ],
           "default": "all",
-          "description": "Filter by post status"
+          "description": "Filter by post status",
+          "match_method": "exact"
         },
         "category": {
           "type": "string",
-          "description": "Filter by topic category"
+          "description": "Filter by topic category",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 10,
-          "description": "Maximum number of results to return"
+          "description": "Maximum number of results to return",
+          "match_method": "exact"
         }
       },
       "required": []
@@ -43,18 +47,20 @@
   },
   {
     "name": "get_post",
-    "description": "Get post metadata \u2014 title, status, tags, section titles, word counts, dates. Returns metadata only, not content. Use when the user asks about a post's status, structure, or properties",
+    "description": "Get post metadata — title, status, tags, section titles, word counts, dates. Returns metadata only, not content. Use when the user asks about a post's status, structure, or properties",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Unique identifier of the post or draft to retrieve"
+          "description": "Unique identifier of the post or draft to retrieve",
+          "match_method": "exact"
         },
         "include_history": {
           "type": "boolean",
           "default": false,
-          "description": "Include version history for the post"
+          "description": "Include version history for the post",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -73,17 +79,19 @@
   },
   {
     "name": "create_post",
-    "description": "Create a new draft post with title and optional topic \u2014 initializes a post record with empty sections. Does not generate content; use generate_outline or generate_prose to fill sections",
+    "description": "Create a new draft post with title and optional topic — initializes a post record with empty sections. Does not generate content; use generate_outline or generate_prose to fill sections",
     "input_schema": {
       "type": "object",
       "properties": {
         "title": {
           "type": "string",
-          "description": "Title of the new post"
+          "description": "Title of the new post",
+          "match_method": "fuzzy"
         },
         "topic": {
           "type": "string",
-          "description": "Topic or theme for the post"
+          "description": "Topic or theme for the post",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -97,13 +105,14 @@
   },
   {
     "name": "delete_post",
-    "description": "Permanently delete a post from the local database \u2014 removes all content, metadata, and version history",
+    "description": "Permanently delete a post from the local database — removes all content, metadata, and version history",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Unique identifier of the post to delete"
+          "description": "Unique identifier of the post to delete",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -115,17 +124,19 @@
   },
   {
     "name": "rollback_post",
-    "description": "Revert a post to a previous version \u2014 restores content and metadata from a specific point in the version history",
+    "description": "Revert a post to a previous version — restores content and metadata from a specific point in the version history",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to revert"
+          "description": "Post to revert",
+          "match_method": "exact"
         },
         "version": {
           "type": "string",
-          "description": "Version identifier to revert to (defaults to the immediately previous version)"
+          "description": "Version identifier to revert to (defaults to the immediately previous version)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -139,21 +150,24 @@
   },
   {
     "name": "update_section",
-    "description": "Replace the content of a specific section in a post \u2014 the standard write operation after any content generation or revision",
+    "description": "Replace the content of a specific section in a post — the standard write operation after any content generation or revision",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post containing the section to update"
+          "description": "Post containing the section to update",
+          "match_method": "exact"
         },
         "section": {
           "type": "string",
-          "description": "Section title to update"
+          "description": "Section title to update",
+          "match_method": "exact"
         },
         "content": {
           "type": "string",
-          "description": "New content for the section"
+          "description": "New content for the section",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -176,21 +190,24 @@
   },
   {
     "name": "insert_section",
-    "description": "Add a new section to a post at a specific position \u2014 creates an empty section placeholder with a heading",
+    "description": "Add a new section to a post at a specific position — creates an empty section placeholder with a heading",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to add the section to"
+          "description": "Post to add the section to",
+          "match_method": "exact"
         },
         "title": {
           "type": "string",
-          "description": "Heading for the new section"
+          "description": "Heading for the new section",
+          "match_method": "exact"
         },
         "position": {
           "type": "integer",
-          "description": "Insertion position (0-indexed; appends to end if omitted)"
+          "description": "Insertion position (0-indexed; appends to end if omitted)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -205,17 +222,19 @@
   },
   {
     "name": "delete_section",
-    "description": "Remove a section from a post \u2014 deletes the heading and all content within that section",
+    "description": "Remove a section from a post — deletes the heading and all content within that section",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post containing the section to remove"
+          "description": "Post containing the section to remove",
+          "match_method": "exact"
         },
         "section": {
           "type": "string",
-          "description": "Section title to delete"
+          "description": "Section title to delete",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -230,20 +249,22 @@
   },
   {
     "name": "reorder_sections",
-    "description": "Rearrange the section order within a post \u2014 moves sections to new positions without changing their content",
+    "description": "Rearrange the section order within a post — moves sections to new positions without changing their content",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to reorder"
+          "description": "Post to reorder",
+          "match_method": "exact"
         },
         "order": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Section titles in the desired order"
+          "description": "Section titles in the desired order",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -258,24 +279,27 @@
   },
   {
     "name": "update_metadata",
-    "description": "Update post-level metadata \u2014 title, tags, status, excerpt, or featured image without modifying section content",
+    "description": "Update post-level metadata — title, tags, status, excerpt, or featured image without modifying section content",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to update"
+          "description": "Post to update",
+          "match_method": "exact"
         },
         "title": {
           "type": "string",
-          "description": "New title for the post"
+          "description": "New title for the post",
+          "match_method": "fuzzy"
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Updated tag list"
+          "description": "Updated tag list",
+          "match_method": "structured"
         },
         "status": {
           "type": "string",
@@ -286,11 +310,13 @@
             "published",
             "archived"
           ],
-          "description": "New workflow status"
+          "description": "New workflow status",
+          "match_method": "exact"
         },
         "excerpt": {
           "type": "string",
-          "description": "Post excerpt or summary for previews and SEO"
+          "description": "Post excerpt or summary for previews and SEO",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -306,22 +332,25 @@
   },
   {
     "name": "generate_outline",
-    "description": "Generate outline options for a topic \u2014 section headings, key points per section, estimated word counts, and suggested reading order",
+    "description": "Generate outline options for a topic — section headings, key points per section, estimated word counts, and suggested reading order",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic or theme to outline"
+          "description": "Topic or theme to outline",
+          "match_method": "fuzzy"
         },
         "depth": {
           "type": "integer",
           "default": 2,
-          "description": "Outline depth (1=sections only, 2=key points, 3=subpoints, 4=phrases)"
+          "description": "Outline depth (1=sections only, 2=key points, 3=subpoints, 4=phrases)",
+          "match_method": "exact"
         },
         "angle": {
           "type": "string",
-          "description": "Specific angle, perspective, or constraint to shape the outline"
+          "description": "Specific angle, perspective, or constraint to shape the outline",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -335,21 +364,24 @@
   },
   {
     "name": "generate_prose",
-    "description": "Write new content from scratch based on a topic and instructions \u2014 generates full prose paragraphs from a brief. For developing existing content, use expand_content instead",
+    "description": "Write new content from scratch based on a topic and instructions — generates full prose paragraphs from a brief. For developing existing content, use expand_content instead",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic or subject to write about"
+          "description": "Topic or subject to write about",
+          "match_method": "fuzzy"
         },
         "instructions": {
           "type": "string",
-          "description": "Specific instructions or brief to guide the writing"
+          "description": "Specific instructions or brief to guide the writing",
+          "match_method": "fuzzy"
         },
         "tone": {
           "type": "string",
-          "description": "Target tone or voice (e.g., conversational, technical, formal)"
+          "description": "Target tone or voice (e.g., conversational, technical, formal)",
+          "match_method": "fuzzy"
         },
         "length": {
           "type": "string",
@@ -359,7 +391,8 @@
             "long"
           ],
           "default": "medium",
-          "description": "Target length \u2014 short (~200 words), medium (~500), long (~1000)"
+          "description": "Target length — short (~200 words), medium (~500), long (~1000)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -373,21 +406,24 @@
   },
   {
     "name": "expand_content",
-    "description": "Develop existing content into fuller prose \u2014 takes bullet points, notes, or sparse sections and expands them into complete paragraphs. Requires existing content; use generate_prose for blank sections",
+    "description": "Develop existing content into fuller prose — takes bullet points, notes, or sparse sections and expands them into complete paragraphs. Requires existing content; use generate_prose for blank sections",
     "input_schema": {
       "type": "object",
       "properties": {
         "source_content": {
           "type": "string",
-          "description": "Existing content (bullets, notes, sparse text) to expand"
+          "description": "Existing content (bullets, notes, sparse text) to expand",
+          "match_method": "exact"
         },
         "instructions": {
           "type": "string",
-          "description": "Specific guidance on how to expand (emphasis, examples to include)"
+          "description": "Specific guidance on how to expand (emphasis, examples to include)",
+          "match_method": "fuzzy"
         },
         "tone": {
           "type": "string",
-          "description": "Target tone or voice for the expanded content"
+          "description": "Target tone or voice for the expanded content",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -401,17 +437,19 @@
   },
   {
     "name": "revise_content",
-    "description": "Rewrite existing content incorporating feedback or revision instructions \u2014 can do heavy restructuring (rework), light editing (polish), or targeted changes (amend)",
+    "description": "Rewrite existing content incorporating feedback or revision instructions — can do heavy restructuring (rework), light editing (polish), or targeted changes (amend)",
     "input_schema": {
       "type": "object",
       "properties": {
         "source_content": {
           "type": "string",
-          "description": "Existing content to revise"
+          "description": "Existing content to revise",
+          "match_method": "exact"
         },
         "instructions": {
           "type": "string",
-          "description": "Revision direction, feedback, or specific changes to incorporate"
+          "description": "Revision direction, feedback, or specific changes to incorporate",
+          "match_method": "fuzzy"
         },
         "focus": {
           "type": "string",
@@ -424,11 +462,13 @@
             "general"
           ],
           "default": "general",
-          "description": "Primary revision focus \u2014 what aspect to prioritize"
+          "description": "Primary revision focus — what aspect to prioritize",
+          "match_method": "exact"
         },
         "tone": {
           "type": "string",
-          "description": "Target tone if the revision should shift voice"
+          "description": "Target tone if the revision should shift voice",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -446,22 +486,25 @@
   },
   {
     "name": "brainstorm_ideas",
-    "description": "Generate a list of angles, hooks, opening lines, or perspectives for a topic \u2014 divergent thinking to explore creative options before committing to a direction",
+    "description": "Generate a list of angles, hooks, opening lines, or perspectives for a topic — divergent thinking to explore creative options before committing to a direction",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic or subject to brainstorm around"
+          "description": "Topic or subject to brainstorm around",
+          "match_method": "fuzzy"
         },
         "count": {
           "type": "integer",
           "default": 5,
-          "description": "Number of ideas to generate"
+          "description": "Number of ideas to generate",
+          "match_method": "exact"
         },
         "angle": {
           "type": "string",
-          "description": "Constraint or direction to shape brainstorming (e.g., 'contrarian takes', 'beginner-friendly')"
+          "description": "Constraint or direction to shape brainstorming (e.g., 'contrarian takes', 'beginner-friendly')",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -476,13 +519,14 @@
   },
   {
     "name": "explain_action",
-    "description": "Explain what Hugo did or plans to do \u2014 provides transparency into the writing process, recent actions, or reasoning behind a suggestion",
+    "description": "Explain what Hugo did or plans to do — provides transparency into the writing process, recent actions, or reasoning behind a suggestion",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "What to explain (e.g., 'last edit', 'revision plan', 'outline reasoning')"
+          "description": "What to explain (e.g., 'last edit', 'revision plan', 'outline reasoning')",
+          "match_method": "fuzzy"
         },
         "scope": {
           "type": "string",
@@ -491,7 +535,8 @@
             "detailed"
           ],
           "default": "brief",
-          "description": "Level of detail in the explanation"
+          "description": "Level of detail in the explanation",
+          "match_method": "exact"
         }
       },
       "required": []
@@ -503,17 +548,19 @@
   },
   {
     "name": "adjust_tone",
-    "description": "Shift the tone or voice of content \u2014 changes register (formal, casual, technical, conversational), adjusts sentence length and vocabulary complexity without changing meaning",
+    "description": "Shift the tone or voice of content — changes register (formal, casual, technical, conversational), adjusts sentence length and vocabulary complexity without changing meaning",
     "input_schema": {
       "type": "object",
       "properties": {
         "source_content": {
           "type": "string",
-          "description": "Content to adjust"
+          "description": "Content to adjust",
+          "match_method": "exact"
         },
         "target_tone": {
           "type": "string",
-          "description": "Desired tone (e.g., 'more conversational', 'more technical', 'formal but warm')"
+          "description": "Desired tone (e.g., 'more conversational', 'more technical', 'formal but warm')",
+          "match_method": "fuzzy"
         },
         "intensity": {
           "type": "string",
@@ -523,7 +570,8 @@
             "strong"
           ],
           "default": "moderate",
-          "description": "How much to shift \u2014 subtle preserves more of the original voice"
+          "description": "How much to shift — subtle preserves more of the original voice",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -538,18 +586,20 @@
   },
   {
     "name": "audit_style",
-    "description": "Compare a post's writing style against the user's published history \u2014 checks voice, vocabulary, sentence patterns, formatting conventions, and tonal consistency across the corpus",
+    "description": "Compare a post's writing style against the user's published history — checks voice, vocabulary, sentence patterns, formatting conventions, and tonal consistency across the corpus",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to audit"
+          "description": "Post to audit",
+          "match_method": "exact"
         },
         "reference_count": {
           "type": "integer",
           "default": 5,
-          "description": "Number of previous posts to compare against"
+          "description": "Number of previous posts to compare against",
+          "match_method": "exact"
         },
         "aspects": {
           "type": "array",
@@ -567,7 +617,8 @@
           "default": [
             "all"
           ],
-          "description": "Which style aspects to analyze"
+          "description": "Which style aspects to analyze",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -581,7 +632,7 @@
   },
   {
     "name": "compare_posts",
-    "description": "Compare style or structure across two or more specific posts \u2014 sentence length, paragraph density, heading patterns, vocabulary overlap, and tonal differences",
+    "description": "Compare style or structure across two or more specific posts — sentence length, paragraph density, heading patterns, vocabulary overlap, and tonal differences",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -590,7 +641,8 @@
           "items": {
             "type": "string"
           },
-          "description": "List of post IDs to compare (minimum 2)"
+          "description": "List of post IDs to compare (minimum 2)",
+          "match_method": "structured"
         },
         "aspects": {
           "type": "array",
@@ -608,7 +660,8 @@
           "default": [
             "all"
           ],
-          "description": "Which aspects to compare"
+          "description": "Which aspects to compare",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -622,18 +675,20 @@
   },
   {
     "name": "check_grammar",
-    "description": "Check grammar, spelling, and punctuation \u2014 returns a list of issues with line references, severity, and suggested corrections",
+    "description": "Check grammar, spelling, and punctuation — returns a list of issues with line references, severity, and suggested corrections",
     "input_schema": {
       "type": "object",
       "properties": {
         "content": {
           "type": "string",
-          "description": "Text content to check"
+          "description": "Text content to check",
+          "match_method": "fuzzy"
         },
         "language": {
           "type": "string",
           "default": "en",
-          "description": "Language code for grammar rules (e.g., 'en', 'en-GB')"
+          "description": "Language code for grammar rules (e.g., 'en', 'en-GB')",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -648,13 +703,14 @@
   },
   {
     "name": "check_readability",
-    "description": "Compute readability metrics \u2014 Flesch-Kincaid grade, average sentence length, passive voice percentage, paragraph density, and vocabulary complexity score",
+    "description": "Compute readability metrics — Flesch-Kincaid grade, average sentence length, passive voice percentage, paragraph density, and vocabulary complexity score",
     "input_schema": {
       "type": "object",
       "properties": {
         "content": {
           "type": "string",
-          "description": "Text content to analyze"
+          "description": "Text content to analyze",
+          "match_method": "fuzzy"
         },
         "metrics": {
           "type": "array",
@@ -672,7 +728,8 @@
           "default": [
             "all"
           ],
-          "description": "Which readability metrics to compute"
+          "description": "Which readability metrics to compute",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -687,13 +744,14 @@
   },
   {
     "name": "detect_issues",
-    "description": "Find writing quality issues \u2014 cliches, filler words, repetitive phrasing, weak transitions, adverb overuse, and hedging language",
+    "description": "Find writing quality issues — cliches, filler words, repetitive phrasing, weak transitions, adverb overuse, and hedging language",
     "input_schema": {
       "type": "object",
       "properties": {
         "content": {
           "type": "string",
-          "description": "Text content to check"
+          "description": "Text content to check",
+          "match_method": "fuzzy"
         },
         "checks": {
           "type": "array",
@@ -712,7 +770,8 @@
           "default": [
             "all"
           ],
-          "description": "Which issue types to check for"
+          "description": "Which issue types to check for",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -727,13 +786,14 @@
   },
   {
     "name": "analyze_content",
-    "description": "Analyze content structure and completeness \u2014 word count, reading time, section count, missing images, empty sections, missing metadata (tags, excerpt, featured image)",
+    "description": "Analyze content structure and completeness — word count, reading time, section count, missing images, empty sections, missing metadata (tags, excerpt, featured image)",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to analyze"
+          "description": "Post to analyze",
+          "match_method": "exact"
         },
         "metrics": {
           "type": "array",
@@ -753,7 +813,8 @@
           "default": [
             "all"
           ],
-          "description": "Which structural metrics to compute"
+          "description": "Which structural metrics to compute",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -768,13 +829,14 @@
   },
   {
     "name": "lookup_word",
-    "description": "Look up word definitions, synonyms, antonyms, or usage examples via dictionary and thesaurus \u2014 e.g., 'synonym for important', 'definition of ephemeral', 'formal alternatives to good'",
+    "description": "Look up word definitions, synonyms, antonyms, or usage examples via dictionary and thesaurus — e.g., 'synonym for important', 'definition of ephemeral', 'formal alternatives to good'",
     "input_schema": {
       "type": "object",
       "properties": {
         "word": {
           "type": "string",
-          "description": "Word or phrase to look up"
+          "description": "Word or phrase to look up",
+          "match_method": "exact"
         },
         "type": {
           "type": "string",
@@ -786,7 +848,8 @@
             "all"
           ],
           "default": "all",
-          "description": "Type of lookup to perform"
+          "description": "Type of lookup to perform",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -800,17 +863,19 @@
   },
   {
     "name": "search_reference",
-    "description": "Search vetted FAQs and curated editorial guidelines \u2014 the unstructured equivalent of a style manual. Returns relevant guidance on writing conventions, house style rules, and domain terminology",
+    "description": "Search vetted FAQs and curated editorial guidelines — the unstructured equivalent of a style manual. Returns relevant guidance on writing conventions, house style rules, and domain terminology",
     "input_schema": {
       "type": "object",
       "properties": {
         "query": {
           "type": "string",
-          "description": "Search term or question about writing guidelines"
+          "description": "Search term or question about writing guidelines",
+          "match_method": "fuzzy"
         },
         "category": {
           "type": "string",
-          "description": "Filter by guideline category (e.g., 'style', 'formatting', 'terminology')"
+          "description": "Filter by guideline category (e.g., 'style', 'formatting', 'terminology')",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -824,17 +889,19 @@
   },
   {
     "name": "analyze_seo",
-    "description": "Analyze SEO quality of a post \u2014 keyword density, meta description presence, title tag optimization, heading structure, internal link count, and image alt text coverage",
+    "description": "Analyze SEO quality of a post — keyword density, meta description presence, title tag optimization, heading structure, internal link count, and image alt text coverage",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to analyze"
+          "description": "Post to analyze",
+          "match_method": "exact"
         },
         "target_keyword": {
           "type": "string",
-          "description": "Primary keyword to check density and placement for"
+          "description": "Primary keyword to check density and placement for",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -849,18 +916,20 @@
   },
   {
     "name": "suggest_keywords",
-    "description": "Research keywords for a topic \u2014 suggests primary and secondary keywords with search volume estimates, competition level, and content angle recommendations",
+    "description": "Research keywords for a topic — suggests primary and secondary keywords with search volume estimates, competition level, and content angle recommendations",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic to research keywords for"
+          "description": "Topic to research keywords for",
+          "match_method": "fuzzy"
         },
         "count": {
           "type": "integer",
           "default": 10,
-          "description": "Number of keyword suggestions to return"
+          "description": "Number of keyword suggestions to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -875,13 +944,14 @@
   },
   {
     "name": "format_content",
-    "description": "Format content for publication on a specific platform \u2014 adjusts heading levels, image placement, code blocks, pull quotes, and metadata fields for the target platform's conventions",
+    "description": "Format content for publication on a specific platform — adjusts heading levels, image placement, code blocks, pull quotes, and metadata fields for the target platform's conventions",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to format"
+          "description": "Post to format",
+          "match_method": "exact"
         },
         "platform": {
           "type": "string",
@@ -893,7 +963,8 @@
             "medium",
             "wordpress"
           ],
-          "description": "Target platform for formatting"
+          "description": "Target platform for formatting",
+          "match_method": "exact"
         },
         "format": {
           "type": "string",
@@ -903,7 +974,8 @@
             "plaintext"
           ],
           "default": "markdown",
-          "description": "Output format"
+          "description": "Output format",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -918,13 +990,14 @@
   },
   {
     "name": "normalize_structure",
-    "description": "Normalize structural formatting across a post \u2014 consistent heading hierarchy, list indentation, paragraph spacing, and whitespace cleanup. Does not change wording",
+    "description": "Normalize structural formatting across a post — consistent heading hierarchy, list indentation, paragraph spacing, and whitespace cleanup. Does not change wording",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to normalize"
+          "description": "Post to normalize",
+          "match_method": "exact"
         },
         "rules": {
           "type": "array",
@@ -941,7 +1014,8 @@
           "default": [
             "all"
           ],
-          "description": "Which normalization rules to apply"
+          "description": "Which normalization rules to apply",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -955,25 +1029,29 @@
   },
   {
     "name": "diff_versions",
-    "description": "Show side-by-side comparison of two content versions \u2014 additions, deletions, and modifications highlighted so the user can evaluate what changed between edits",
+    "description": "Show side-by-side comparison of two content versions — additions, deletions, and modifications highlighted so the user can evaluate what changed between edits",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post containing the section to diff"
+          "description": "Post containing the section to diff",
+          "match_method": "exact"
         },
         "section": {
           "type": "string",
-          "description": "Section title to compare versions of"
+          "description": "Section title to compare versions of",
+          "match_method": "exact"
         },
         "version_a": {
           "type": "string",
-          "description": "Version identifier for the left side (e.g., 'previous', 'v2')"
+          "description": "Version identifier for the left side (e.g., 'previous', 'v2')",
+          "match_method": "exact"
         },
         "version_b": {
           "type": "string",
-          "description": "Version identifier for the right side (defaults to current)"
+          "description": "Version identifier for the right side (defaults to current)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -988,29 +1066,34 @@
   },
   {
     "name": "insert_media",
-    "description": "Add an image or media element to a section \u2014 includes URL, alt text for accessibility, and optional caption. Validates the URL and image dimensions before inserting",
+    "description": "Add an image or media element to a section — includes URL, alt text for accessibility, and optional caption. Validates the URL and image dimensions before inserting",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to add media to"
+          "description": "Post to add media to",
+          "match_method": "exact"
         },
         "section": {
           "type": "string",
-          "description": "Section to insert the media into"
+          "description": "Section to insert the media into",
+          "match_method": "exact"
         },
         "url": {
           "type": "string",
-          "description": "URL of the image or media file"
+          "description": "URL of the image or media file",
+          "match_method": "exact"
         },
         "alt_text": {
           "type": "string",
-          "description": "Accessibility description of the image"
+          "description": "Accessibility description of the image",
+          "match_method": "fuzzy"
         },
         "caption": {
           "type": "string",
-          "description": "Display caption shown below the media"
+          "description": "Display caption shown below the media",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -1029,13 +1112,14 @@
   },
   {
     "name": "check_links",
-    "description": "Validate all links in a post \u2014 checks for broken URLs, missing anchors, redirect chains, and external link health. Returns a report of issues with fix suggestions",
+    "description": "Validate all links in a post — checks for broken URLs, missing anchors, redirect chains, and external link health. Returns a report of issues with fix suggestions",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to check links for"
+          "description": "Post to check links for",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1050,13 +1134,14 @@
   },
   {
     "name": "browse_topics",
-    "description": "Browse trending topics, saved ideas, and content gaps \u2014 filtered by category or source. Returns topic suggestions with relevance scores and content angle ideas",
+    "description": "Browse trending topics, saved ideas, and content gaps — filtered by category or source. Returns topic suggestions with relevance scores and content angle ideas",
     "input_schema": {
       "type": "object",
       "properties": {
         "category": {
           "type": "string",
-          "description": "Filter by topic category"
+          "description": "Filter by topic category",
+          "match_method": "exact"
         },
         "source": {
           "type": "string",
@@ -1067,12 +1152,14 @@
             "all"
           ],
           "default": "all",
-          "description": "Source of topic ideas"
+          "description": "Source of topic ideas",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 10,
-          "description": "Maximum number of ideas to return"
+          "description": "Maximum number of ideas to return",
+          "match_method": "exact"
         }
       },
       "required": []
@@ -1085,13 +1172,14 @@
   },
   {
     "name": "publish_post",
-    "description": "Publish or unpublish a post on a platform \u2014 makes the post live immediately or removes it from the platform",
+    "description": "Publish or unpublish a post on a platform — makes the post live immediately or removes it from the platform",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to publish"
+          "description": "Post to publish",
+          "match_method": "exact"
         },
         "platform": {
           "type": "string",
@@ -1103,7 +1191,8 @@
             "medium",
             "wordpress"
           ],
-          "description": "Target platform"
+          "description": "Target platform",
+          "match_method": "exact"
         },
         "action": {
           "type": "string",
@@ -1114,7 +1203,8 @@
             "promote"
           ],
           "default": "publish",
-          "description": "Publication action to perform"
+          "description": "Publication action to perform",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1131,13 +1221,14 @@
   },
   {
     "name": "check_platform",
-    "description": "Check the publication status of a post on a specific platform \u2014 returns published URL, publish date, view count, and sync status",
+    "description": "Check the publication status of a post on a specific platform — returns published URL, publish date, view count, and sync status",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to check"
+          "description": "Post to check",
+          "match_method": "exact"
         },
         "platform": {
           "type": "string",
@@ -1147,7 +1238,8 @@
             "twitter",
             "linkedin"
           ],
-          "description": "Platform to check status on"
+          "description": "Platform to check status on",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1163,7 +1255,7 @@
   },
   {
     "name": "list_platforms",
-    "description": "List configured publishing platforms and their connection status \u2014 shows API health, credential validity, last sync date, and available features per platform",
+    "description": "List configured publishing platforms and their connection status — shows API health, credential validity, last sync date, and available features per platform",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -1177,13 +1269,14 @@
   },
   {
     "name": "render_preview",
-    "description": "Render a platform-specific preview of a post \u2014 shows exactly how the content will appear when published, including layout, images, and formatting",
+    "description": "Render a platform-specific preview of a post — shows exactly how the content will appear when published, including layout, images, and formatting",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to preview"
+          "description": "Post to preview",
+          "match_method": "exact"
         },
         "platform": {
           "type": "string",
@@ -1193,7 +1286,8 @@
             "linkedin",
             "twitter"
           ],
-          "description": "Target platform for preview rendering"
+          "description": "Target platform for preview rendering",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1207,13 +1301,14 @@
   },
   {
     "name": "manage_schedule",
-    "description": "View, reschedule, or cancel a scheduled publication \u2014 manages the queue of future-dated posts awaiting automatic publishing",
+    "description": "View, reschedule, or cancel a scheduled publication — manages the queue of future-dated posts awaiting automatic publishing",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to manage schedule for"
+          "description": "Post to manage schedule for",
+          "match_method": "exact"
         },
         "action": {
           "type": "string",
@@ -1224,7 +1319,8 @@
             "schedule"
           ],
           "default": "view",
-          "description": "Schedule management action"
+          "description": "Schedule management action",
+          "match_method": "exact"
         },
         "platform": {
           "type": "string",
@@ -1236,7 +1332,8 @@
             "medium",
             "wordpress"
           ],
-          "description": "Platform to manage schedule on"
+          "description": "Platform to manage schedule on",
+          "match_method": "exact"
         },
         "datetime": {
           "type": "object",
@@ -1254,7 +1351,8 @@
               "type": "string",
               "description": "Timezone abbreviation (e.g. \"EST\", \"PST\")"
             }
-          }
+          },
+          "match_method": "structured"
         }
       },
       "required": [
@@ -1269,24 +1367,27 @@
   },
   {
     "name": "plan_calendar",
-    "description": "Generate a content calendar with topics, target dates, and publishing cadence \u2014 lays out a schedule over weeks or months for consistent content production",
+    "description": "Generate a content calendar with topics, target dates, and publishing cadence — lays out a schedule over weeks or months for consistent content production",
     "input_schema": {
       "type": "object",
       "properties": {
         "timeframe": {
           "type": "string",
-          "description": "Calendar span (e.g., '2 weeks', '1 month', 'Q1 2026')"
+          "description": "Calendar span (e.g., '2 weeks', '1 month', 'Q1 2026')",
+          "match_method": "fuzzy"
         },
         "count": {
           "type": "integer",
-          "description": "Number of posts to plan"
+          "description": "Number of posts to plan",
+          "match_method": "exact"
         },
         "categories": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Topic categories to include in the calendar"
+          "description": "Topic categories to include in the calendar",
+          "match_method": "structured"
         },
         "cadence": {
           "type": "string",
@@ -1298,7 +1399,8 @@
             "monthly"
           ],
           "default": "weekly",
-          "description": "Publishing frequency"
+          "description": "Publishing frequency",
+          "match_method": "exact"
         }
       },
       "required": []
@@ -1310,18 +1412,20 @@
   },
   {
     "name": "plan_series",
-    "description": "Plan a multi-part blog series \u2014 splits a broad theme into installments, defines the narrative arc, assigns subtopics to each part, and sets a suggested publication sequence",
+    "description": "Plan a multi-part blog series — splits a broad theme into installments, defines the narrative arc, assigns subtopics to each part, and sets a suggested publication sequence",
     "input_schema": {
       "type": "object",
       "properties": {
         "theme": {
           "type": "string",
-          "description": "Overarching theme for the series"
+          "description": "Overarching theme for the series",
+          "match_method": "fuzzy"
         },
         "part_count": {
           "type": "integer",
           "default": 3,
-          "description": "Number of installments in the series"
+          "description": "Number of installments in the series",
+          "match_method": "exact"
         },
         "format": {
           "type": "string",
@@ -1333,11 +1437,13 @@
             "mixed"
           ],
           "default": "mixed",
-          "description": "Content format for each installment"
+          "description": "Content format for each installment",
+          "match_method": "exact"
         },
         "target_length": {
           "type": "integer",
-          "description": "Target word count per installment"
+          "description": "Target word count per installment",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1351,17 +1457,19 @@
   },
   {
     "name": "search_by_time",
-    "description": "Search posts by date or date range \u2014 find posts published, created, or last edited within a specific period",
+    "description": "Search posts by date or date range — find posts published, created, or last edited within a specific period",
     "input_schema": {
       "type": "object",
       "properties": {
         "start_date": {
           "type": "string",
-          "description": "Start of date range (ISO 8601 date, e.g., '2026-01-01')"
+          "description": "Start of date range (ISO 8601 date, e.g., '2026-01-01')",
+          "match_method": "exact"
         },
         "end_date": {
           "type": "string",
-          "description": "End of date range (defaults to today if omitted)"
+          "description": "End of date range (defaults to today if omitted)",
+          "match_method": "exact"
         },
         "date_field": {
           "type": "string",
@@ -1371,12 +1479,14 @@
             "published"
           ],
           "default": "modified",
-          "description": "Which date field to filter on"
+          "description": "Which date field to filter on",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 10,
-          "description": "Maximum number of results to return"
+          "description": "Maximum number of results to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1393,20 +1503,22 @@
   },
   {
     "name": "read_post",
-    "description": "Display post content for the user to review \u2014 use only when the user asks to see, read, or review content. Do NOT use as a precursor to editing; action tools like revise_content and expand_content already load content internally",
+    "description": "Display post content for the user to review — use only when the user asks to see, read, or review content. Do NOT use as a precursor to editing; action tools like revise_content and expand_content already load content internally",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to load into context"
+          "description": "Post to load into context",
+          "match_method": "exact"
         },
         "sections": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Load only these sections (loads all if omitted)"
+          "description": "Load only these sections (loads all if omitted)",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -1429,13 +1541,14 @@
   },
   {
     "name": "heads_or_tails",
-    "description": "Preview the first or last N paragraphs of a post \u2014 quick glance at content shape and quality without loading the full post into context",
+    "description": "Preview the first or last N paragraphs of a post — quick glance at content shape and quality without loading the full post into context",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to preview"
+          "description": "Post to preview",
+          "match_method": "exact"
         },
         "end": {
           "type": "string",
@@ -1444,12 +1557,14 @@
             "tail"
           ],
           "default": "head",
-          "description": "Which end of the post to preview"
+          "description": "Which end of the post to preview",
+          "match_method": "exact"
         },
         "n": {
           "type": "integer",
           "default": 3,
-          "description": "Number of paragraphs to return"
+          "description": "Number of paragraphs to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1464,13 +1579,14 @@
   },
   {
     "name": "read_outline",
-    "description": "Display the structural outline of a post for the user to review \u2014 section headings, key points, and word counts. Use only when the user asks to see the outline or structure, not as a precursor to editing",
+    "description": "Display the structural outline of a post for the user to review — section headings, key points, and word counts. Use only when the user asks to see the outline or structure, not as a precursor to editing",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post to read outline from"
+          "description": "Post to read outline from",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1487,25 +1603,29 @@
   },
   {
     "name": "write_section",
-    "description": "Write a brand-new section from scratch and insert it into a post \u2014 for creating sections that don't exist yet. To rewrite or edit an existing section, use revise_content instead. Post-aware writing, unlike generate_prose which writes standalone text",
+    "description": "Write a brand-new section from scratch and insert it into a post — for creating sections that don't exist yet. To rewrite or edit an existing section, use revise_content instead. Post-aware writing, unlike generate_prose which writes standalone text",
     "input_schema": {
       "type": "object",
       "properties": {
         "post_id": {
           "type": "string",
-          "description": "Post containing the section to write"
+          "description": "Post containing the section to write",
+          "match_method": "exact"
         },
         "section": {
           "type": "string",
-          "description": "Section to generate content for"
+          "description": "Section to generate content for",
+          "match_method": "exact"
         },
         "instructions": {
           "type": "string",
-          "description": "Guidance on what to write (key points to cover, angle to take)"
+          "description": "Guidance on what to write (key points to cover, angle to take)",
+          "match_method": "fuzzy"
         },
         "tone": {
           "type": "string",
-          "description": "Target tone or voice for the generated content"
+          "description": "Target tone or voice for the generated content",
+          "match_method": "fuzzy"
         }
       },
       "required": [
@@ -1521,17 +1641,19 @@
   },
   {
     "name": "draft_content",
-    "description": "Generate a quick rough draft \u2014 faster and less polished than generate_prose. Gets ideas down on paper before committing to careful writing. Good for first passes and exploration",
+    "description": "Generate a quick rough draft — faster and less polished than generate_prose. Gets ideas down on paper before committing to careful writing. Good for first passes and exploration",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic or subject to draft about"
+          "description": "Topic or subject to draft about",
+          "match_method": "fuzzy"
         },
         "instructions": {
           "type": "string",
-          "description": "Brief guidance on what to cover"
+          "description": "Brief guidance on what to cover",
+          "match_method": "fuzzy"
         },
         "length": {
           "type": "string",
@@ -1541,7 +1663,8 @@
             "long"
           ],
           "default": "medium",
-          "description": "Target length \u2014 short (~150 words), medium (~400), long (~800)"
+          "description": "Target length — short (~150 words), medium (~400), long (~800)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1556,22 +1679,25 @@
   },
   {
     "name": "search_sources",
-    "description": "Search the web for original sources and citations \u2014 academic papers, official reports, authoritative pages that substantiate a claim or provide background for a topic",
+    "description": "Search the web for original sources and citations — academic papers, official reports, authoritative pages that substantiate a claim or provide background for a topic",
     "input_schema": {
       "type": "object",
       "properties": {
         "query": {
           "type": "string",
-          "description": "Topic, claim, or question to find sources for"
+          "description": "Topic, claim, or question to find sources for",
+          "match_method": "fuzzy"
         },
         "domain": {
           "type": "string",
-          "description": "Restrict to a specific domain (e.g., '.edu', '.gov', 'nature.com')"
+          "description": "Restrict to a specific domain (e.g., '.edu', '.gov', 'nature.com')",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 5,
-          "description": "Maximum number of sources to return"
+          "description": "Maximum number of sources to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1587,13 +1713,14 @@
   },
   {
     "name": "search_evidence",
-    "description": "Search the web for supporting evidence \u2014 statistics, data points, expert quotes, and research findings that strengthen an argument or back up a claim",
+    "description": "Search the web for supporting evidence — statistics, data points, expert quotes, and research findings that strengthen an argument or back up a claim",
     "input_schema": {
       "type": "object",
       "properties": {
         "claim": {
           "type": "string",
-          "description": "The claim or argument to find evidence for"
+          "description": "The claim or argument to find evidence for",
+          "match_method": "fuzzy"
         },
         "evidence_type": {
           "type": "string",
@@ -1604,12 +1731,14 @@
             "any"
           ],
           "default": "any",
-          "description": "Type of evidence to prioritize"
+          "description": "Type of evidence to prioritize",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 5,
-          "description": "Maximum number of evidence items to return"
+          "description": "Maximum number of evidence items to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1625,13 +1754,14 @@
   },
   {
     "name": "search_inspiration",
-    "description": "Search the web for similar articles and content \u2014 see how others approach a topic, what angles are trending, and where content gaps exist. Returns summaries with links",
+    "description": "Search the web for similar articles and content — see how others approach a topic, what angles are trending, and where content gaps exist. Returns summaries with links",
     "input_schema": {
       "type": "object",
       "properties": {
         "topic": {
           "type": "string",
-          "description": "Topic to find similar content for"
+          "description": "Topic to find similar content for",
+          "match_method": "fuzzy"
         },
         "source_type": {
           "type": "string",
@@ -1642,12 +1772,14 @@
             "any"
           ],
           "default": "any",
-          "description": "Type of source to search"
+          "description": "Type of source to search",
+          "match_method": "exact"
         },
         "limit": {
           "type": "integer",
           "default": 5,
-          "description": "Maximum number of results to return"
+          "description": "Maximum number of results to return",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1664,7 +1796,7 @@
   },
   {
     "name": "coordinate_context",
-    "description": "Read conversation history and contextual state \u2014 provides the skill with relevant prior turns, user intent, and session context",
+    "description": "Read conversation history and contextual state — provides the skill with relevant prior turns, user intent, and session context",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1676,12 +1808,14 @@
             "summary"
           ],
           "default": "recent",
-          "description": "How much context to retrieve"
+          "description": "How much context to retrieve",
+          "match_method": "exact"
         },
         "turn_count": {
           "type": "integer",
           "default": 5,
-          "description": "Number of recent turns to include (when scope=recent)"
+          "description": "Number of recent turns to include (when scope=recent)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1695,7 +1829,7 @@
   },
   {
     "name": "manage_memory",
-    "description": "Read or write the agent's memory \u2014 L1 session scratchpad, L2 persistent user preferences, L3 unvetted business context from documents and domain knowledge",
+    "description": "Read or write the agent's memory — L1 session scratchpad, L2 persistent user preferences, L3 unvetted business context from documents and domain knowledge",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1706,7 +1840,8 @@
             "write",
             "delete"
           ],
-          "description": "Memory operation to perform"
+          "description": "Memory operation to perform",
+          "match_method": "exact"
         },
         "level": {
           "type": "string",
@@ -1715,15 +1850,18 @@
             "L2",
             "L3"
           ],
-          "description": "L1=session scratchpad, L2=persistent preferences, L3=business context"
+          "description": "L1=session scratchpad, L2=persistent preferences, L3=business context",
+          "match_method": "exact"
         },
         "key": {
           "type": "string",
-          "description": "Memory key to read, write, or delete"
+          "description": "Memory key to read, write, or delete",
+          "match_method": "exact"
         },
         "value": {
           "type": "string",
-          "description": "Value to store (when operation=write)"
+          "description": "Value to store (when operation=write)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1742,7 +1880,7 @@
   },
   {
     "name": "read_flow_stack",
-    "description": "Read the current flow stack \u2014 slot values, flow metadata, parent flows, and execution state for the active flow chain",
+    "description": "Read the current flow stack — slot values, flow metadata, parent flows, and execution state for the active flow chain",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1754,11 +1892,13 @@
             "all"
           ],
           "default": "current",
-          "description": "Which flows to read from the stack"
+          "description": "Which flows to read from the stack",
+          "match_method": "exact"
         },
         "flow_id": {
           "type": "string",
-          "description": "Specific flow ID to read (when scope=current or parent)"
+          "description": "Specific flow ID to read (when scope=current or parent)",
+          "match_method": "exact"
         }
       },
       "required": [
@@ -1778,14 +1918,16 @@
       "properties": {
         "clarification": {
           "type": "string",
-          "description": "The clarifying question to ask the user to disambiguate their request"
+          "description": "The clarifying question to ask the user to disambiguate their request",
+          "match_method": "fuzzy"
         },
         "candidates": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "List of plausible tool names that could apply"
+          "description": "List of plausible tool names that could apply",
+          "match_method": "structured"
         }
       },
       "required": [
@@ -1805,7 +1947,8 @@
       "properties": {
         "reason": {
           "type": "string",
-          "description": "Brief explanation of why a conversational response is appropriate"
+          "description": "Brief explanation of why a conversational response is appropriate",
+          "match_method": "fuzzy"
         }
       },
       "required": [

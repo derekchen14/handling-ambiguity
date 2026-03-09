@@ -15,22 +15,14 @@ def build_param_schema_index(manifest: list[dict]) -> dict[tuple[str, str], dict
 
 
 def classify_match_method(param_schema: dict) -> str:
-    """Classify a param's match method from its JSON Schema definition.
+    """Read the explicit match_method from a parameter schema.
 
     Returns: "exact" | "fuzzy" | "structured"
-    - "exact": has "enum", or type is "boolean"/"integer"/"number"
-    - "structured": type is "object" or "array"
-    - "fuzzy": plain "type": "string" with no enum (default)
+    Raises ValueError if the field is missing or invalid.
     """
-    ptype = param_schema.get('type', '')
-
-    if 'enum' in param_schema:
-        return 'exact'
-    elif not param_schema:
-        return 'fuzzy'
-    elif ptype in ('boolean', 'integer', 'number'):
-        return 'exact'
-    elif ptype in ('object', 'array'):
-        return 'structured'
-
-    return 'fuzzy'
+    method = param_schema.get('match_method')
+    if method is None:
+        raise ValueError(f"Parameter schema missing required 'match_method' field: {param_schema}")
+    if method not in ('exact', 'fuzzy', 'structured'):
+        raise ValueError(f"Invalid match_method '{method}', must be exact/fuzzy/structured")
+    return method

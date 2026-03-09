@@ -3,7 +3,8 @@
 
 Modes (Exp 2A — staged NLU funnel):
     intent      — Intent classification only                → results/exp2a/intents/
-    slot        — Slot-filling only (uses gold flow)        → results/exp2a/slots/
+    parameters  — Parameter accuracy (uses gold tool)       → results/exp2a/parameters/
+    slot        — Slot-filling (reserved, not wired yet)    → results/exp2a/slots/
     scoped_tool — Tool selection scoped by gold flow        → results/exp2a/tools/
 
 Mode (Exp 2B — direct tool-calling):
@@ -15,7 +16,7 @@ Mode (Exp 2C — tool-calling with ambiguity hint):
 Examples:
     python3 exp2_runner.py --domain hugo --config 2_001 --seeds 1 --mode tool
     python3 exp2_runner.py --domain dana --tier low --seeds 1-3 --mode intent
-    python3 exp2_runner.py --domain hugo --all --seeds 1 --mode slot
+    python3 exp2_runner.py --domain hugo --all --seeds 1 --mode parameters
 """
 
 from __future__ import annotations
@@ -114,10 +115,10 @@ def main():
                         help='Run all configs at a given model_level')
     parser.add_argument('--all', action='store_true', help='Run all configs')
     parser.add_argument('--seeds', default='1', help='Seed(s): 1, 1-5, or 1,3,5')
-    parser.add_argument('--mode', choices=['tool', 'intent', 'slot', 'scoped_tool', 'hint'], default='tool',
-                        help='Pipeline mode: tool (exp2b), hint (exp2c), intent/slot/scoped_tool (exp2a)')
-    parser.add_argument('--slot-strategy', choices=['per_tool', 'batch'], default='per_tool',
-                        help='Param extraction strategy for --mode slot')
+    parser.add_argument('--mode', choices=['tool', 'intent', 'parameters', 'slot', 'scoped_tool', 'hint'], default='tool',
+                        help='Pipeline mode: tool (exp2b), hint (exp2c), intent/parameters/scoped_tool (exp2a), slot (reserved)')
+    parser.add_argument('--param-strategy', choices=['per_tool', 'batch'], default='per_tool',
+                        help='Param extraction strategy for --mode parameters')
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--verbose', '-v', action='store_true')
     args = parser.parse_args()
@@ -186,11 +187,11 @@ def main():
                 result = runner.run_exp2_intent(
                     args.domain, config, eval_set, seed,
                 )
-            elif args.mode == 'slot':
+            elif args.mode == 'parameters':
                 tools = load_tools(args.domain)
-                result = runner.run_exp2_slots(
+                result = runner.run_exp2_parameters(
                     args.domain, config, eval_set, tools, seed,
-                    strategy=args.slot_strategy,
+                    strategy=args.param_strategy,
                 )
 
             # Extract stats
@@ -209,6 +210,7 @@ def main():
                 'hint': Path('exp2c'),
                 'scoped_tool': Path('exp2a') / 'tools',
                 'intent': Path('exp2a') / 'intents',
+                'parameters': Path('exp2a') / 'parameters',
                 'slot': Path('exp2a') / 'slots',
             }[args.mode]
             summary_path = (

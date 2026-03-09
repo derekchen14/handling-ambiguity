@@ -268,7 +268,7 @@ class ExperimentRunner:
 
     # ── Experiment 2: Slot-filling ───────────────────────────────────
 
-    def run_exp2_slots(
+    def run_exp2_parameters(
         self,
         domain: str,
         config: dict,
@@ -288,9 +288,9 @@ class ExperimentRunner:
                       'batch' (one LLM call per turn listing all gold tools).
         """
         config_id = config['config_id']
-        run_id = f'exp2a_slot_{domain}_{config_id}_seed{seed}'
+        run_id = f'exp2a_param_{domain}_{config_id}_seed{seed}'
 
-        output_path = self.results_dir / 'exp2a' / 'slots' / f'{domain}_{config_id}_seed{seed}.jsonl'
+        output_path = self.results_dir / 'exp2a' / 'parameters' / f'{domain}_{config_id}_seed{seed}.jsonl'
         completed = self._load_completed(output_path)
 
         param_schema_index = build_param_schema_index(tools)
@@ -309,9 +309,9 @@ class ExperimentRunner:
             results.append(convo_result)
             self._append_jsonl(output_path, convo_result)
 
-        summary = self._compute_summary(results, run_id, 'exp2a_slot', domain, config_id, seed)
+        summary = self._compute_summary(results, run_id, 'exp2a_param', domain, config_id, seed)
         return RunResult(
-            run_id=run_id, experiment='2a_slot', domain=domain,
+            run_id=run_id, experiment='2a_param', domain=domain,
             config_id=config_id, seed=seed,
             timestamp=summary['timestamp'],
             conversations=results, summary=summary,

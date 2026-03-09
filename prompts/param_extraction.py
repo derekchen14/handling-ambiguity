@@ -1,4 +1,4 @@
-"""Build system prompts for param extraction eval (--mode slot)."""
+"""Build system prompts for param extraction eval (--mode parameters)."""
 
 from __future__ import annotations
 

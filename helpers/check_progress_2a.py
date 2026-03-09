@@ -19,10 +19,11 @@ DOMAINS = ['hugo', 'dana']
 SEEDS = [1, 2, 3]
 
 MODE_DIRS = {
-    'intent': 'intents',
-    'flow':   'flows',
-    'slot':   'slots',
-    'tool':   'tools',
+    'intent':     'intents',
+    'flow':       'flows',
+    'parameters': 'parameters',
+    'slot':       'slots',
+    'tool':       'tools',
 }
 
 # Ordered by tier then provider — low → mid → high
