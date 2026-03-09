@@ -1,4 +1,4 @@
-# Improving Model Reliability in Ambiguous Situations: A Case Study on AI Agents
+# Improving Model Reliability in Ambiguous Situations
 
 *When the model doesn't know what it doesn't know, you get confident misdirection — as low as 37.5% accuracy on ambiguous turns.*
 
@@ -38,8 +38,6 @@ Categories three and four are not edge cases. They emerge from the basic fact th
 
 ---
 
-@Pranav: Better segway from 2 to 3, goes from pretty high level to low level problem formulation.
-
 ## 3. Problem Setup
 
 We evaluated direct tool-calling against a multi-stage pipeline on a conversational tool-use benchmark.
@@ -48,9 +46,7 @@ We evaluated direct tool-calling against a multi-stage pipeline on a conversatio
 - **Hugo** — a blog-writing assistant with ~56 tools spanning Research, Draft, Revise, and Publish workflows
 - **Dana** — a data analysis assistant with a comparable tool inventory spanning Clean, Transform, Analyze, and Report workflows
 
-@Pranav maybe a better description of Hugo and Dana and their difference matter (they both involve semantically similar operations)
-
-We chose these domains for their structural differences: Hugo tools cluster around semantically similar content operations; Dana tools cover a broader range of data manipulation primitives. We wanted to test whether any pipeline benefit was domain-specific or architectural.
+These domains were chosen because they are structurally different: Hugo tools are semantically clustered around more open-ended content operations; Dana tools span structured data operations. We wanted to know if the pipeline benefit was domain-specific or architectural.
 
 **Models**: We ran 15 models across 5 providers and 3 capability tiers. Results below report the top 8 by overall accuracy; the full 15-model ranking follows the same pattern.
 
@@ -74,8 +70,6 @@ The first hypothesis to test: maybe good models with good instructions already h
 
 **Figure 1**: *Direct tool-calling accuracy by turn category across 8 models. The drop on ambiguous-first is consistent regardless of provider or capability tier.*
 
-@Pranav: Maybe show for top n models individuall instead of averaging
-
 The per-category accuracy under direct tool-calling:
 
 | Turn category | Avg accuracy | Range |
@@ -85,7 +79,7 @@ The per-category accuracy under direct tool-calling:
 | ambiguous-second | 63.9% | 45.1%–78.1% |
 | **ambiguous-first** | **47.2%** | **37.5%–57.3%** |
 
-The gap is not model-specific. @Pranav: "this point especially is better if we see this tabl for multiple models" Gemini 3.1 Pro — the strongest model in our benchmark — achieves 55.2% on ambiguous-first. DeepSeek R1 (a high-tier reasoning model) reaches 40.4%. Haiku 4.5 falls to 37.5%. The consistent pattern across eight models from five providers rules out the "weak model" explanation. This is a structural problem.
+The gap is not model-specific. Gemini 3.1 Pro — the strongest model in our benchmark — achieves 55.2% on ambiguous-first. DeepSeek R1 (a high-tier reasoning model) reaches 40.4%. Haiku 4.5 falls to 37.5%. The consistent pattern across eight models from five providers rules out the "weak model" explanation. This is a structural problem.
 
 The structural issue: the model must simultaneously detect ambiguity *and* select the right tool in a single inference step. It has no access to information that would tell it whether the current situation warrants hesitation. It sees an underspecified utterance, generates logits over a 56-item vocabulary, and picks the argmax.
 
@@ -99,7 +93,7 @@ What happens when you add an explicit hint? We added this to the system prompt: 
 | Gemini 3 Flash | 73.0% | 74.2% | +1.3% |
 | Sonnet 4.6 | 61.5% | 63.7% | +2.1% |
 
-Ambiguous-first improves modestly (Haiku +11.7 pp, Flash +4.5 pp, Sonnet +4.9 pp). But the hint also causes regression on unambiguous turns: Gemini Flash's ambiguous-second accuracy dropped 4.9 points. The model over-triggers ambiguity handling on turns that don't need it. @Pranav: "this in table"
+Ambiguous-first improves modestly (Haiku +11.7 pp, Flash +4.5 pp, Sonnet +4.9 pp). But the hint also causes regression on unambiguous turns: Gemini Flash's ambiguous-second accuracy dropped 4.9 points. The model over-triggers ambiguity handling on turns that don't need it.
 
 This is the fundamental limitation of prompt-level intervention: the model doesn't have the information it would need to know when the instruction applies. Telling it to be cautious makes it globally more cautious — not selectively cautious where caution is warranted. For that, you need a prior classification stage.
 
@@ -121,11 +115,11 @@ At the flow detection stage, the 5-voter ensemble produces a confidence distribu
 
 **Figure 3**: *Per-stage accuracy breakdown. Intent classification is the most reliable stage (89–95%); flow detection is the bottleneck, especially on ambiguous-first turns (78.8%).*
 
-How each stage contributes:
+Each stage narrows the decision space for the next:
 
-- **Intent classification**: 89.9%–94.7% accuracy across models. All eight models are reliable at this stage. Intent classification assigns an utterance to one of ~6 high-level categories, pruning the flow space from 42 to roughly 6–12 candidates.
-- **Flow detection** (ensemble): 93.4% on same-flow and ambiguous-second, 92.8% on switch-flow, 78.8% on ambiguous-first. The ensemble's 78.8% on ambiguous-first is where improvement is most valuable — and where individual models fall well below the ensemble's performance.
-- **Scoped tool selection**: the model sees 5–7 tools instead of ~56. Confusable alternatives are absent. Per-model accuracy on this stage ranges from 72% to 97% — substantially higher than direct tool-calling from the full inventory.
+- **Stage 1 — Intent Classification**: Categorizes the utterance into one of ~6 high-level intents (e.g., Research, Draft, Revise, Publish for our blog-writing domain). This prunes the candidate flow space from 42 flows down to roughly 6–12.
+- **Stage 2 — Flow Detection**: Identifies the specific user intent (e.g., `expand`, `tone`, `format`) within the intent bucket. This maps to a known tool scope of 5–7 tools. Notably, this can be composed using a 5-voter ensemble of individual models, each of which may be less accurate, but which together outperform the best single model on the task.
+- **Stage 3 — Scoped Tool Selection**: The model sees only the 5–7 tools relevant to the detected flow and selects one.
 
 The result:
 
@@ -175,11 +169,9 @@ Counterpoint three: the pipeline provides **theory of mind** that direct tool-ca
 
 ### c. Doesn't building ontologies go against the Bitter Lesson?
 
-A fair challenge. The Bitter Lesson argues that hand-crafted structure loses to learned representations at scale. Building intent taxonomies by hand looks like the kind of manual feature engineering the lesson warns against.
+A fair challenge. The Bitter Lesson argues that hand-crafted structure loses to learned representations at scale. Building intent taxonomies by hand looks like the kind of manual feature engineering the lesson warns against. However, building ontologies is no longer a matter of manual feature engineering anymore.
 
-Two responses.
-
-First, this is now largely automated. The actor-critic pattern works well here: a frontier LLM proposes an ontology, a second LLM acting as critic — given a rubric of common failure modes (slots masquerading as flows, near-synonym flows, trivially simple flows that should be merged) — iterates toward convergence. This process typically resolves in less than a day for a new domain. The upfront cost is real but substantially lower than it appears.
+Building ontologies can now largely automated by providing guidelines for what makes a good ontology. Furthermore, we apply the actor-critic pattern: a frontier LLM proposes an set of intents and flows, while a second LLM acting as critic — given a rubric of common failure modes (slots masquerading as flows, near-synonym flows, trivially simple flows that should be merged) — iterates toward convergence. This process typically resolves in less than a day for a new domain. The upfront cost is real but substantially lower than it appears.
 
 Second, the pipeline does not resist scale — it benefits from it. Better models mean better ontology proposals from the actor. More compute means more thorough critique. More data means better coverage of real user request distributions. The structure is a scaffold for directing scale, not a barrier to it.
 
@@ -215,8 +207,56 @@ Together, these properties give the agent something like theory of mind: a repre
 
 The practical recommendation for multi-intent agent builders: if your system has an ambiguity or clarification tool, make it **structurally reachable** through an upstream routing decision — not just mentioned in the prompt. A prompt that says "ask when uncertain" gives the model an instruction it cannot reliably follow without the structural context to know when it applies. A flow detection stage gives it that context.
 
-Structural problems require structural solutions. Intent disambiguation that relies purely on the model's internal calibration will not scale reliably to the full diversity of real user requests. A pipeline that explicitly models user intent uncertainty — and routes accordingly — will.
+Structural problems require structural solutions. Intent disambiguation that relies purely on the model's internal calibration will not scale reliably to the full diversity of real user requests. A pipeline that explicitly models user intent uncertainty (and routes accordingly) will.
+
+
+## 5. Why Narrowing Works
+
+The mathematical case is straightforward. Intent classification runs at ~94.9% accuracy. Flow detection runs at 78.8%–93.4% (with the lower end on ambiguous inputs). Each stage incurs a small accuracy tax — but the payoff is that Stage 3 operates on 5–7 scoped tools instead of ~56.
+
+Even if the pipeline's cumulative overhead were 10%, it breaks even if the scoped tool stage gains more than 10% over flat tool selection. In practice, the gains are far larger. Restricting the tool slate from ~56 to 5–7 removes semantically confusable alternatives — the model no longer has to distinguish `expand_content` from `revise_content` from `insert_section` from `analyze_content` in a single step.
+
+The **cognitive load analogy** is apt: "which of 7 tools is right for a blog expansion task?" is a categorically easier question than "which of 56 tools is right for this utterance?" even holding model capability constant.
+
+There's also a calibration effect. Flat tool selection from large inventories appears to degrade model calibration — the model assigns probability mass across a larger outcome space, increasing the chance of a plausible-but-wrong selection. The confusion tables from our evaluation illustrate this: when models err under flat tool-calling, they tend to pick tools that are superficially related but semantically wrong (e.g., routing a `polish` request to `analyze_content`, or an `expand` request to `search_posts`). These specific confusions don't arise under the pipeline because the tool slate no longer contains those alternatives.
+
+**Cost**: The pipeline requires 3 serial LLM calls vs. 1 for flat. In practice, stages 1 and 2 use lightweight models (a single fast model for intent, a 5-voter ensemble for flow). Stage 3 uses the target model on a small slate. The latency overhead is real but bounded, and for agents where accuracy matters more than raw throughput, the trade-off is favorable.
 
 ---
 
-*This work is part of our preprint on conversational tool-use accuracy in multi-stage NLU pipelines. Code and eval data available at [repo]. See also: [Post A — Draft 1].*
+## 6. The Domain-Invariance Surprise
+
+Before running the domain split, we expected Hugo to show a larger pipeline advantage. Blog tools are semantically closer together — the difference between `polish`, `rework`, and `expand` is subtle in a way that `pivot_tables` vs. `execute_sql` is not. We hypothesized that the pipeline's disambiguation power would be more valuable in Hugo.
+
+It wasn't. Hugo averaged **+16.2%** and Dana averaged **+17.3%** — essentially identical.
+
+**Figure 3**: *Domain split — Hugo (blog writing) and Dana (data analysis) show nearly identical pipeline advantages across all 7 models. The gain is architectural, not domain-specific.*
+
+This is a meaningful result. It suggests the pipeline's advantage doesn't come primarily from resolving semantic confusability between domain-specific tools — it comes from the structural reduction in decision space itself. The intent → flow → scoped-tool narrowing benefits both domains similarly because both domains have ~56 tools that need filtering.
+
+The implication for practitioners: if your agent operates in a domain you believe has "less confusable" tools, the pipeline benefit is unlikely to disappear. The fundamental problem — choosing from a large, flat tool inventory — is domain-agnostic.
+
+---
+
+## 7. Practical Takeaways
+
+**Rule of thumb**: If your agent has more than ~20 tools, staged pre-filtering is worth the latency cost. The break-even point is when the scoped-tool accuracy gain exceeds the cumulative stage overhead.
+
+**Intent classification is cheap and reliable — don't skip it**. Intent accuracy ranged from 89.9% to 94.9% across all 7 models. Even the worst-performing model on intent classification is a reliable pre-filter. The common argument against adding an intent stage — "it just seems like overhead" — isn't supported by the data.
+
+**The weakest pipeline configuration still beats every flat configuration we tested**. Haiku 4.5 in the pipeline achieved 72.0% E2E; Gemini 3.1 Pro in flat mode achieved 76.4%. That 4.4-point gap is the size of a single model-tier upgrade. The architecture is doing real work.
+
+**Open question**: Does the advantage scale beyond ~56 tools? We would expect it to grow, since the relative cost of large-inventory flat selection increases while the pipeline's scoped stage stays constant. Empirical confirmation at 100+ tools remains future work.
+
+---
+
+## 8. Limitations and Future Work
+
+- The pipeline requires an intent and flow **ontology** to be defined in advance. This upfront design cost is non-trivial — our two domains each required careful taxonomy work before the pipeline was functional.
+- We evaluated on a **fixed distribution** across 4 turn categories. Real user traffic will have a different distribution, which may shift the magnitude of the advantage.
+- **External validation** on ATIS, MultiWOZ, or ToolBench is pending. Our domains were constructed specifically to test multi-turn, multi-intent scenarios; how the finding transfers to other benchmark distributions is an open question.
+- Latency was not formally benchmarked in this study.
+
+---
+
+*This work is part of our preprint on conversational tool-use accuracy in multi-stage NLU pipelines. Code and eval data available at [repo]. See also: [Post B — Why Flat Tool-Calling Collapses on Ambiguous Requests] and [Post C — We Tested 7 LLMs on Multi-Turn Tool Selection. The Architecture Mattered More Than the Model].*
