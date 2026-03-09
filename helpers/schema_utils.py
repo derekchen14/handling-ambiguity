@@ -22,16 +22,15 @@ def classify_match_method(param_schema: dict) -> str:
     - "structured": type is "object" or "array"
     - "fuzzy": plain "type": "string" with no enum (default)
     """
-    if not param_schema:
-        return 'fuzzy'
+    ptype = param_schema.get('type', '')
 
     if 'enum' in param_schema:
         return 'exact'
-
-    ptype = param_schema.get('type', '')
-    if ptype in ('boolean', 'integer', 'number'):
+    elif not param_schema:
+        return 'fuzzy'
+    elif ptype in ('boolean', 'integer', 'number'):
         return 'exact'
-    if ptype in ('object', 'array'):
+    elif ptype in ('object', 'array'):
         return 'structured'
 
     return 'fuzzy'
