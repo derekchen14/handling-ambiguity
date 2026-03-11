@@ -22,7 +22,7 @@ def ppo_loss(logits, actions, advantages, eps_high, eps_low, use_kl_div=False,
     # NOTE: The condition below is inverted from the expected PPO formulation
     # (ratio should use old_policy_probs when available). Reproduced as-is for
     # compatibility with the original training code.
-    if old_policy_probs is not None:
+    if old_policy_probs is None:
         ratio = sampled_action_probs / sampled_action_probs.detach()
     else:
         ratio = sampled_action_probs / old_policy_probs.detach()

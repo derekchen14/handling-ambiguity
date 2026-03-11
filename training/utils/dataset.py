@@ -18,7 +18,7 @@ from transformers import PreTrainedTokenizer
 
 def tokenize_and_pad(tokenizer, messages, max_length, tool_specs=None):
     """Shared tokenization: apply_chat_template -> pad/truncate -> (input_ids, attention_mask, length)."""
-    token_ids = tokenizer.apply_chat_template(messages, tools=tool_specs, tokenize=True)
+    token_ids = tokenizer.apply_chat_template(messages, tools=tool_specs, tokenize=True, return_dict=False)
     length = len(token_ids)
     attention_mask = torch.ones(length, dtype=torch.int64)
 
@@ -35,8 +35,13 @@ def tokenize_and_pad(tokenizer, messages, max_length, tool_specs=None):
     return input_ids, attention_mask, length
 
 
-def find_assistant_spans(input_ids, im_start=151644, assistant=77091, im_end=151645):
+def find_assistant_spans(input_ids, tokenizer=None, im_start=151644, assistant=77091, im_end=151645):
     """Find (start, end) index pairs for assistant token spans."""
+    if tokenizer is not None:
+        vocab = tokenizer.get_vocab()
+        im_start = vocab.get('<|im_start|>', im_start)
+        im_end = vocab.get('<|im_end|>', im_end)
+        assistant = vocab.get('assistant', assistant)
     if not isinstance(input_ids, torch.Tensor):
         input_ids = torch.tensor(input_ids)
     ids = input_ids.tolist()
@@ -142,7 +147,7 @@ class RLTrainingDataset(Dataset):
         if self.tokenizer is None:
             return encodings
 
-        assistant_tok_indices = find_assistant_spans(encodings['input_ids'])
+        assistant_tok_indices = find_assistant_spans(encodings['input_ids'], tokenizer=self.tokenizer)
 
         label_mask = torch.zeros_like(encodings['input_ids'])
         for tok_idx in assistant_tok_indices:
@@ -219,7 +224,7 @@ class NLUSFTDataset(Dataset):
             return None
 
         # Build label mask using shared helper
-        spans = find_assistant_spans(input_ids)
+        spans = find_assistant_spans(input_ids, tokenizer=self.tokenizer)
         label_mask = torch.zeros_like(input_ids)
         for start, end in spans:
             label_mask[start:end] = 1

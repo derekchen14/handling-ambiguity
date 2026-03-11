@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from openai import OpenAI
 from sglang.utils import wait_for_server, terminate_process
-from sglang.test.test_utils import is_in_ci
 
 
 def launch_server(model_name: str, num_gpus: int = 1, seed: int = 42):
+    from sglang.test.test_utils import is_in_ci
     if is_in_ci():
         from patch import launch_server_cmd
     else:

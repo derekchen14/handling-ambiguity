@@ -6,22 +6,22 @@ Usage examples:
 
     # RL: train flow detection
     python -m training.train_nlu --mode rl --stages flow --domain hugo \
-        --model_name Qwen/Qwen3-0.6B --eval_data_path datasets/hugo/eval_set.json
+        --model_name Qwen/Qwen3-0.6B --data_path datasets/hugo/eval_set.json
 
     # RL: train tool selection + param extraction as one stage
     python -m training.train_nlu --mode rl \
         --stages tool_selection+param_extraction --stage_weights 0.6,0.4 \
         --domain hugo --model_name Qwen/Qwen3-0.6B \
-        --eval_data_path datasets/hugo/eval_set.json \
+        --data_path datasets/hugo/eval_set.json \
         --tool_manifest_path tools/tool_manifest_hugo.json
 
     # SFT: distil from gold labels
     python -m training.train_nlu --mode sft --stages flow --domain hugo \
-        --model_name Qwen/Qwen3-0.6B --eval_data_path datasets/hugo/eval_set.json
+        --model_name Qwen/Qwen3-0.6B --data_path datasets/hugo/eval_set.json
 
     # SFT: distil from ensemble results
     python -m training.train_nlu --mode sft --stages flow --domain hugo \
-        --model_name Qwen/Qwen3-0.6B --eval_data_path datasets/hugo/eval_set.json \
+        --model_name Qwen/Qwen3-0.6B --data_path datasets/hugo/eval_set.json \
         --ensemble_results_path results/exp1b/hugo_3v-9_seed1.jsonl \
         --confidence_threshold 0.7
 """
@@ -63,8 +63,8 @@ def parse_args() -> argparse.Namespace:
     # Data
     parser.add_argument('--domain', type=str, choices=['hugo', 'dana'], required=True,
                         help='Domain')
-    parser.add_argument('--eval_data_path', type=str, required=True,
-                        help='Path to eval_set.json')
+    parser.add_argument('--data_path', type=str, required=True,
+                        help='Path to dataset JSON (used for both training and validation)')
     parser.add_argument('--tool_manifest_path', type=str, default=None,
                         help='Path to tool manifest JSON (for tool stages)')
     parser.add_argument('--ensemble_results_path', type=str, default=None,
@@ -111,6 +111,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--confidence_threshold', type=float, default=0.7,
                         help='Minimum ensemble confidence for SFT examples')
 
+    # LoRA
+    parser.add_argument('--use_lora', action='store_true',
+                        help='Use LoRA for SFT instead of full fine-tuning')
+    parser.add_argument('--lora_rank', type=int, default=16,
+                        help='LoRA rank (r)')
+    parser.add_argument('--lora_alpha', type=int, default=32,
+                        help='LoRA alpha scaling factor')
+    parser.add_argument('--lora_dropout', type=float, default=0.05,
+                        help='LoRA dropout rate')
+    parser.add_argument('--lora_target_modules', type=str, default=None,
+                        help='Comma-separated target modules for LoRA (default: peft auto-detect)')
+
+    # Eval (SFT only)
+    parser.add_argument('--eval_every', type=int, default=1,
+                        help='Run evaluation every N epochs (SFT only). 0 to disable.')
+    parser.add_argument('--eval_temperature', type=float, default=1.0,
+                        help='Sampling temperature for evaluation.')
+
     # Output
     parser.add_argument('--model_save_path', type=str, default='./nlu_model',
                         help='Path to save model checkpoints')
@@ -123,8 +141,8 @@ def parse_args() -> argparse.Namespace:
 
     # Misc
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--train_split', type=float, default=0.8,
-                        help='Fraction of eval set used for training (rest is validation)')
+    parser.add_argument('--val_ratio', type=float, default=0.2,
+                        help='Fraction of data held out for validation')
 
     args = parser.parse_args()
 
@@ -172,7 +190,7 @@ def build_stage(stage_spec: str, weights_spec: str | None = None) -> PipelineSta
 
 def load_data(args) -> tuple[list[dict], list[dict] | None]:
     """Load eval set and optional tool manifest."""
-    with open(args.eval_data_path) as f:
+    with open(args.data_path) as f:
         eval_set = json.load(f)
 
     tools = None
@@ -212,7 +230,7 @@ def run_rl(
     random.seed(args.seed)
     random.shuffle(all_examples)
 
-    split_idx = int(len(all_examples) * args.train_split)
+    split_idx = int(len(all_examples) * (1 - args.val_ratio))
     train_examples = all_examples[:split_idx]
     val_examples = all_examples[split_idx:]
     print(f'Train examples: {len(train_examples)}, Val examples: {len(val_examples)}')
@@ -342,11 +360,14 @@ def run_rl(
 
 
 def main() -> None:
+    from dotenv import load_dotenv
+    load_dotenv()
+
     args = parse_args()
 
     # Load data
     eval_set, tools = load_data(args)
-    print(f'Loaded {len(eval_set)} conversations from {args.eval_data_path}')
+    print(f'Loaded {len(eval_set)} conversations from {args.data_path}')
     if tools:
         print(f'Loaded {len(tools)} tools from {args.tool_manifest_path}')
 

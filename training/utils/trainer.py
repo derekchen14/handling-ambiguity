@@ -333,6 +333,8 @@ def run_sft(
         eval_set: The evaluation set (list of conversation dicts).
         tools: Optional tool manifest (for tool-calling stages).
     """
+    import random
+    import shutil
     from pathlib import Path
     from typing import Any
 
@@ -340,6 +342,8 @@ def run_sft(
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     from training.utils.sft_data import SFTDataGenerator, SFTExample
+    from training.rollouts import build_turn_examples
+    from training.eval import evaluate
 
     accelerator = Accelerator(mixed_precision='fp16')
 
@@ -348,16 +352,29 @@ def run_sft(
     if tools:
         stage_kwargs['tools'] = tools
 
-    # Generate SFT examples
+    # Train/val split for evaluation
+    random.seed(args.seed)
+    all_convos = list(eval_set)
+    random.shuffle(all_convos)
+    split_idx = int(len(all_convos) * (1 - args.val_ratio))
+    train_convos = all_convos[:split_idx]
+    val_convos = all_convos[split_idx:]
+
+    # Build val examples for periodic evaluation
+    val_examples = build_turn_examples(val_convos, stage, args.domain, tools, **stage_kwargs)
+    print(f'SFT split: {len(train_convos)} train convos, {len(val_convos)} val convos '
+          f'({len(val_examples)} val turn examples)')
+
+    # Generate SFT examples (from train split only)
     generator = SFTDataGenerator(stage, args.domain, **stage_kwargs)
 
     if args.ensemble_results_path:
         ensemble_results = SFTDataGenerator.load_jsonl(args.ensemble_results_path)
         examples = generator.generate_from_ensemble_results(
-            ensemble_results, eval_set, args.confidence_threshold
+            ensemble_results, train_convos, args.confidence_threshold
         )
     else:
-        examples = generator.generate_from_gold_labels(eval_set)
+        examples = generator.generate_from_gold_labels(train_convos)
 
     if not examples:
         print('No SFT examples generated. Check eval set and stage configuration.')
@@ -390,6 +407,20 @@ def run_sft(
         args.model_name, torch_dtype=torch.bfloat16,
     )
 
+    # Optionally wrap with LoRA
+    use_lora = getattr(args, 'use_lora', False)
+    if use_lora:
+        from peft import LoraConfig, get_peft_model, TaskType
+        lora_config = LoraConfig(
+            task_type=TaskType.CAUSAL_LM,
+            r=args.lora_rank,
+            lora_alpha=args.lora_alpha,
+            lora_dropout=args.lora_dropout,
+            target_modules=args.lora_target_modules.split(',') if args.lora_target_modules else "all-linear",
+        )
+        model = get_peft_model(model, lora_config)
+        model.print_trainable_parameters()
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.sft_lr)
 
     model, optimizer, dataloader = accelerator.prepare(model, optimizer, dataloader)
@@ -409,9 +440,12 @@ def run_sft(
                     'sft_lr': args.sft_lr,
                     'sft_epochs': args.sft_epochs,
                     'num_examples': len(dataset),
+                    'use_lora': use_lora,
+                    **(dict(lora_rank=args.lora_rank, lora_alpha=args.lora_alpha,
+                            lora_dropout=args.lora_dropout) if use_lora else {}),
                 },
             )
-        except ImportError:
+        except Exception:
             wandb = None
     else:
         wandb = None
@@ -421,6 +455,33 @@ def run_sft(
     global_step = 0
 
     for epoch in range(args.sft_epochs):
+        # Pre-update evaluation
+        if args.eval_every > 0 and epoch % args.eval_every == 0 and val_examples:
+            temp_save_dir = Path(args.model_save_path) / '_eval_ckpt'
+            if accelerator.is_main_process:
+                temp_save_dir.mkdir(parents=True, exist_ok=True)
+                unwrapped = accelerator.unwrap_model(model)
+                if use_lora:
+                    import copy
+                    merged = copy.deepcopy(unwrapped).merge_and_unload()
+                    merged.save_pretrained(temp_save_dir)
+                    del merged
+                else:
+                    unwrapped.save_pretrained(temp_save_dir)
+                tokenizer.save_pretrained(temp_save_dir)
+            accelerator.wait_for_everyone()
+
+            eval_metrics = evaluate(
+                str(temp_save_dir), val_examples, stage, args.domain,
+                accelerator, max_tokens=args.max_tokens,
+                temperature=args.eval_temperature, seed=args.seed,
+            )
+
+            if accelerator.is_main_process and wandb is not None:
+                wandb.log({**eval_metrics, 'epoch': epoch, 'global_step': global_step})
+            if accelerator.is_main_process:
+                shutil.rmtree(temp_save_dir, ignore_errors=True)
+
         total_loss = 0.0
         num_batches = 0
 
@@ -455,9 +516,22 @@ def run_sft(
         save_dir = Path(args.model_save_path)
         save_dir.mkdir(parents=True, exist_ok=True)
         unwrapped = accelerator.unwrap_model(model)
-        unwrapped.save_pretrained(save_dir)
-        tokenizer.save_pretrained(save_dir)
-        print(f'Model saved to {save_dir}')
+        if use_lora:
+            # Save adapter weights
+            unwrapped.save_pretrained(save_dir)
+            tokenizer.save_pretrained(save_dir)
+            print(f'LoRA adapter saved to {save_dir}')
+            # Also save a merged version for easy sglang inference
+            merged_dir = Path(f'{args.model_save_path}_merged')
+            merged_dir.mkdir(parents=True, exist_ok=True)
+            merged = unwrapped.merge_and_unload()
+            merged.save_pretrained(merged_dir)
+            tokenizer.save_pretrained(merged_dir)
+            print(f'Merged model saved to {merged_dir}')
+        else:
+            unwrapped.save_pretrained(save_dir)
+            tokenizer.save_pretrained(save_dir)
+            print(f'Model saved to {save_dir}')
 
         if wandb is not None:
             wandb.finish()
