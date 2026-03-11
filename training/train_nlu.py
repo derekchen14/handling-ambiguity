@@ -44,7 +44,7 @@ from training.stages import (
     PipelineStage,
 )
 from training.rollouts import build_turn_examples, do_nlu_rollout
-from training.sft_trainer import run_sft
+from training.utils import run_sft
 
 
 def parse_args() -> argparse.Namespace:
@@ -190,9 +190,7 @@ def run_rl(
     tools: list[dict] | None = None,
 ) -> None:
     """RL training loop, structurally identical to rl/train/train.py:main()."""
-    from foundryml.rl.train.dset import RLTrainingDataset
-    from foundryml.rl.train.models.trainer import PPOTrainer
-    from foundryml.rl.train.utils.utils import free_memory
+    from training.utils import RLTrainingDataset, PPOTrainer, free_memory
 
     if args.use_kl_div and not args.compute_reference_probs:
         raise ValueError(

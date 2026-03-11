@@ -241,7 +241,7 @@ def do_nlu_rollout(
         (train_trajectories, train_queries, val_trajectories, val_queries)
         in the format expected by ``RLTrainingDataset``.
     """
-    from foundryml.rl.train.utils.utils import (
+    from training.utils import (
         cleanup_server,
         setup_server_and_client,
         save_json,
