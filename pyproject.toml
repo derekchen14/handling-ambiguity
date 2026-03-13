@@ -17,18 +17,13 @@ dependencies = [
 
 [project.optional-dependencies]
 training = [
-    "torch>=2.0.0",
-    "transformers>=5.3.0",
-    "accelerate>=1.13.0",
-    "peft",
+    # "torch>=2.0.0",
+    # "transformers>=5.3.0",
+    # "accelerate>=1.13.0",
     "wandb",
-    "sglang>=0.5.0",
-    "aiohttp",
-    "fastapi",
-    "orjson",
-    "uvicorn",
-    "pybase64",
-    "nest-asyncio",
+    "sglang[all]",
+    "accelerate",
+    "peft",
 ]
 
 [dependency-groups]

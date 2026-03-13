@@ -421,6 +421,8 @@ def run_sft(
         model = get_peft_model(model, lora_config)
         model.print_trainable_parameters()
 
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.sft_lr)
 
     model, optimizer, dataloader = accelerator.prepare(model, optimizer, dataloader)
@@ -463,7 +465,7 @@ def run_sft(
                 unwrapped = accelerator.unwrap_model(model)
                 if use_lora:
                     import copy
-                    merged = copy.deepcopy(unwrapped).merge_and_unload()
+                    merged = copy.deepcopy(unwrapped).cpu().merge_and_unload()
                     merged.save_pretrained(temp_save_dir)
                     del merged
                 else:

@@ -36,7 +36,7 @@ def evaluate(
 
     if accelerator.is_main_process:
         server_process, port, client = setup_server_and_client(
-            model_path, accelerator.num_processes, seed=seed,
+            model_path, num_gpus=1, seed=seed,
         )
 
         trajectories, queries = _do_generations_parallel(
@@ -51,6 +51,9 @@ def evaluate(
         )
 
         cleanup_server(server_process)
+        import gc, torch
+        gc.collect()
+        torch.cuda.empty_cache()
 
         trajectories = _clean_trajectories(trajectories)
 
@@ -67,6 +70,7 @@ def evaluate(
         else:
             metrics['eval/accuracy'] = 0.0
             metrics['eval/reward_std'] = 0.0
+            
 
         print(
             f"Eval: accuracy={metrics['eval/accuracy']:.4f}, "

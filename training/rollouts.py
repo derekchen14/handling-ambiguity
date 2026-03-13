@@ -132,6 +132,15 @@ def generate_single_nlu_trajectory(
         response = client.chat.completions.create(**kwargs)
         choice = response.choices[0]
 
+        # Diagnostic logging for empty responses
+        if not choice.message.content and not choice.message.tool_calls:
+            reasoning = getattr(choice.message, 'reasoning_content', None)
+            if reasoning:
+                print(f'[DEBUG] Empty content for {example.query_key}: '
+                      f'reasoning_content={reasoning!r:.200}')
+            else:
+                print(f'[DEBUG] Empty response for {example.query_key}')
+
         # Extract raw response
         if choice.message.tool_calls:
             # Tool-calling response: serialize tool calls to JSON
@@ -148,7 +157,13 @@ def generate_single_nlu_trajectory(
             assistant_content = raw_response
 
         if not raw_response:
-            return {'messages': None, 'reward': None}
+            # Fallback: check reasoning_content (sglang reasoning parsers)
+            reasoning = getattr(choice.message, 'reasoning_content', None) or ''
+            if reasoning:
+                raw_response = reasoning
+                assistant_content = reasoning
+            else:
+                return {'messages': None, 'reward': None}
 
         # Compute reward
         callback = make_trajectory_eval_callback(
