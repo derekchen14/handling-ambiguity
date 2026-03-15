@@ -61,8 +61,8 @@ def parse_args() -> argparse.Namespace:
                         help='Comma-separated reward weights for composed stages, e.g. "0.6,0.4"')
 
     # Data
-    parser.add_argument('--domain', type=str, choices=['hugo', 'dana'], required=True,
-                        help='Domain')
+    parser.add_argument('--domain', type=str, required=True,
+                        help='Domain (comma-separated for multi-domain SFT)')
     parser.add_argument('--data_path', type=str, required=True,
                         help='Path to dataset JSON (used for both training and validation)')
     parser.add_argument('--tool_manifest_path', type=str, default=None,
@@ -151,6 +151,25 @@ def parse_args() -> argparse.Namespace:
 
     if args.wandb_name is None:
         args.wandb_name = f'{args.mode}_{args.stages}_{args.domain}'
+
+    # Parse comma-separated multi-domain fields
+    args.domains = [d.strip() for d in args.domain.split(',')]
+    args.data_paths = [p.strip() for p in args.data_path.split(',')]
+    args.ensemble_results_paths = (
+        [p.strip() for p in args.ensemble_results_path.split(',')]
+        if args.ensemble_results_path else [None] * len(args.domains)
+    )
+
+    if len(args.data_paths) != len(args.domains):
+        parser.error(
+            f'--data_path count ({len(args.data_paths)}) must match '
+            f'--domain count ({len(args.domains)})'
+        )
+    if len(args.ensemble_results_paths) != len(args.domains):
+        parser.error(
+            f'--ensemble_results_path count ({len(args.ensemble_results_paths)}) must match '
+            f'--domain count ({len(args.domains)})'
+        )
 
     return args
 
@@ -365,20 +384,30 @@ def main() -> None:
 
     args = parse_args()
 
-    # Load data
-    eval_set, tools = load_data(args)
-    print(f'Loaded {len(eval_set)} conversations from {args.data_path}')
-    if tools:
-        print(f'Loaded {len(tools)} tools from {args.tool_manifest_path}')
-
     # Build stage
     stage = build_stage(args.stages, args.stage_weights)
     print(f'Stage: {stage.name}')
 
+    tools = None
+    if args.tool_manifest_path:
+        with open(args.tool_manifest_path) as f:
+            tools = json.load(f)
+
     # Dispatch
     if args.mode == 'sft':
-        run_sft(args, stage, eval_set, tools)
+        domain_configs = []
+        for i, domain in enumerate(args.domains):
+            with open(args.data_paths[i]) as f:
+                eval_set = json.load(f)
+            ens_path = args.ensemble_results_paths[i]
+            domain_configs.append((domain, eval_set, ens_path))
+            print(f'Loaded {len(eval_set)} conversations for {domain}')
+        run_sft(args, stage, domain_configs, tools)
     elif args.mode == 'rl':
+        eval_set, tools = load_data(args)
+        print(f'Loaded {len(eval_set)} conversations from {args.data_path}')
+        if tools:
+            print(f'Loaded {len(tools)} tools from {args.tool_manifest_path}')
         run_rl(args, stage, eval_set, tools)
 
 

@@ -31,6 +31,7 @@ class NLUTurnExample:
     convo: dict[str, Any]
     tool_specs: list[dict] | None = None
     stage_kwargs: dict[str, Any] = field(default_factory=dict)
+    domain: str = ''
 
     @property
     def query_key(self) -> str:
@@ -76,6 +77,7 @@ def build_turn_examples(
                     convo=convo,
                     tool_specs=tool_specs,
                     stage_kwargs=stage_kwargs,
+                    domain=domain,
                 ))
 
                 # Synthetic assistant response for context continuity
@@ -166,8 +168,9 @@ def generate_single_nlu_trajectory(
                 return {'messages': None, 'reward': None}
 
         # Compute reward
+        effective_domain = example.domain or domain
         callback = make_trajectory_eval_callback(
-            stage, domain, example.convo, example.turn, **example.stage_kwargs
+            stage, effective_domain, example.convo, example.turn, **example.stage_kwargs
         )
         reward = callback(raw_response)
 

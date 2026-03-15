@@ -158,7 +158,7 @@ class SFTDataGenerator:
 
                     ens_turn = ens_turns.get(turn_num, {})
                     correct = ens_turn.get('correct', False)
-                    confidence = ens_turn.get('confidence', 0.0)
+                    confidence = ens_turn.get('confidence', 1.0)
 
                     if not correct or confidence < confidence_threshold:
                         message_history.append({

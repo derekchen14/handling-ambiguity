@@ -316,10 +316,42 @@ class PPOTrainer:
 # SFT training
 # ---------------------------------------------------------------------------
 
+def _stratified_split(
+    convos: list[dict],
+    val_ratio: float,
+    seed: int,
+) -> tuple[list[dict], list[dict]]:
+    """Split conversations into train/val, stratified by category.
+
+    Groups by ``convo['category']``, shuffles each group independently,
+    and splits at ``val_ratio`` (at least 1 val per category).
+    """
+    import random
+    from collections import defaultdict
+
+    by_cat: dict[str, list[dict]] = defaultdict(list)
+    for c in convos:
+        by_cat[c.get('category', 'unknown')].append(c)
+
+    rng = random.Random(seed)
+    train_convos: list[dict] = []
+    val_convos: list[dict] = []
+
+    for key in sorted(by_cat.keys()):
+        group = by_cat[key]
+        rng.shuffle(group)
+        n_val = max(1, int(len(group) * val_ratio))
+        split_idx = len(group) - n_val
+        train_convos.extend(group[:split_idx])
+        val_convos.extend(group[split_idx:])
+
+    return train_convos, val_convos
+
+
 def run_sft(
     args,
     stage,
-    eval_set: list[dict],
+    domain_configs: list[tuple[str, list[dict], str | None]],
     tools: list[dict] | None = None,
 ) -> None:
     """Run supervised fine-tuning for a pipeline stage.
@@ -327,10 +359,9 @@ def run_sft(
     Args:
         args: Parsed argument namespace (from train_nlu.py) with fields:
             model_name, sft_epochs, sft_lr, max_tokens, batch_size,
-            model_save_path, wandb_project, wandb_name, confidence_threshold,
-            ensemble_results_path, domain.
+            model_save_path, wandb_project, wandb_name, confidence_threshold.
         stage: The pipeline stage to train.
-        eval_set: The evaluation set (list of conversation dicts).
+        domain_configs: List of (domain, eval_set, ensemble_results_path) tuples.
         tools: Optional tool manifest (for tool-calling stages).
     """
     import random
@@ -352,36 +383,43 @@ def run_sft(
     if tools:
         stage_kwargs['tools'] = tools
 
-    # Train/val split for evaluation
-    random.seed(args.seed)
-    all_convos = list(eval_set)
-    random.shuffle(all_convos)
-    split_idx = int(len(all_convos) * (1 - args.val_ratio))
-    train_convos = all_convos[:split_idx]
-    val_convos = all_convos[split_idx:]
+    # Per-domain train/val split + SFT example generation
+    all_chat_examples = []
+    all_val_examples = []
 
-    # Build val examples for periodic evaluation
-    val_examples = build_turn_examples(val_convos, stage, args.domain, tools, **stage_kwargs)
-    print(f'SFT split: {len(train_convos)} train convos, {len(val_convos)} val convos '
-          f'({len(val_examples)} val turn examples)')
-
-    # Generate SFT examples (from train split only)
-    generator = SFTDataGenerator(stage, args.domain, **stage_kwargs)
-
-    if args.ensemble_results_path:
-        ensemble_results = SFTDataGenerator.load_jsonl(args.ensemble_results_path)
-        examples = generator.generate_from_ensemble_results(
-            ensemble_results, train_convos, args.confidence_threshold
+    for domain, eval_set, ens_path in domain_configs:
+        train_convos, val_convos = _stratified_split(
+            list(eval_set), args.val_ratio, args.seed,
         )
-    else:
-        examples = generator.generate_from_gold_labels(train_convos)
+        print(f'  {domain}: stratified split — '
+              + ', '.join(
+                  f'{cat}: {sum(1 for c in val_convos if c.get("category") == cat)} val'
+                  for cat in sorted({c.get("category", "unknown") for c in eval_set})
+              ))
 
-    if not examples:
+        val_examples = build_turn_examples(val_convos, stage, domain, tools, **stage_kwargs)
+        all_val_examples.extend(val_examples)
+
+        generator = SFTDataGenerator(stage, domain, **stage_kwargs)
+        if ens_path:
+            ens_results = SFTDataGenerator.load_jsonl(ens_path)
+            examples = generator.generate_from_ensemble_results(
+                ens_results, train_convos, args.confidence_threshold,
+            )
+        else:
+            examples = generator.generate_from_gold_labels(train_convos)
+
+        all_chat_examples.extend([ex.to_chat_format() for ex in examples])
+        print(f'  {domain}: {len(examples)} train, {len(val_examples)} val')
+
+    chat_examples = all_chat_examples
+    val_examples = all_val_examples
+
+    if not chat_examples:
         print('No SFT examples generated. Check eval set and stage configuration.')
         return
 
-    chat_examples = [ex.to_chat_format() for ex in examples]
-    print(f'Generated {len(chat_examples)} SFT examples for stage={stage.name}')
+    print(f'Total: {len(chat_examples)} SFT examples, {len(val_examples)} val examples')
 
     # Initialise tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
@@ -437,7 +475,7 @@ def run_sft(
                 config={
                     'mode': 'sft',
                     'stage': stage.name,
-                    'domain': args.domain,
+                    'domain': ','.join(d for d, _, _ in domain_configs),
                     'model': args.model_name,
                     'sft_lr': args.sft_lr,
                     'sft_epochs': args.sft_epochs,
@@ -474,7 +512,7 @@ def run_sft(
             accelerator.wait_for_everyone()
 
             eval_metrics = evaluate(
-                str(temp_save_dir), val_examples, stage, args.domain,
+                str(temp_save_dir), val_examples, stage, domain_configs[0][0],
                 accelerator, max_tokens=args.max_tokens,
                 temperature=args.eval_temperature, seed=args.seed,
             )

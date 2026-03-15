@@ -61,6 +61,30 @@ python -m training.train_nlu --mode sft --stages flow --domain hugo \
     --confidence_threshold 0.7
 ```
 
+### Distillation SFT — LoRA from 10v-1 ensemble pseudo-labels (Hugo + Dana)
+
+**Step 1: Generate ensemble pseudo-labels**
+
+Compose 10v-1 ensemble results from exp1a predictions for both domains:
+
+```bash
+uv run python -m training.scripts.compose_distillation_data
+```
+
+This produces `training/distill_data/hugo_10v-1.jsonl` and `training/distill_data/dana_10v-1.jsonl` (128 conversations each).
+
+**Step 2: Run distillation SFT**
+
+```bash
+uv run bash training/scripts/distill_sft_lora.sh
+```
+
+This trains Qwen3-4B-Instruct with LoRA (rank 16) on the ensemble pseudo-labels across both domains. Per-domain train/val splits are created at the conversation level (80/20). Training uses ensemble pseudo-labels; evaluation uses gold labels.
+
+Output:
+- `./distill_lora_model/` — LoRA adapter weights
+- `./distill_lora_model_merged/` — merged model for inference
+
 ### RL — single stage
 
 ```bash
