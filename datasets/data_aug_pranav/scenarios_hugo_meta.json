@@ -1,0 +1,18 @@
+{
+  "domain": "hugo",
+  "target": 384,
+  "total_scenarios": 384,
+  "new_scenarios": 1,
+  "resumed_from": 383,
+  "model_distribution": {
+    "google/gemini-3-pro-preview": 1
+  },
+  "diversity_distribution": {
+    "enterprise and corporate contexts": 1
+  },
+  "seed": 42,
+  "batch_size": 6,
+  "max_threads": 1,
+  "waves": 1,
+  "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_hugo.jsonl"
+}

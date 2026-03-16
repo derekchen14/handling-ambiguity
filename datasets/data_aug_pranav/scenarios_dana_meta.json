@@ -1,0 +1,28 @@
+{
+  "domain": "dana",
+  "target": 384,
+  "total_scenarios": 384,
+  "new_scenarios": 384,
+  "resumed_from": 0,
+  "model_distribution": {
+    "claude-sonnet-4-6": 108,
+    "gpt-5.2": 96,
+    "google/gemini-3-pro-preview": 96,
+    "deepseek/deepseek-chat": 84
+  },
+  "diversity_distribution": {
+    "enterprise and corporate contexts": 60,
+    "personal and hobbyist contexts": 50,
+    "academic and research contexts": 48,
+    "startup and small-business contexts": 38,
+    "non-profit and public-sector contexts": 48,
+    "creative and artistic contexts": 46,
+    "technical and engineering contexts": 48,
+    "marketing and growth contexts": 46
+  },
+  "seed": 42,
+  "batch_size": 12,
+  "max_threads": 20,
+  "waves": 2,
+  "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_dana.jsonl"
+}
