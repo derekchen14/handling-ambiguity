@@ -321,17 +321,18 @@ def _stratified_split(
     val_ratio: float,
     seed: int,
 ) -> tuple[list[dict], list[dict]]:
-    """Split conversations into train/val, stratified by category.
+    """Split conversations into train/val, stratified by (category, domain).
 
-    Groups by ``convo['category']``, shuffles each group independently,
-    and splits at ``val_ratio`` (at least 1 val per category).
+    Groups by ``(convo['category'], convo['_domain'])``, shuffles each group
+    independently, and splits at ``val_ratio`` (at least 1 val per group).
     """
     import random
     from collections import defaultdict
 
-    by_cat: dict[str, list[dict]] = defaultdict(list)
+    by_cat: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for c in convos:
-        by_cat[c.get('category', 'unknown')].append(c)
+        key = (c.get('category', 'unknown'), c.get('_domain', 'unknown'))
+        by_cat[key].append(c)
 
     rng = random.Random(seed)
     train_convos: list[dict] = []
@@ -383,34 +384,53 @@ def run_sft(
     if tools:
         stage_kwargs['tools'] = tools
 
-    # Per-domain train/val split + SFT example generation
-    all_chat_examples = []
-    all_val_examples = []
-
+    # Phase 1 — Combine, tag with _domain, split once across all domains
+    all_convos = []
+    domain_ens_paths = {}
     for domain, eval_set, ens_path in domain_configs:
-        train_convos, val_convos = _stratified_split(
-            list(eval_set), args.val_ratio, args.seed,
-        )
-        print(f'  {domain}: stratified split — '
-              + ', '.join(
-                  f'{cat}: {sum(1 for c in val_convos if c.get("category") == cat)} val'
-                  for cat in sorted({c.get("category", "unknown") for c in eval_set})
-              ))
+        for c in eval_set:
+            c['_domain'] = domain
+        all_convos.extend(eval_set)
+        domain_ens_paths[domain] = ens_path
 
-        val_examples = build_turn_examples(val_convos, stage, domain, tools, **stage_kwargs)
-        all_val_examples.extend(val_examples)
+    train_convos, val_convos = _stratified_split(all_convos, args.val_ratio, args.seed)
 
+    # Log split stats per (category, domain) group
+    from collections import defaultdict as _defaultdict
+    split_stats = _defaultdict(lambda: {'train': 0, 'val': 0})
+    for c in train_convos:
+        split_stats[(c.get('category', 'unknown'), c.get('_domain', 'unknown'))]['train'] += 1
+    for c in val_convos:
+        split_stats[(c.get('category', 'unknown'), c.get('_domain', 'unknown'))]['val'] += 1
+    for (cat, dom), counts in sorted(split_stats.items()):
+        print(f'  ({cat}, {dom}): {counts["train"]} train, {counts["val"]} val')
+
+    # Phase 2 — Partition by domain, generate examples
+    val_by_domain: dict[str, list[dict]] = _defaultdict(list)
+    for c in val_convos:
+        val_by_domain[c['_domain']].append(c)
+
+    train_by_domain: dict[str, list[dict]] = _defaultdict(list)
+    for c in train_convos:
+        train_by_domain[c['_domain']].append(c)
+
+    all_val_examples = []
+    for domain, _, _ in domain_configs:
+        v_examples = build_turn_examples(val_by_domain[domain], stage, domain, tools, **stage_kwargs)
+        all_val_examples.extend(v_examples)
+
+    all_chat_examples = []
+    for domain, _, ens_path in domain_configs:
         generator = SFTDataGenerator(stage, domain, **stage_kwargs)
         if ens_path:
             ens_results = SFTDataGenerator.load_jsonl(ens_path)
             examples = generator.generate_from_ensemble_results(
-                ens_results, train_convos, args.confidence_threshold,
+                ens_results, train_by_domain[domain], args.confidence_threshold,
             )
         else:
-            examples = generator.generate_from_gold_labels(train_convos)
-
+            examples = generator.generate_from_gold_labels(train_by_domain[domain])
         all_chat_examples.extend([ex.to_chat_format() for ex in examples])
-        print(f'  {domain}: {len(examples)} train, {len(val_examples)} val')
+        print(f'  {domain}: {len(examples)} train, {len(val_by_domain[domain])} val convos')
 
     chat_examples = all_chat_examples
     val_examples = all_val_examples
@@ -550,6 +570,33 @@ def run_sft(
                     'sft_loss': avg_loss,
                     'global_step': global_step,
                 })
+
+    # Post-loop evaluation (after final epoch)
+    if args.eval_every > 0 and val_examples:
+        temp_save_dir = Path(args.model_save_path) / '_eval_ckpt'
+        if accelerator.is_main_process:
+            temp_save_dir.mkdir(parents=True, exist_ok=True)
+            unwrapped = accelerator.unwrap_model(model)
+            if use_lora:
+                import copy
+                merged = copy.deepcopy(unwrapped).cpu().merge_and_unload()
+                merged.save_pretrained(temp_save_dir)
+                del merged
+            else:
+                unwrapped.save_pretrained(temp_save_dir)
+            tokenizer.save_pretrained(temp_save_dir)
+        accelerator.wait_for_everyone()
+
+        eval_metrics = evaluate(
+            str(temp_save_dir), val_examples, stage, domain_configs[0][0],
+            accelerator, max_tokens=args.max_tokens,
+            temperature=args.eval_temperature, seed=args.seed,
+        )
+
+        if accelerator.is_main_process and wandb is not None:
+            wandb.log({**eval_metrics, 'epoch': args.sft_epochs, 'global_step': global_step})
+        if accelerator.is_main_process:
+            shutil.rmtree(temp_save_dir, ignore_errors=True)
 
     # Save
     if accelerator.is_main_process:

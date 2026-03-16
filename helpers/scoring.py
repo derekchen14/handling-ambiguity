@@ -46,6 +46,7 @@ def score_turn(
     detected_flows: list[str],
     expected_flow: str,
     candidate_flows: list[str] | None,
+    rng: random.Random | None = None,
 ) -> bool:
     """Score a single turn.  Returns True/False.
 
@@ -53,7 +54,7 @@ def score_turn(
     For ambiguous turns in exp1b, use ``score_turn_ensemble`` instead.
     """
     if candidate_flows:
-        return _score_ambiguous(detected_flows, candidate_flows)
+        return _score_ambiguous(detected_flows, candidate_flows, rng=rng)
     # Clear turn: exactly one correct flow
     return len(detected_flows) == 1 and detected_flows[0] == expected_flow
 
@@ -61,6 +62,7 @@ def score_turn(
 def _score_ambiguous(
     detected_flows: list[str],
     candidate_flows: list[str],
+    rng: random.Random | None = None,
 ) -> bool:
     """Score a single model on an ambiguous turn.
 
@@ -76,7 +78,8 @@ def _score_ambiguous(
     """
     if len(detected_flows) < 2:
         return False
-    predicted = random.choice(detected_flows)
+    _rng = rng if rng is not None else random.Random(42)
+    predicted = _rng.choice(detected_flows)
     return predicted in set(candidate_flows)
 
 

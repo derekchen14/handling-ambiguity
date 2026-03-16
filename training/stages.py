@@ -187,7 +187,8 @@ class FlowStage(PipelineStage):
         category = convo.get('category', 'unknown')
         expected_flow = turn.get('flow', '')
         candidate_flows = turn.get('candidate_flows')
-        correct = score_turn(category, detected_flows, expected_flow, candidate_flows)
+        rng = kwargs.get('rng')
+        correct = score_turn(category, detected_flows, expected_flow, candidate_flows, rng=rng)
         return StageReward(reward=1.0 if correct else 0.0, details={'correct': correct})
 
 
