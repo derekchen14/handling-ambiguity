@@ -7,15 +7,15 @@ conversation categories (same_flow, switch_flow, ambiguous_first,
 ambiguous_second).
 
 Usage:
-    python datasets/data_aug_pranav/enrich_scenarios.py \
+    uv run datasets/data_aug_pranav/enrich_scenarios.py \
         --domain hugo --batch-size 8 --seed 42 --max-threads 20
 
     # Single-model smoke test:
-    python datasets/data_aug_pranav/enrich_scenarios.py \
+    uv run datasets/data_aug_pranav/enrich_scenarios.py \
         --domain hugo --models anthropic --batch-size 4
 
     # Dry run (print prompts, no API calls):
-    python datasets/data_aug_pranav/enrich_scenarios.py \
+    uv run datasets/data_aug_pranav/enrich_scenarios.py \
         --domain hugo --dry-run
 """
 
