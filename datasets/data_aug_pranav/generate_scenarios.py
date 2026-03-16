@@ -30,6 +30,8 @@ import sys
 import time
 from pathlib import Path
 
+from tqdm import tqdm
+
 # ── Path setup ───────────────────────────────────────────────────────
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -603,14 +605,12 @@ def generate_scenarios(
     # --- Live path: wave-based async orchestration ---
     wave_num = 0
     batch_cursor = 0  # global batch counter for logging
+    pbar = tqdm(total=remaining, unit="scenarios", desc="Generating")
 
     while len(new_scenarios) < remaining:
         # Build batch specs for this wave (up to max_threads batches)
         wave_specs: list[dict] = []
         for _ in range(max_threads):
-            if batch_cursor >= num_batches:
-                break
-
             model_config = active_models[model_idx % len(active_models)]
             diversity_axis = DIVERSITY_AXES[axis_idx % len(DIVERSITY_AXES)]
             grounding = _sample_flows(flows, rng, n=7)
@@ -638,12 +638,6 @@ def generate_scenarios(
         if not wave_specs:
             break
 
-        log.info(
-            'Wave %d: launching %d batches [%s]',
-            wave_num + 1, len(wave_specs),
-            ', '.join(s['model_config']['name'] for s in wave_specs),
-        )
-
         # Fire all batches in this wave concurrently
         semaphore = asyncio.Semaphore(max_threads)
         results = asyncio.run(_run_wave(wave_specs, system_prompt, semaphore))
@@ -656,16 +650,15 @@ def generate_scenarios(
             mname = spec['model_config']['name']
 
             if isinstance(result, BaseException):
-                log.error('Batch %d failed (%s): %s', bnum, mname, result)
+                pbar.write(f'ERROR: Batch {bnum} failed ({mname}): {result}')
                 continue
 
             batch_scenarios = _parse_scenarios(result)
             if not batch_scenarios:
-                log.warning('Batch %d: no valid scenarios parsed from %s', bnum, mname)
+                pbar.write(f'WARNING: Batch {bnum}: no valid scenarios parsed from {mname}')
                 continue
 
-            if verbose:
-                log.info('Batch %d: parsed %d scenarios', bnum, len(batch_scenarios))
+            log.debug('Batch %d: parsed %d scenarios', bnum, len(batch_scenarios))
 
             grounding_flow_names = [name for name, _ in spec['grounding']]
             for scenario_obj in batch_scenarios:
@@ -676,8 +669,7 @@ def generate_scenarios(
 
                 # Skip duplicates (check both prior and this wave's new entries)
                 if _is_duplicate(scenario_desc, all_generated):
-                    if verbose:
-                        log.info('Skipping duplicate: %s', scenario_desc[:60])
+                    log.debug('Skipping duplicate: %s', scenario_desc[:60])
                     continue
 
                 scenario_id = f'{domain}_{scenario_counter:03d}'
@@ -724,13 +716,12 @@ def generate_scenarios(
                 for obj in wave_new:
                     f.write(json.dumps(obj, ensure_ascii=False) + '\n')
             new_scenarios.extend(wave_new)
-            log.info(
-                'Wave %d: wrote %d scenarios (total: %d/%d)',
-                wave_num + 1, len(wave_new),
-                len(existing_scenarios) + len(new_scenarios), target,
-            )
+            pbar.update(len(wave_new))
 
         wave_num += 1
+        pbar.set_postfix_str(f"wave {wave_num + 1}")
+
+    pbar.close()
 
     # Write summary meta JSON
     total = len(existing_scenarios) + len(new_scenarios)
@@ -810,12 +801,13 @@ def main():
 
     args = parser.parse_args()
 
-    level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(
-        level=level,
+        level=logging.WARNING,
         format='%(asctime)s %(levelname)s %(name)s: %(message)s',
         datefmt='%H:%M:%S',
     )
+    # Only our logger gets DEBUG/INFO — keep httpcore/httpx silent
+    log.setLevel(logging.DEBUG if args.verbose else logging.INFO)
 
     models_filter = None
     if args.models:
