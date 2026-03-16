@@ -20,6 +20,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 import logging
 import os
@@ -315,6 +316,114 @@ def _call_model(config: dict, system_prompt: str, user_prompt: str) -> str:
     raise last_error  # type: ignore[misc]
 
 
+# ── Async provider call functions ────────────────────────────────────
+
+async def _call_anthropic_async(system_prompt: str, user_prompt: str) -> str:
+    """Call Anthropic API using async client."""
+    import anthropic
+
+    client = anthropic.AsyncAnthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+    try:
+        resp = await client.messages.create(
+            model='claude-sonnet-4-6',
+            max_tokens=4096,
+            temperature=0.9,
+            system=system_prompt,
+            messages=[{'role': 'user', 'content': user_prompt}],
+        )
+        return resp.content[0].text if resp.content else ''
+    finally:
+        await client.close()
+
+
+async def _call_openai_async(system_prompt: str, user_prompt: str) -> str:
+    """Call OpenAI API using async client."""
+    import openai
+
+    client = openai.AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
+    try:
+        resp = await client.chat.completions.create(
+            model='gpt-5.2',
+            max_completion_tokens=4096,
+            temperature=0.9,
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+        )
+        return resp.choices[0].message.content or ''
+    finally:
+        await client.close()
+
+
+async def _call_openrouter_async(system_prompt: str, user_prompt: str, model_id: str) -> str:
+    """Call OpenRouter's OpenAI-compatible API using async client."""
+    import openai
+
+    client = openai.AsyncOpenAI(
+        api_key=os.environ['OPEN_ROUTER_API_KEY'],
+        base_url='https://openrouter.ai/api/v1',
+    )
+    try:
+        resp = await client.chat.completions.create(
+            model=model_id,
+            max_completion_tokens=4096,
+            temperature=0.9,
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+        )
+        if not resp or not resp.choices:
+            raise RuntimeError('OpenRouter returned empty choices (transient error)')
+        return resp.choices[0].message.content or ''
+    finally:
+        await client.close()
+
+
+async def _call_model_async(config: dict, system_prompt: str, user_prompt: str) -> str:
+    """Async dispatch to the right provider with retries."""
+    provider = config['provider']
+    last_error = None
+
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            if provider == 'anthropic':
+                return await _call_anthropic_async(system_prompt, user_prompt)
+            elif provider == 'openai':
+                return await _call_openai_async(system_prompt, user_prompt)
+            elif provider == 'openrouter':
+                return await _call_openrouter_async(system_prompt, user_prompt, config['model_id'])
+            else:
+                raise ValueError(f'Unknown provider: {provider}')
+        except Exception as e:
+            last_error = e
+            err_str = f'{type(e).__name__}: {e}'.lower()
+            is_retryable = any(kw in err_str for kw in (
+                'ratelimit', 'rate_limit', 'rate limit', 'resource_exhausted',
+                'timeout', 'internal', 'server', '429', '500', '503',
+            ))
+            if not is_retryable:
+                raise
+            if attempt < MAX_RETRIES:
+                delay = max(BACKOFF_BASE_S * (2 ** attempt), 5.0 if '429' in err_str else 1.0)
+                log.warning(
+                    'Retry %d/%d for %s after %s: %s',
+                    attempt + 1, MAX_RETRIES, config['name'], type(e).__name__, e,
+                )
+                await asyncio.sleep(delay)
+
+    raise last_error  # type: ignore[misc]
+
+
+async def _run_wave(batch_specs: list[dict], system_prompt: str, semaphore: asyncio.Semaphore) -> list:
+    """Run a wave of batches concurrently, bounded by semaphore."""
+    async def _run_one(spec):
+        async with semaphore:
+            return await _call_model_async(spec['model_config'], system_prompt, spec['user_prompt'])
+    return await asyncio.gather(*[_run_one(s) for s in batch_specs], return_exceptions=True)
+
+
 # ── Response parser ──────────────────────────────────────────────────
 
 def _parse_scenarios(raw: str) -> list[dict]:
@@ -388,6 +497,7 @@ def generate_scenarios(
     models_filter: list[str] | None = None,
     dry_run: bool = False,
     verbose: bool = False,
+    max_threads: int | None = None,
 ) -> Path:
     """Main orchestrator: round-robin models x diversity axes, dedup, JSONL append.
 
@@ -447,6 +557,10 @@ def generate_scenarios(
     # Build system prompt once
     system_prompt = _build_system_prompt(domain)
 
+    # Concurrency setup
+    if max_threads is None:
+        max_threads = len(active_models)
+
     # Round-robin state
     model_idx = 0
     axis_idx = 0
@@ -455,29 +569,22 @@ def generate_scenarios(
 
     num_batches = (remaining + batch_size - 1) // batch_size
 
-    for batch_num in range(num_batches):
-        if len(new_scenarios) >= remaining:
-            break
-
-        # Pick model and diversity axis
-        model_config = active_models[model_idx % len(active_models)]
-        diversity_axis = DIVERSITY_AXES[axis_idx % len(DIVERSITY_AXES)]
-
-        # Sample grounding flows
-        grounding = _sample_flows(flows, rng, n=7)
-
-        # Build user prompt
-        user_prompt = _build_user_prompt(
-            domain=domain,
-            batch_size=batch_size,
-            diversity_axis=diversity_axis,
-            grounding_flows=grounding,
-            exclusion_list=all_generated,
-        )
-
-        if dry_run:
+    # --- Dry-run path (sequential, no async) ---
+    if dry_run:
+        for batch_num in range(num_batches):
+            model_config = active_models[model_idx % len(active_models)]
+            diversity_axis = DIVERSITY_AXES[axis_idx % len(DIVERSITY_AXES)]
+            grounding = _sample_flows(flows, rng, n=7)
+            user_prompt = _build_user_prompt(
+                domain=domain,
+                batch_size=batch_size,
+                diversity_axis=diversity_axis,
+                grounding_flows=grounding,
+                exclusion_list=all_generated,
+            )
+            wave_label = f'wave {batch_num // max_threads + 1}' if max_threads > 1 else ''
             print(f'\n{"="*70}')
-            print(f'BATCH {batch_num + 1}/{num_batches}')
+            print(f'BATCH {batch_num + 1}/{num_batches}' + (f'  ({wave_label})' if wave_label else ''))
             print(f'Model: {model_config["name"]} ({model_config["model_id"]})')
             print(f'Diversity axis: {diversity_axis}')
             print(f'Grounding flows: {[name for name, _ in grounding]}')
@@ -486,102 +593,144 @@ def generate_scenarios(
             print(f'\n--- USER PROMPT ---\n{user_prompt[:1000]}...')
             model_idx += 1
             axis_idx += 1
-            continue
 
-        # Call LLM
-        log.info(
-            'Batch %d/%d: model=%s, axis=%s',
-            batch_num + 1, num_batches, model_config['name'], diversity_axis,
-        )
-
-        try:
-            raw_response = _call_model(model_config, system_prompt, user_prompt)
-        except Exception as e:
-            log.error('Batch %d failed (%s): %s', batch_num + 1, model_config['name'], e)
-            # Advance to next model to avoid getting stuck
-            model_idx += 1
-            continue
-
-        # Parse and validate
-        batch_scenarios = _parse_scenarios(raw_response)
-        if not batch_scenarios:
-            log.warning('Batch %d: no valid scenarios parsed from %s', batch_num + 1, model_config['name'])
-            model_idx += 1
-            continue
-
-        if verbose:
-            log.info('Batch %d: parsed %d scenarios', batch_num + 1, len(batch_scenarios))
-
-        # Dedup and write
-        grounding_flow_names = [name for name, _ in grounding]
-        for scenario_obj in batch_scenarios:
-            if len(new_scenarios) >= remaining:
-                break
-
-            scenario_desc = scenario_obj['scenario']
-
-            # Skip duplicates
-            if _is_duplicate(scenario_desc, all_generated):
-                if verbose:
-                    log.info('Skipping duplicate: %s', scenario_desc[:60])
-                continue
-
-            # Build rich output object
-            scenario_id = f'{domain}_{scenario_counter:03d}'
-            scenario_counter += 1
-
-            # Validate grounding_flows against actual flow names
-            raw_grounding = scenario_obj.get('grounding_flows', [])
-            valid_grounding = [f for f in raw_grounding if f in flows]
-            if not valid_grounding:
-                # Fall back to a random subset of the grounding flows we provided
-                valid_grounding = rng.sample(
-                    grounding_flow_names,
-                    min(2, len(grounding_flow_names)),
-                )
-
-            # Validate grounding_intents
-            raw_intents = scenario_obj.get('grounding_intents', [])
-            all_intent_names = set(by_intent.keys())
-            valid_intents = [i for i in raw_intents if i in all_intent_names]
-            if not valid_intents:
-                # Derive from valid_grounding flows
-                valid_intents = list({
-                    flows[f]['intent'].value
-                    for f in valid_grounding
-                    if f in flows
-                })
-
-            output_obj = {
-                'scenario_id': scenario_id,
-                'domain': domain,
-                'scenario': scenario_desc,
-                'example_utterances': scenario_obj['example_utterances'],
-                'grounding_flows': valid_grounding,
-                'grounding_intents': valid_intents,
-                'diversity_axis': diversity_axis,
-                'model': model_config['model_id'],
-                'provider': model_config['provider'],
-            }
-
-            new_scenarios.append(output_obj)
-            all_generated.append(scenario_desc)
-
-        # Advance round-robin
-        model_idx += 1
-        axis_idx += 1
-
-    if dry_run:
-        print(f'\n[DRY RUN] Would generate ~{num_batches * batch_size} scenarios across {num_batches} batches')
+        num_waves = (num_batches + max_threads - 1) // max_threads
+        print(f'\n[DRY RUN] Would generate ~{num_batches * batch_size} scenarios '
+              f'across {num_batches} batches in {num_waves} waves '
+              f'(max_threads={max_threads})')
         return output_jsonl
 
-    # Append new scenarios to JSONL
-    if new_scenarios:
-        with open(output_jsonl, 'a') as f:
-            for obj in new_scenarios:
-                f.write(json.dumps(obj, ensure_ascii=False) + '\n')
+    # --- Live path: wave-based async orchestration ---
+    wave_num = 0
+    batch_cursor = 0  # global batch counter for logging
 
-        log.info('Wrote %d new scenarios to %s', len(new_scenarios), output_jsonl)
+    while len(new_scenarios) < remaining:
+        # Build batch specs for this wave (up to max_threads batches)
+        wave_specs: list[dict] = []
+        for _ in range(max_threads):
+            if batch_cursor >= num_batches:
+                break
+
+            model_config = active_models[model_idx % len(active_models)]
+            diversity_axis = DIVERSITY_AXES[axis_idx % len(DIVERSITY_AXES)]
+            grounding = _sample_flows(flows, rng, n=7)
+
+            user_prompt = _build_user_prompt(
+                domain=domain,
+                batch_size=batch_size,
+                diversity_axis=diversity_axis,
+                grounding_flows=grounding,
+                exclusion_list=all_generated,
+            )
+
+            wave_specs.append({
+                'model_config': model_config,
+                'user_prompt': user_prompt,
+                'diversity_axis': diversity_axis,
+                'grounding': grounding,
+                'batch_num': batch_cursor,
+            })
+
+            model_idx += 1
+            axis_idx += 1
+            batch_cursor += 1
+
+        if not wave_specs:
+            break
+
+        log.info(
+            'Wave %d: launching %d batches [%s]',
+            wave_num + 1, len(wave_specs),
+            ', '.join(s['model_config']['name'] for s in wave_specs),
+        )
+
+        # Fire all batches in this wave concurrently
+        semaphore = asyncio.Semaphore(max_threads)
+        results = asyncio.run(_run_wave(wave_specs, system_prompt, semaphore))
+
+        # Process results and dedup
+        wave_new: list[dict] = []
+
+        for spec, result in zip(wave_specs, results):
+            bnum = spec['batch_num'] + 1
+            mname = spec['model_config']['name']
+
+            if isinstance(result, BaseException):
+                log.error('Batch %d failed (%s): %s', bnum, mname, result)
+                continue
+
+            batch_scenarios = _parse_scenarios(result)
+            if not batch_scenarios:
+                log.warning('Batch %d: no valid scenarios parsed from %s', bnum, mname)
+                continue
+
+            if verbose:
+                log.info('Batch %d: parsed %d scenarios', bnum, len(batch_scenarios))
+
+            grounding_flow_names = [name for name, _ in spec['grounding']]
+            for scenario_obj in batch_scenarios:
+                if len(new_scenarios) + len(wave_new) >= remaining:
+                    break
+
+                scenario_desc = scenario_obj['scenario']
+
+                # Skip duplicates (check both prior and this wave's new entries)
+                if _is_duplicate(scenario_desc, all_generated):
+                    if verbose:
+                        log.info('Skipping duplicate: %s', scenario_desc[:60])
+                    continue
+
+                scenario_id = f'{domain}_{scenario_counter:03d}'
+                scenario_counter += 1
+
+                # Validate grounding_flows against actual flow names
+                raw_grounding = scenario_obj.get('grounding_flows', [])
+                valid_grounding = [f for f in raw_grounding if f in flows]
+                if not valid_grounding:
+                    valid_grounding = rng.sample(
+                        grounding_flow_names,
+                        min(2, len(grounding_flow_names)),
+                    )
+
+                # Validate grounding_intents
+                raw_intents = scenario_obj.get('grounding_intents', [])
+                all_intent_names = set(by_intent.keys())
+                valid_intents = [i for i in raw_intents if i in all_intent_names]
+                if not valid_intents:
+                    valid_intents = list({
+                        flows[f]['intent'].value
+                        for f in valid_grounding
+                        if f in flows
+                    })
+
+                output_obj = {
+                    'scenario_id': scenario_id,
+                    'domain': domain,
+                    'scenario': scenario_desc,
+                    'example_utterances': scenario_obj['example_utterances'],
+                    'grounding_flows': valid_grounding,
+                    'grounding_intents': valid_intents,
+                    'diversity_axis': spec['diversity_axis'],
+                    'model': spec['model_config']['model_id'],
+                    'provider': spec['model_config']['provider'],
+                }
+
+                wave_new.append(output_obj)
+                all_generated.append(scenario_desc)
+
+        # Flush this wave's results to JSONL immediately
+        if wave_new:
+            with open(output_jsonl, 'a') as f:
+                for obj in wave_new:
+                    f.write(json.dumps(obj, ensure_ascii=False) + '\n')
+            new_scenarios.extend(wave_new)
+            log.info(
+                'Wave %d: wrote %d scenarios (total: %d/%d)',
+                wave_num + 1, len(wave_new),
+                len(existing_scenarios) + len(new_scenarios), target,
+            )
+
+        wave_num += 1
 
     # Write summary meta JSON
     total = len(existing_scenarios) + len(new_scenarios)
@@ -601,6 +750,8 @@ def generate_scenarios(
         'diversity_distribution': axis_counts,
         'seed': seed,
         'batch_size': batch_size,
+        'max_threads': max_threads,
+        'waves': wave_num,
         'output_file': str(output_jsonl),
     }
 
@@ -652,6 +803,10 @@ def main():
         '--verbose', action='store_true',
         help='Enable debug logging',
     )
+    parser.add_argument(
+        '--max-threads', type=int, default=None,
+        help='Max concurrent API calls (default: number of active models)',
+    )
 
     args = parser.parse_args()
 
@@ -674,6 +829,7 @@ def main():
         models_filter=models_filter,
         dry_run=args.dry_run,
         verbose=args.verbose,
+        max_threads=args.max_threads,
     )
 
     print(f'\nOutput: {output_path}')
