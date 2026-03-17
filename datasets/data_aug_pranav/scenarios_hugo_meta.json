@@ -2,17 +2,23 @@
   "domain": "hugo",
   "target": 384,
   "total_scenarios": 384,
-  "new_scenarios": 1,
-  "resumed_from": 383,
+  "new_scenarios": 57,
+  "resumed_from": 327,
   "model_distribution": {
-    "google/gemini-3-pro-preview": 1
+    "claude-sonnet-4-6": 24,
+    "gpt-5.2": 21,
+    "deepseek/deepseek-chat": 12
   },
   "diversity_distribution": {
-    "enterprise and corporate contexts": 1
+    "enterprise and corporate contexts": 12,
+    "personal and hobbyist contexts": 12,
+    "academic and research contexts": 12,
+    "startup and small-business contexts": 12,
+    "non-profit and public-sector contexts": 9
   },
-  "seed": 42,
-  "batch_size": 6,
-  "max_threads": 1,
+  "seed": 43,
+  "batch_size": 12,
+  "max_threads": 6,
   "waves": 1,
   "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_hugo.jsonl"
 }

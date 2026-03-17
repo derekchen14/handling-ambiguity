@@ -1,0 +1,485 @@
+{
+  "domain": "dana",
+  "original_count": 383,
+  "duplicates_removed": 60,
+  "removed_ids": [
+    "dana_001",
+    "dana_003",
+    "dana_025",
+    "dana_027",
+    "dana_032",
+    "dana_036",
+    "dana_042",
+    "dana_051",
+    "dana_066",
+    "dana_071",
+    "dana_085",
+    "dana_105",
+    "dana_106",
+    "dana_111",
+    "dana_123",
+    "dana_132",
+    "dana_138",
+    "dana_159",
+    "dana_160",
+    "dana_164",
+    "dana_167",
+    "dana_185",
+    "dana_194",
+    "dana_196",
+    "dana_198",
+    "dana_199",
+    "dana_207",
+    "dana_215",
+    "dana_223",
+    "dana_232",
+    "dana_236",
+    "dana_241",
+    "dana_247",
+    "dana_249",
+    "dana_274",
+    "dana_289",
+    "dana_291",
+    "dana_296",
+    "dana_305",
+    "dana_307",
+    "dana_315",
+    "dana_316",
+    "dana_319",
+    "dana_322",
+    "dana_325",
+    "dana_339",
+    "dana_340",
+    "dana_341",
+    "dana_352",
+    "dana_358",
+    "dana_359",
+    "dana_361",
+    "dana_363",
+    "dana_364",
+    "dana_368",
+    "dana_370",
+    "dana_373",
+    "dana_374",
+    "dana_380",
+    "dana_381"
+  ],
+  "survivors_count": 323,
+  "final_count": 382,
+  "phase1_clusters": 57,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "dana_336",
+      "remove": [
+        "dana_159"
+      ],
+      "reason": "Both are podcast producers tracking episode performance (downloads) and ad reads with the goal of producing a recurring performance summary/dashboard for team decision-making."
+    },
+    {
+      "keep": "dana_136",
+      "remove": [
+        "dana_194",
+        "dana_001"
+      ],
+      "reason": "All focus on defining/standardizing KPI metric definitions/formulas (e.g., ARR/MRR, gross margin, EBITDA) so analyses and reporting use consistent calculations."
+    },
+    {
+      "keep": "dana_126",
+      "remove": [
+        "dana_071"
+      ],
+      "reason": "Both involve time-series sensor/experiment data with missing readings due to gaps and the goal of filling/interpolating those missing values."
+    },
+    {
+      "keep": "dana_303",
+      "remove": [
+        "dana_106",
+        "dana_247"
+      ],
+      "reason": "All involve time-stamped activity/usage readings with missing hourly/daily values and the goal of imputing/interpolating missing measurements while ensuring timestamps are handled correctly."
+    },
+    {
+      "keep": "dana_057",
+      "remove": [
+        "dana_368"
+      ],
+      "reason": "Both are about filling missing values by carrying forward/forward-filling the most recent known value in a dataset (amounts/department codes)."
+    },
+    {
+      "keep": "dana_035",
+      "remove": [
+        "dana_223"
+      ],
+      "reason": "Both scenarios involve analyzing sales data for e-commerce businesses, focusing on identifying trends."
+    },
+    {
+      "keep": "dana_283",
+      "remove": [
+        "dana_289"
+      ],
+      "reason": "Both scenarios involve preparing reports for corporate leadership with visual highlights for key metrics."
+    },
+    {
+      "keep": "dana_248",
+      "remove": [
+        "dana_185"
+      ],
+      "reason": "Both scenarios involve tracking financial transactions (commissions/payments) to analyze earnings or reconcile data."
+    },
+    {
+      "keep": "dana_038",
+      "remove": [
+        "dana_036"
+      ],
+      "reason": "Both scenarios involve small business inventory or sales tracking against operational data."
+    },
+    {
+      "keep": "dana_140",
+      "remove": [
+        "dana_232"
+      ],
+      "reason": "Both scenarios involve analyzing sales trends for business planning purposes."
+    },
+    {
+      "keep": "dana_270",
+      "remove": [
+        "dana_358"
+      ],
+      "reason": "Both scenarios involve analyzing digital marketing campaign performance to optimize spend."
+    },
+    {
+      "keep": "dana_000",
+      "remove": [
+        "dana_236"
+      ],
+      "reason": "Both scenarios involve standardizing inconsistent contact data formats before integration into a system."
+    },
+    {
+      "keep": "dana_073",
+      "remove": [
+        "dana_003"
+      ],
+      "reason": "Both scenarios involve data type standardization (OS names/price columns) for better analytics."
+    },
+    {
+      "keep": "dana_212",
+      "remove": [
+        "dana_215"
+      ],
+      "reason": "Both scenarios involve filtering or analyzing specialized datasets (patient records/star luminosity) for research purposes."
+    },
+    {
+      "keep": "dana_024",
+      "remove": [
+        "dana_322"
+      ],
+      "reason": "Both scenarios involve restructuring data from wide to long format for analysis or reporting."
+    },
+    {
+      "keep": "dana_257",
+      "remove": [
+        "dana_339"
+      ],
+      "reason": "Both scenarios involve tracking costs (print/class registrations) and analyzing trends over time."
+    },
+    {
+      "keep": "dana_110",
+      "remove": [
+        "dana_199"
+      ],
+      "reason": "Both scenarios involve personal fitness tracking (heart rate/workouts) with a focus on data validation or presentation."
+    },
+    {
+      "keep": "dana_208",
+      "remove": [
+        "dana_381"
+      ],
+      "reason": "Both scenarios involve hobbyist tracking (espresso shots/pantry inventory) for optimization or management."
+    },
+    {
+      "keep": "dana_014",
+      "remove": [
+        "dana_380"
+      ],
+      "reason": "Both scenarios involve cleaning or merging datasets to remove duplicates or standardize entries."
+    },
+    {
+      "keep": "dana_192",
+      "remove": [
+        "dana_361"
+      ],
+      "reason": "Both scenarios involve marketing professionals preparing performance reports with analytical insights."
+    },
+    {
+      "keep": "dana_030",
+      "remove": [
+        "dana_123"
+      ],
+      "reason": "Both involve exporting cleaned data for statistical analysis in SPSS/Excel for research purposes — same domain (research data export) and same user goal (saving cleaned dataset for downstream statistical analysis)."
+    },
+    {
+      "keep": "dana_049",
+      "remove": [
+        "dana_374",
+        "dana_319"
+      ],
+      "reason": "All three involve validating that categorical/code values in a dataset conform to an approved list before submitting a report to a compliance or finance authority — same domain (data validation for compliance reporting) and same user goal."
+    },
+    {
+      "keep": "dana_337",
+      "remove": [
+        "dana_051"
+      ],
+      "reason": "Both involve validating that field values in a dataset conform to an approved set of allowed options before exporting/submitting — dana_051 (voter party affiliation codes) and dana_337 (vendor categories and power requirements) share the same core goal of categorical value validation, though domains differ slightly. However, dana_051 is more specifically about inconsistent historical data entry while dana_337 is about pre-export validation — these are close but not strong duplicates."
+    },
+    {
+      "keep": "dana_148",
+      "remove": [
+        "dana_325"
+      ],
+      "reason": "Both involve a municipal transit authority analyst merging or comparing ridership data across time periods (before/after or year-over-year) to assess changes by route/line — same domain and same analytical goal."
+    },
+    {
+      "keep": "dana_037",
+      "remove": [
+        "dana_132"
+      ],
+      "reason": "Both involve preparing a recurring performance dashboard/report for investors at a startup — same domain (startup investor reporting) and same user goal (churn/performance metrics for investors)."
+    },
+    {
+      "keep": "dana_253",
+      "remove": [
+        "dana_340"
+      ],
+      "reason": "Both involve filling down missing repeated values across line items in sales logs and then summarizing trends by category — same data cleaning goal (fill-down) and same analytical goal (sales summary), just different hobby/business contexts."
+    },
+    {
+      "keep": "dana_302",
+      "remove": [
+        "dana_296"
+      ],
+      "reason": "Both involve a hobbyist removing duplicate entries from repeated imports and standardizing date/format fields in a personal tracking log — same domain (hobbyist log deduplication and formatting) and same user goal."
+    },
+    {
+      "keep": "dana_306",
+      "remove": [
+        "dana_032"
+      ],
+      "reason": "Both involve splitting full names into first/given and last/surname columns for sorting/integration."
+    },
+    {
+      "keep": "dana_130",
+      "remove": [
+        "dana_138"
+      ],
+      "reason": "Both are about removing duplicate records from a startup dataset to improve data accuracy (customer feedback/user data deduplication)."
+    },
+    {
+      "keep": "dana_217",
+      "remove": [
+        "dana_316"
+      ],
+      "reason": "Both scenarios involve analyzing standardized test scores for educational reporting, focusing on district-level data."
+    },
+    {
+      "keep": "dana_070",
+      "remove": [
+        "dana_164"
+      ],
+      "reason": "Both scenarios involve analyzing server logs with a focus on timestamp conversion for error tracking."
+    },
+    {
+      "keep": "dana_209",
+      "remove": [
+        "dana_111"
+      ],
+      "reason": "Both scenarios involve language learners tracking and summarizing their study progress, focusing on date-time formatting and performance metrics."
+    },
+    {
+      "keep": "dana_335",
+      "remove": [
+        "dana_196"
+      ],
+      "reason": "Both scenarios involve redesigning charts for clarity and consistency in professional reports."
+    },
+    {
+      "keep": "dana_060",
+      "remove": [
+        "dana_066"
+      ],
+      "reason": "Both scenarios involve cleaning and formatting contact lists for event invitations in cultural institutions."
+    },
+    {
+      "keep": "dana_353",
+      "remove": [
+        "dana_027"
+      ],
+      "reason": "Both scenarios involve converting string inputs into usable data formats for scientific analysis."
+    },
+    {
+      "keep": "dana_311",
+      "remove": [
+        "dana_025"
+      ],
+      "reason": "Both scenarios involve separating composite data into distinct variables for analysis."
+    },
+    {
+      "keep": "dana_331",
+      "remove": [
+        "dana_341"
+      ],
+      "reason": "Both scenarios involve summarizing performance data in plain language for managerial or grant reporting."
+    },
+    {
+      "keep": "dana_308",
+      "remove": [
+        "dana_307"
+      ],
+      "reason": "Both scenarios involve cleaning datasets to ensure data integrity before analysis."
+    },
+    {
+      "keep": "dana_272",
+      "remove": [
+        "dana_364"
+      ],
+      "reason": "Both scenarios involve preparing marketing performance reports for stakeholder review."
+    },
+    {
+      "keep": "dana_005",
+      "remove": [
+        "dana_198"
+      ],
+      "reason": "Both scenarios involve fixing inconsistent data formatting for reporting purposes."
+    },
+    {
+      "keep": "dana_259",
+      "remove": [
+        "dana_352"
+      ],
+      "reason": "Both scenarios involve merging and analyzing production and quality assurance data."
+    },
+    {
+      "keep": "dana_326",
+      "remove": [
+        "dana_373"
+      ],
+      "reason": "Both scenarios involve preparing financial data for presentation or reporting."
+    },
+    {
+      "keep": "dana_096",
+      "remove": [
+        "dana_105"
+      ],
+      "reason": "Both scenarios involve analyzing performance metrics to identify trends or outliers."
+    },
+    {
+      "keep": "dana_061",
+      "remove": [
+        "dana_241"
+      ],
+      "reason": "Both scenarios involve analyzing attendance or ridership trends for planning purposes."
+    },
+    {
+      "keep": "dana_069",
+      "remove": [
+        "dana_359"
+      ],
+      "reason": "Both scenarios involve adjusting data presentation for professional or campaign purposes."
+    },
+    {
+      "keep": "dana_174",
+      "remove": [
+        "dana_315"
+      ],
+      "reason": "Both scenarios involve filling in missing data entries for analysis."
+    },
+    {
+      "keep": "dana_222",
+      "remove": [
+        "dana_274"
+      ],
+      "reason": "Both scenarios involve analyzing subscription or conversion data for business insights."
+    },
+    {
+      "keep": "dana_343",
+      "remove": [
+        "dana_305"
+      ],
+      "reason": "Both scenarios involve analyzing sensor data with gaps or inconsistencies."
+    },
+    {
+      "keep": "dana_201",
+      "remove": [
+        "dana_207"
+      ],
+      "reason": "Both scenarios involve merging datasets for comprehensive analysis."
+    },
+    {
+      "keep": "dana_329",
+      "remove": [
+        "dana_370"
+      ],
+      "reason": "Both scenarios involve exporting cleaned datasets for external use."
+    },
+    {
+      "keep": "dana_187",
+      "remove": [
+        "dana_291"
+      ],
+      "reason": "Both scenarios involve analyzing financial performance metrics for reporting."
+    },
+    {
+      "keep": "dana_255",
+      "remove": [
+        "dana_160"
+      ],
+      "reason": "Both scenarios involve tracking and analyzing performance metrics for planning purposes."
+    },
+    {
+      "keep": "dana_055",
+      "remove": [
+        "dana_249"
+      ],
+      "reason": "Both scenarios involve analyzing trends in educational or performance data."
+    },
+    {
+      "keep": "dana_040",
+      "remove": [
+        "dana_363"
+      ],
+      "reason": "Both scenarios involve comparing performance metrics across different segments."
+    },
+    {
+      "keep": "dana_087",
+      "remove": [
+        "dana_042"
+      ],
+      "reason": "Both focus on analyzing customer retention/churn patterns for subscription-based businesses, with the same analytical goal of understanding why customers leave."
+    },
+    {
+      "keep": "dana_357",
+      "remove": [
+        "dana_085"
+      ],
+      "reason": "Both involve analyzing blog post performance metrics to inform content strategy decisions, same domain and user goal."
+    },
+    {
+      "keep": "dana_226",
+      "remove": [
+        "dana_167"
+      ],
+      "reason": "Both involve preparing a performance summary/report for stakeholders (client or management), focused on tracking and summarizing operational metrics for a status report context."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": true,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}

@@ -2,18 +2,18 @@
   "domain": "hugo",
   "total_input": 384,
   "total_enriched": 384,
-  "new_enriched": 15,
-  "resumed_from": 369,
+  "new_enriched": 57,
+  "resumed_from": 327,
   "failed": 0,
   "failed_ids": [],
   "model_distribution": {
-    "gpt-5.2": 5,
-    "claude-sonnet-4-6": 5,
-    "deepseek/deepseek-chat": 5
+    "deepseek/deepseek-chat": 19,
+    "claude-sonnet-4-6": 19,
+    "gpt-5.2": 19
   },
-  "seed": 42,
+  "seed": 43,
   "batch_size": 8,
-  "max_threads": 20,
-  "waves": 1,
+  "max_threads": 6,
+  "waves": 2,
   "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_hugo_enriched.jsonl"
 }

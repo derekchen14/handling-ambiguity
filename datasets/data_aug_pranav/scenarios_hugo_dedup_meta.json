@@ -1,0 +1,461 @@
+{
+  "domain": "hugo",
+  "original_count": 384,
+  "duplicates_removed": 57,
+  "removed_ids": [
+    "hugo_014",
+    "hugo_022",
+    "hugo_025",
+    "hugo_038",
+    "hugo_039",
+    "hugo_058",
+    "hugo_080",
+    "hugo_088",
+    "hugo_092",
+    "hugo_104",
+    "hugo_111",
+    "hugo_125",
+    "hugo_138",
+    "hugo_142",
+    "hugo_143",
+    "hugo_145",
+    "hugo_147",
+    "hugo_159",
+    "hugo_161",
+    "hugo_165",
+    "hugo_166",
+    "hugo_170",
+    "hugo_172",
+    "hugo_187",
+    "hugo_193",
+    "hugo_196",
+    "hugo_202",
+    "hugo_222",
+    "hugo_228",
+    "hugo_229",
+    "hugo_231",
+    "hugo_233",
+    "hugo_234",
+    "hugo_249",
+    "hugo_251",
+    "hugo_256",
+    "hugo_258",
+    "hugo_268",
+    "hugo_274",
+    "hugo_275",
+    "hugo_279",
+    "hugo_285",
+    "hugo_288",
+    "hugo_295",
+    "hugo_302",
+    "hugo_310",
+    "hugo_321",
+    "hugo_327",
+    "hugo_349",
+    "hugo_352",
+    "hugo_356",
+    "hugo_357",
+    "hugo_358",
+    "hugo_362",
+    "hugo_366",
+    "hugo_373",
+    "hugo_381"
+  ],
+  "survivors_count": 327,
+  "final_count": 384,
+  "phase1_clusters": 54,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "hugo_269",
+      "remove": [
+        "hugo_222"
+      ],
+      "reason": "Both are e-commerce startup blog posts comparing their platform to competitors (Shopify), targeting small business owners."
+    },
+    {
+      "keep": "hugo_055",
+      "remove": [
+        "hugo_321",
+        "hugo_143"
+      ],
+      "reason": "All three are about a public/county library system writing a blog post announcing a new digital literacy program for seniors. hugo_321 adds Medium cross-posting detail and hugo_143 adds homepage featuring, but the core scenario is the same."
+    },
+    {
+      "keep": "hugo_049",
+      "remove": [
+        "hugo_147"
+      ],
+      "reason": "Both involve a municipal/city transit authority writing a blog post about new bus route/corridor changes for commuters/affected neighborhoods."
+    },
+    {
+      "keep": "hugo_253",
+      "remove": [
+        "hugo_161"
+      ],
+      "reason": "Both are dance choreographers writing a blog post reflecting on/explaining a new piece, with interest in voice consistency and engaging non-dancer readers."
+    },
+    {
+      "keep": "hugo_144",
+      "remove": [
+        "hugo_234"
+      ],
+      "reason": "Both involve nonprofit communications staff researching past published content to plan new posts about policy changes — hugo_144 is housing/refugee policy, hugo_234 is wetland conservation policy, but the scenario structure (browsing past content to find gaps before drafting a policy-related post) is semantically very similar. However, these are different domains so they are NOT duplicates."
+    },
+    {
+      "keep": "hugo_051",
+      "remove": [
+        "hugo_145"
+      ],
+      "reason": "Both involve a state department of education staffer writing/editing a blog post about education programs for school administrators, but hugo_051 is drafting a new post about literacy grants while hugo_145 is cleaning up formatting — different goals, so NOT duplicates."
+    },
+    {
+      "keep": "hugo_179",
+      "remove": [
+        "hugo_088"
+      ],
+      "reason": "Both are content/marketing blog posts about content strategy planning — hugo_179 is about quarterly blog calendars and hugo_088 is about content strategy growth metrics. These are related but have different specific goals, so NOT duplicates."
+    },
+    {
+      "keep": "hugo_019",
+      "remove": [
+        "hugo_014"
+      ],
+      "reason": "Both are personal hobby blogs where the user browses saved ideas and content gaps to pick the next post topic — hugo_019 is personal finance/budgeting and hugo_014 is DIY woodworking. Same user goal and workflow, different domain, so NOT duplicates."
+    },
+    {
+      "keep": "hugo_369",
+      "remove": [
+        "hugo_193",
+        "hugo_279",
+        "hugo_381"
+      ],
+      "reason": "All are corporate/legal/compliance blog posts whose goal is to explain new/updated regulations in clear, accessible language for a non-expert audience (avoid legal jargon / overly legalistic tone)."
+    },
+    {
+      "keep": "hugo_277",
+      "remove": [
+        "hugo_349"
+      ],
+      "reason": "Both are cybersecurity content focused on ransomware (trends/strain intelligence) with the goal of informing a technical security audience using threat context and historical vectors."
+    },
+    {
+      "keep": "hugo_344",
+      "remove": [
+        "hugo_166"
+      ],
+      "reason": "Both are programming tutorials where the user goal is to ensure code snippets and headings/styling are presented correctly on the blogging platform."
+    },
+    {
+      "keep": "hugo_338",
+      "remove": [
+        "hugo_159"
+      ],
+      "reason": "Both are graphic designer case-study blog posts about branding/rebranding work, with the goal of publishing/presenting the case study in a way suitable for attracting/promoting to clients."
+    },
+    {
+      "keep": "hugo_141",
+      "remove": [
+        "hugo_233"
+      ],
+      "reason": "Both scenarios involve a public health department blog post explaining a new free vaccination program to low-income residents, focusing on accessibility and plain language."
+    },
+    {
+      "keep": "hugo_035",
+      "remove": [
+        "hugo_038"
+      ],
+      "reason": "Both scenarios involve a SaaS startup blog post about simplifying workflows or promoting freelancer tips, targeting similar audiences."
+    },
+    {
+      "keep": "hugo_221",
+      "remove": [
+        "hugo_196"
+      ],
+      "reason": "Both scenarios involve a SaaS startup blog post announcing a new feature or platform update, targeting existing customers."
+    },
+    {
+      "keep": "hugo_073",
+      "remove": [
+        "hugo_170"
+      ],
+      "reason": "Both scenarios involve drafting a blog post about migrating from a monolith to microservices, targeting stakeholders or reflecting on legacy code."
+    },
+    {
+      "keep": "hugo_012",
+      "remove": [
+        "hugo_288"
+      ],
+      "reason": "Both scenarios involve a personal hobby blog post (sourdough baking and woodworking) where the user is turning notes into a structured guide."
+    },
+    {
+      "keep": "hugo_227",
+      "remove": [
+        "hugo_202"
+      ],
+      "reason": "Both scenarios involve travel-related blog posts, one about safety measures and the other about a Kyoto trip, but both are focused on travel tips."
+    },
+    {
+      "keep": "hugo_257",
+      "remove": [
+        "hugo_080"
+      ],
+      "reason": "Both scenarios involve technical blog posts aimed at educating a general audience (data cleaning with Python and LLM fine-tuning)."
+    },
+    {
+      "keep": "hugo_375",
+      "remove": [
+        "hugo_366"
+      ],
+      "reason": "Both scenarios involve corporate blog posts explaining improvements or updates (logistics efficiency and quarterly earnings) to boost stakeholder confidence."
+    },
+    {
+      "keep": "hugo_322",
+      "remove": [
+        "hugo_327"
+      ],
+      "reason": "Both scenarios involve nonprofit blog posts aimed at community engagement (zoning hearing and legal aid resources), focusing on advocacy and support."
+    },
+    {
+      "keep": "hugo_360",
+      "remove": [
+        "hugo_231"
+      ],
+      "reason": "Both scenarios involve marketing blog posts announcing new collaborations or releases (influencer collaboration and game release)."
+    },
+    {
+      "keep": "hugo_013",
+      "remove": [
+        "hugo_285"
+      ],
+      "reason": "Both scenarios involve personal running blog posts where the user is refining race recaps or notes into a structured story."
+    },
+    {
+      "keep": "hugo_024",
+      "remove": [
+        "hugo_125"
+      ],
+      "reason": "Both scenarios involve summarizing complex topics (grant aims and medical research) for a general audience, focusing on accessibility."
+    },
+    {
+      "keep": "hugo_185",
+      "remove": [
+        "hugo_357"
+      ],
+      "reason": "Both scenarios involve marketing blog posts about best practices (lead generation and email open rates) for business audiences."
+    },
+    {
+      "keep": "hugo_003",
+      "remove": [
+        "hugo_310"
+      ],
+      "reason": "Both scenarios involve corporate blog posts about updates or reminders (inventory forecasting and holiday shipping deadlines) for business audiences."
+    },
+    {
+      "keep": "hugo_260",
+      "remove": [
+        "hugo_172"
+      ],
+      "reason": "Both are about comparing React vs Vue.js/frontend frameworks, same technical topic and goal"
+    },
+    {
+      "keep": "hugo_110",
+      "remove": [
+        "hugo_022"
+      ],
+      "reason": "Both are personal home coffee/espresso hobby blogs creating outlines for grinder-related posts for beginners"
+    },
+    {
+      "keep": "hugo_097",
+      "remove": [
+        "hugo_275"
+      ],
+      "reason": "Both are consulting/professional services firms writing blog posts summarizing digital transformation insights targeting C-suite/senior decision makers"
+    },
+    {
+      "keep": "hugo_272",
+      "remove": [
+        "hugo_228"
+      ],
+      "reason": "Both are startup marketing blog posts announcing a new product/service launch targeting their user/fan base — fitness virtual classes and game release are both product launch announcements in startup contexts, though these are different enough domains to reconsider; keeping as non-duplicate"
+    },
+    {
+      "keep": "hugo_097",
+      "remove": [
+        "hugo_274"
+      ],
+      "reason": "Both are B2B/consulting thought leadership blog posts on digital transformation/AI governance targeting C-suite decision makers"
+    },
+    {
+      "keep": "hugo_319",
+      "remove": [
+        "hugo_092"
+      ],
+      "reason": "Both are gaming-focused blog posts reflecting on growth/launch trends in the gaming/esports space with a revision/reflection goal"
+    },
+    {
+      "keep": "hugo_071",
+      "remove": [
+        "hugo_256"
+      ],
+      "reason": "Both are DevOps/SRE-style post-mortem blog posts about a recent outage, with the goal of producing a professional, blameless incident write-up."
+    },
+    {
+      "keep": "hugo_347",
+      "remove": [
+        "hugo_165"
+      ],
+      "reason": "Both are software release notes announcing a major version update, aimed at external developers, with the goal of clearly formatting/communicating version changes."
+    },
+    {
+      "keep": "hugo_048",
+      "remove": [
+        "hugo_142"
+      ],
+      "reason": "Both are year-end nonprofit donor-facing posts that structure impact statistics and stories into a compelling narrative to engage donors."
+    },
+    {
+      "keep": "hugo_271",
+      "remove": [
+        "hugo_039"
+      ],
+      "reason": "Both scenarios involve writing a blog post for a fitness-related audience, focusing on new class schedules or virtual workout classes."
+    },
+    {
+      "keep": "hugo_316",
+      "remove": [
+        "hugo_358"
+      ],
+      "reason": "Both scenarios involve writing a blog post about fitness-related topics, focusing on home workout mistakes or A/B testing benefits."
+    },
+    {
+      "keep": "hugo_309",
+      "remove": [
+        "hugo_268"
+      ],
+      "reason": "Both scenarios involve drafting a blog post to announce a new AI-powered feature for a SaaS startup, targeting different audiences."
+    },
+    {
+      "keep": "hugo_273",
+      "remove": [
+        "hugo_187"
+      ],
+      "reason": "Both scenarios involve drafting a blog post announcing a new hybrid work policy for a corporate audience."
+    },
+    {
+      "keep": "hugo_096",
+      "remove": [
+        "hugo_104"
+      ],
+      "reason": "Both scenarios involve ensuring consistency in tone and style across blog posts for enterprise software companies."
+    },
+    {
+      "keep": "hugo_329",
+      "remove": [
+        "hugo_058"
+      ],
+      "reason": "Both scenarios involve writing a blog post for a nonprofit organization aimed at shifting public perception and reducing stigma."
+    },
+    {
+      "keep": "hugo_342",
+      "remove": [
+        "hugo_251"
+      ],
+      "reason": "Both scenarios involve a theater director blogging about rehearsal notes or staging a difficult scene."
+    },
+    {
+      "keep": "hugo_294",
+      "remove": [
+        "hugo_111"
+      ],
+      "reason": "Both scenarios involve writing blog posts related to tabletop RPG sessions, focusing on recaps or session summaries."
+    },
+    {
+      "keep": "hugo_064",
+      "remove": [
+        "hugo_249"
+      ],
+      "reason": "Both scenarios involve a ceramic artist publishing a studio update or documenting a new glaze experiment series on their blog."
+    },
+    {
+      "keep": "hugo_207",
+      "remove": [
+        "hugo_025"
+      ],
+      "reason": "Both scenarios involve writing a blog post about a personal or professional topic, focusing on book reviews or publication summaries."
+    },
+    {
+      "keep": "hugo_306",
+      "remove": [
+        "hugo_258"
+      ],
+      "reason": "Both scenarios involve writing a technical blog post related to engineering topics, focusing on bridge safety features or geometric dimensioning and tolerancing."
+    },
+    {
+      "keep": "hugo_335",
+      "remove": [
+        "hugo_352"
+      ],
+      "reason": "Both scenarios involve writing a technical blog post related to game development or blockchain, focusing on environmental storytelling or smart contract audits."
+    },
+    {
+      "keep": "hugo_305",
+      "remove": [
+        "hugo_302"
+      ],
+      "reason": "Both scenarios involve writing a blog post related to academic or scientific topics, focusing on black hole imaging or psychology study recaps."
+    },
+    {
+      "keep": "hugo_361",
+      "remove": [
+        "hugo_362"
+      ],
+      "reason": "Both scenarios involve writing a blog post about marketing strategies, focusing on creating viral content or explaining the benefits of retargeting ads."
+    },
+    {
+      "keep": "hugo_230",
+      "remove": [
+        "hugo_229"
+      ],
+      "reason": "Both scenarios involve writing a blog post for a startup, focusing on skincare tips or the benefits of using their platform."
+    },
+    {
+      "keep": "hugo_100",
+      "remove": [
+        "hugo_373"
+      ],
+      "reason": "Both are corporate blog posts about sustainability/ESG topics targeting professional peers in the industry, sharing the same domain and goal of communicating sustainability achievements/practices."
+    },
+    {
+      "keep": "hugo_085",
+      "remove": [
+        "hugo_356"
+      ],
+      "reason": "Both are e-commerce brand blog posts targeting customers/growth, sharing the same domain (e-commerce brand blogging) and similar goal of driving sales/customer engagement."
+    },
+    {
+      "keep": "hugo_084",
+      "remove": [
+        "hugo_295"
+      ],
+      "reason": "Both are fitness blog posts focused on workout/training content for personal audiences, sharing the same domain and goal of discussing fitness routines/progress."
+    },
+    {
+      "keep": "hugo_033",
+      "remove": [
+        "hugo_138"
+      ],
+      "reason": "Both involve content creation about environmental sustainability topics (renewable energy / sustainable packaging) aimed at public or industry audiences with an eco-focused message."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": true,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}
