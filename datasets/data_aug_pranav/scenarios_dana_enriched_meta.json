@@ -1,0 +1,17 @@
+{
+  "domain": "dana",
+  "total_input": 384,
+  "total_enriched": 383,
+  "new_enriched": 0,
+  "resumed_from": 383,
+  "failed": 1,
+  "failed_ids": [
+    "dana_204"
+  ],
+  "model_distribution": {},
+  "seed": 42,
+  "batch_size": 4,
+  "max_threads": 3,
+  "waves": 1,
+  "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_dana_enriched.jsonl"
+}
