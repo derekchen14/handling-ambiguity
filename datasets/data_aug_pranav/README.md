@@ -48,8 +48,38 @@ uv run datasets/data_aug_pranav/enrich_scenarios.py \
 
 Resumable — rerun the same command to pick up where it left off.
 
+### Step 3: Semantic Deduplication
+
+Step 1 applies Jaccard dedup (threshold 0.5), which only catches lexical overlap. This step uses LLMs to find semantic duplicates — scenarios with the same domain/topic and user goal but different wording — then backfills via Steps 1+2 to restore the original count.
+
+**Two-phase approach:**
+- **Phase 1 (within-batch):** Split scenarios into batches of ~60, each sent to an LLM to identify duplicate clusters.
+- **Phase 2 (cross-batch):** Send all survivors in a single consolidation call to catch duplicates that spanned different Phase 1 batches.
+
+```bash
+# Dry run — prints prompts and batch composition, no API calls
+python datasets/data_aug_pranav/dedup_scenarios.py \
+    --domain hugo --dry-run
+
+# Dedup only — inspect results before backfilling
+python datasets/data_aug_pranav/dedup_scenarios.py \
+    --domain hugo --skip-backfill
+
+# Full run — dedup + backfill to restore original count
+python datasets/data_aug_pranav/dedup_scenarios.py \
+    --domain hugo --batch-size 60 --seed 43 --max-threads 6
+```
+
+**Input:** `scenarios_<domain>_enriched.jsonl` (from Step 2)
+
+**Output:**
+- `scenarios_<domain>_enriched_deduped.jsonl` — final deduped enriched scenarios (new file, originals untouched until backfill)
+- `scenarios_<domain>_dedup_meta.json` — duplicate clusters, counts, and model distribution
+
+During backfill, deduped IDs are removed from the base and enriched JSONL files, then `generate_scenarios` and `enrich_scenarios` are called to fill the gap.
+
 ---
 
-**Providers:** Anthropic (Claude), OpenAI (GPT), Google (Gemini via OpenRouter), DeepSeek (via OpenRouter).
+**Providers:** Anthropic (Claude), OpenAI (GPT), Google (Gemini via OpenRouter), DeepSeek (via OpenRouter). Step 3 skips Gemini by default.
 
 **Required env vars:** `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPEN_ROUTER_API_KEY` (set in `.env` at project root).
