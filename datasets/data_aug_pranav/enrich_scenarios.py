@@ -116,6 +116,30 @@ def _flows_by_intent(flows: dict) -> dict[str, list[str]]:
     return groups
 
 
+def _load_flow_mapping(domain: str) -> str:
+    """Load flow-tool mapping markdown for the domain."""
+    path = _PROJECT_ROOT / 'tools' / f'flow_tool_mapping_{domain}.md'
+    return path.read_text()
+
+
+def _load_tool_manifest(domain: str) -> str:
+    """Load tool manifest JSON for the domain."""
+    path = _PROJECT_ROOT / 'tools' / f'tool_manifest_{domain}.json'
+    return path.read_text()
+
+
+def _assign_anchor_flows(scenarios: list[dict], user_facing: dict, rng: random.Random) -> list[dict]:
+    """Round-robin assign 2 anchor flows per scenario for uniform distribution."""
+    flow_names = sorted(user_facing.keys())
+    rng.shuffle(flow_names)
+    result = []
+    for i, sc in enumerate(scenarios):
+        a = flow_names[(2 * i) % len(flow_names)]
+        b = flow_names[(2 * i + 1) % len(flow_names)]
+        result.append({**sc, 'anchor_flows': [a, b]})
+    return result
+
+
 # ── Async provider call functions ────────────────────────────────────
 
 async def _call_anthropic_async(system_prompt: str, user_prompt: str) -> str:
@@ -226,7 +250,7 @@ async def _run_wave(batch_specs: list[dict], system_prompt: str, semaphore: asyn
 
 # ── Prompt builders ──────────────────────────────────────────────────
 
-def _build_system_prompt(domain: str, user_facing: dict) -> str:
+def _build_system_prompt(domain: str, user_facing: dict, flow_mapping_text: str, tool_manifest_text: str) -> str:
     """Build the system prompt for flow sequence enrichment."""
     domain_name = DOMAIN_NAMES[domain]
     domain_desc = DOMAIN_DESCRIPTIONS[domain]
@@ -243,7 +267,15 @@ def _build_system_prompt(domain: str, user_facing: dict) -> str:
 
     return f"""You are a workflow analyst for {domain_name}, {domain_desc}.
 
-Your task: given a scenario, identify the natural sequence of 5-7 flows a user would progress through to accomplish their goal in that scenario.
+Your task: given a scenario, identify the natural sequence of 5-7 flows a user would progress through to accomplish their goal in that scenario. Also generate refreshed example_utterances that reflect the full scenario including the anchor flows.
+
+## Flow-Tool Mapping
+
+{flow_mapping_text}
+
+## Tool Manifest
+
+{tool_manifest_text}
 
 ## Flow Catalog
 
@@ -252,18 +284,21 @@ Your task: given a scenario, identify the natural sequence of 5-7 flows a user w
 ## Rules
 
 1. Return exactly 5-7 flows per scenario. No fewer, no more.
-2. The sequence must use at least 2 different intents (e.g. Research + Draft, or Draft + Revise).
-3. No duplicate flows in a single sequence — each flow appears at most once.
-4. Every flow name must come from the catalog above. Do not invent flow names.
-5. Include at least one adjacent pair where the second flow appears in the first flow's edge_flows list.
-6. Order flows by natural workflow progression — earlier phases (Research) before later phases (Publish).
-7. Consider the scenario's example_utterances to understand what the user actually needs.
+2. The sequence must use at least 3 different intents.
+3. No more than 2 flows from any single intent in one sequence.
+4. No duplicate flows in a single sequence — each flow appears at most once.
+5. Every flow name must come from the catalog above. Do not invent flow names.
+6. Include at least one adjacent pair where the second flow appears in the first flow's edge_flows list.
+7. You MUST include both of the scenario's anchor_flows in the flow_sequence. Build the rest of the sequence naturally around them.
+8. Sequences may jump between phases — real users don't follow strict linear order. A user might Draft, then Research, then Revise, then Publish, then Converse.
+9. Consider the scenario's example_utterances to understand what the user actually needs.
 
 ## Output Format
 
 Return a JSON array of objects, one per scenario. Each object must have:
 - "scenario_id": the scenario_id from the input
 - "flow_sequence": an array of objects, each with "flow" (flow name) and "intent" (the intent of that flow from the catalog)
+- "example_utterances": an array of exactly 4 short, natural user utterances that reflect the scenario and its anchor flows
 
 Return valid JSON only. No markdown fences, no explanation outside the JSON array."""
 
@@ -278,6 +313,7 @@ def _build_user_prompt(scenarios: list[dict]) -> str:
             'example_utterances': s['example_utterances'],
             'grounding_flows': s.get('grounding_flows', []),
             'grounding_intents': s.get('grounding_intents', []),
+            'anchor_flows': s.get('anchor_flows', []),
         })
 
     return f"""Enrich the following {len(scenarios)} scenarios with flow sequences.
@@ -321,6 +357,9 @@ def _parse_enrichments(raw: str) -> list[dict]:
             continue
         if 'flow_sequence' not in item or not isinstance(item['flow_sequence'], list):
             continue
+        # Extract example_utterances if present
+        if 'example_utterances' in item and isinstance(item['example_utterances'], list):
+            item['example_utterances'] = [u for u in item['example_utterances'] if isinstance(u, str)]
         valid.append(item)
 
     return valid
@@ -328,7 +367,7 @@ def _parse_enrichments(raw: str) -> list[dict]:
 
 # ── Validation and auto-repair ───────────────────────────────────────
 
-def _validate_flow_sequence(flow_seq: list[dict], user_facing: dict) -> list[str]:
+def _validate_flow_sequence(flow_seq: list[dict], user_facing: dict, anchor_flows: list[str] | None = None) -> list[str]:
     """Validate a flow sequence. Returns list of error strings (empty = valid)."""
     errors = []
 
@@ -352,15 +391,21 @@ def _validate_flow_sequence(flow_seq: list[dict], user_facing: dict) -> list[str
             if step.get('intent') != expected_val:
                 errors.append(f'wrong_intent: {fname} should be {expected_val}, got {step.get("intent")}')
 
-    # 4. At least 2 distinct intents
-    intents = set()
+    # 4. At least 3 distinct intents
+    intent_counts: dict[str, int] = {}
     for step in flow_seq:
         fname = step.get('flow')
         if fname in user_facing:
             iv = user_facing[fname]['intent']
-            intents.add(iv.value if hasattr(iv, 'value') else str(iv))
-    if len(intents) < 2:
-        errors.append(f'single_intent: only {intents}')
+            iv_str = iv.value if hasattr(iv, 'value') else str(iv)
+            intent_counts[iv_str] = intent_counts.get(iv_str, 0) + 1
+    if len(intent_counts) < 3:
+        errors.append(f'too_few_intents: only {set(intent_counts.keys())} (need 3+)')
+
+    # 4b. No more than 2 flows from any single intent
+    for intent_val, count in intent_counts.items():
+        if count > 2:
+            errors.append(f'intent_overload: {intent_val} has {count} flows (max 2)')
 
     # 5. No duplicate flows
     flow_names = [s.get('flow') for s in flow_seq]
@@ -379,10 +424,17 @@ def _validate_flow_sequence(flow_seq: list[dict], user_facing: dict) -> list[str
     if not has_edge_pair:
         errors.append('no_edge_pair: no adjacent flows connected by edge_flows')
 
+    # 7. Anchor flows must be present
+    if anchor_flows:
+        seq_flow_names = {s.get('flow') for s in flow_seq}
+        for af in anchor_flows:
+            if af not in seq_flow_names:
+                errors.append(f'missing_anchor: {af} not in sequence')
+
     return errors
 
 
-def _auto_repair(flow_seq: list[dict], user_facing: dict, rng: random.Random) -> list[dict]:
+def _auto_repair(flow_seq: list[dict], user_facing: dict, rng: random.Random, anchor_flows: list[str] | None = None) -> list[dict]:
     """Attempt to auto-repair a flow sequence. Returns repaired copy."""
     seq = [dict(step) for step in flow_seq]  # shallow copy each step
 
@@ -405,38 +457,139 @@ def _auto_repair(flow_seq: list[dict], user_facing: dict, rng: random.Random) ->
             deduped.append(step)
     seq = deduped
 
-    # Too long → truncate to 7
-    if len(seq) > 7:
-        seq = seq[:7]
+    # Insert missing anchor flows before truncation/padding
+    if anchor_flows:
+        seq_flow_names = {s['flow'] for s in seq}
+        for af in anchor_flows:
+            if af in user_facing and af not in seq_flow_names:
+                intent_val = user_facing[af]['intent']
+                seq.append({
+                    'flow': af,
+                    'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
+                })
 
-    # Too short → append from edge_flows of last flow
+    # Fix intent overload: replace excess flows from over-represented intents
+    # with flows from under-represented intents
+    anchor_set = set(anchor_flows) if anchor_flows else set()
+
+    def _get_intent(fname):
+        iv = user_facing[fname]['intent']
+        return iv.value if hasattr(iv, 'value') else str(iv)
+
+    for _ in range(5):  # up to 5 repair passes
+        intent_counts: dict[str, list[int]] = {}  # intent -> list of indices
+        for idx, step in enumerate(seq):
+            fname = step.get('flow')
+            if fname in user_facing:
+                iv_str = _get_intent(fname)
+                intent_counts.setdefault(iv_str, []).append(idx)
+
+        # Find an overloaded intent (>2 flows)
+        overloaded = [(iv, idxs) for iv, idxs in intent_counts.items() if len(idxs) > 2]
+        if not overloaded:
+            break
+
+        iv_over, idxs_over = overloaded[0]
+        # Pick a non-anchor index to replace
+        replaceable = [i for i in idxs_over if seq[i]['flow'] not in anchor_set]
+        if not replaceable:
+            break  # all overloaded flows are anchors, can't fix
+
+        # Find intents with 0 flows (for diversity) or fewest flows
+        all_intents_in_seq = set(intent_counts.keys())
+        # Get all possible intents from user_facing
+        all_possible_intents = set()
+        for f in user_facing:
+            all_possible_intents.add(_get_intent(f))
+        missing_intents = all_possible_intents - all_intents_in_seq
+
+        # Candidate replacement flows
+        seq_flow_names = {s['flow'] for s in seq}
+        if missing_intents:
+            candidates = [
+                f for f in user_facing
+                if f not in seq_flow_names and _get_intent(f) in missing_intents
+            ]
+        else:
+            # Pick from least-represented intent
+            min_count = min(len(idxs) for idxs in intent_counts.values())
+            min_intents = [iv for iv, idxs in intent_counts.items() if len(idxs) == min_count and iv != iv_over]
+            candidates = [
+                f for f in user_facing
+                if f not in seq_flow_names and _get_intent(f) in min_intents
+            ]
+
+        if not candidates:
+            break
+
+        pick = rng.choice(candidates)
+        replace_idx = replaceable[-1]  # replace last occurrence
+        seq[replace_idx] = {
+            'flow': pick,
+            'intent': _get_intent(pick),
+        }
+
+    # Too long → truncate to 7, never removing anchor flows
+    if len(seq) > 7:
+        # Partition into anchor and non-anchor
+        anchored = [s for s in seq if s['flow'] in anchor_set]
+        non_anchored = [s for s in seq if s['flow'] not in anchor_set]
+        # Keep all anchors + fill remaining slots from non-anchored (preserve order)
+        slots = 7 - len(anchored)
+        seq = non_anchored[:slots] + anchored
+        # Re-sort to maintain a reasonable order (by original position)
+        original_order = {s['flow']: i for i, s in enumerate(flow_seq)}
+        seq.sort(key=lambda s: original_order.get(s['flow'], 999))
+
+    # Too short → append flows, preferring intents not yet in sequence
     attempts = 0
     while len(seq) < 5 and attempts < 10:
         attempts += 1
+        # Compute current intent distribution
+        current_intents = set()
+        for s in seq:
+            fname = s.get('flow')
+            if fname in user_facing:
+                iv = user_facing[fname]['intent']
+                current_intents.add(iv.value if hasattr(iv, 'value') else str(iv))
+
+        # Prefer flows from intents not yet represented
+        remaining = [f for f in user_facing if f not in {s['flow'] for s in seq}]
+        underrepresented = [
+            f for f in remaining
+            if (user_facing[f]['intent'].value if hasattr(user_facing[f]['intent'], 'value') else str(user_facing[f]['intent']))
+            not in current_intents
+        ]
+
+        # Try edge_flows of last flow first
         last_flow = seq[-1]['flow'] if seq else None
         if last_flow and last_flow in user_facing:
             edges = user_facing[last_flow].get('edge_flows', [])
-            # Filter to user-facing and not already in sequence
-            candidates = [e for e in edges if e in user_facing and e not in {s['flow'] for s in seq}]
-            if candidates:
-                pick = rng.choice(candidates)
-                intent_val = user_facing[pick]['intent']
-                seq.append({
-                    'flow': pick,
-                    'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
-                })
-                continue
-        # Fallback: pick any user-facing flow not already in sequence
-        remaining = [f for f in user_facing if f not in {s['flow'] for s in seq}]
-        if remaining:
+            edge_candidates = [e for e in edges if e in user_facing and e not in {s['flow'] for s in seq}]
+            # Prefer edge candidates from underrepresented intents
+            edge_under = [e for e in edge_candidates if e in underrepresented]
+            if edge_under:
+                pick = rng.choice(edge_under)
+            elif edge_candidates:
+                pick = rng.choice(edge_candidates)
+            elif underrepresented:
+                pick = rng.choice(underrepresented)
+            elif remaining:
+                pick = rng.choice(remaining)
+            else:
+                break
+        elif underrepresented:
+            pick = rng.choice(underrepresented)
+        elif remaining:
             pick = rng.choice(remaining)
-            intent_val = user_facing[pick]['intent']
-            seq.append({
-                'flow': pick,
-                'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
-            })
         else:
             break
+
+        intent_val = user_facing[pick]['intent']
+        seq.append({
+            'flow': pick,
+            'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
+        })
 
     # No edge_flow pair → swap last flow with one from edge_flows of second-to-last
     has_edge_pair = False
@@ -455,10 +608,25 @@ def _auto_repair(flow_seq: list[dict], user_facing: dict, rng: random.Random) ->
             if candidates:
                 pick = rng.choice(candidates)
                 intent_val = user_facing[pick]['intent']
-                seq[-1] = {
-                    'flow': pick,
-                    'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
-                }
+                # Only swap last flow if it's not an anchor
+                if seq[-1]['flow'] not in anchor_set:
+                    seq[-1] = {
+                        'flow': pick,
+                        'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
+                    }
+                else:
+                    # Insert before the last (anchor) flow instead
+                    seq.insert(-1, {
+                        'flow': pick,
+                        'intent': intent_val.value if hasattr(intent_val, 'value') else str(intent_val),
+                    })
+                    # Truncate if now too long
+                    if len(seq) > 7:
+                        # Remove a non-anchor from the front
+                        for idx in range(len(seq)):
+                            if seq[idx]['flow'] not in anchor_set:
+                                seq.pop(idx)
+                                break
 
     return seq
 
@@ -551,8 +719,15 @@ def enrich_scenarios(
         len(remaining_scenarios), domain, len(enriched_ids), len(all_scenarios),
     )
 
+    # Load full context files once
+    flow_mapping_text = _load_flow_mapping(domain)
+    tool_manifest_text = _load_tool_manifest(domain)
+
+    # Assign anchor flows for uniform distribution
+    remaining_scenarios = _assign_anchor_flows(remaining_scenarios, user_facing, rng)
+
     # Build system prompt once
-    system_prompt = _build_system_prompt(domain, user_facing)
+    system_prompt = _build_system_prompt(domain, user_facing, flow_mapping_text, tool_manifest_text)
 
     # Concurrency setup
     if max_threads is None:
@@ -670,12 +845,13 @@ def enrich_scenarios(
                     continue
 
                 flow_seq = enrichment['flow_sequence']
+                scenario_anchors = scenario.get('anchor_flows', [])
 
                 # Auto-repair before validation
-                flow_seq = _auto_repair(flow_seq, user_facing, rng)
+                flow_seq = _auto_repair(flow_seq, user_facing, rng, anchor_flows=scenario_anchors)
 
                 # Validate
-                errors = _validate_flow_sequence(flow_seq, user_facing)
+                errors = _validate_flow_sequence(flow_seq, user_facing, anchor_flows=scenario_anchors)
                 if errors:
                     log.debug('Validation failed for %s after repair: %s', sid, errors)
                     total_failed.append(scenario)
@@ -691,6 +867,9 @@ def enrich_scenarios(
                 output_obj['edge_flow_pairs'] = edge_pairs
                 output_obj['enrichment_model'] = mc['model_id']
                 output_obj['enrichment_provider'] = mc['provider']
+                # Overwrite example_utterances if LLM returned refreshed ones
+                if enrichment.get('example_utterances'):
+                    output_obj['example_utterances'] = enrichment['example_utterances']
 
                 wave_valid.append(output_obj)
 
@@ -782,8 +961,9 @@ def enrich_scenarios(
                         retry_failed.append(scenario)
                         continue
 
-                    flow_seq = _auto_repair(enrichment['flow_sequence'], user_facing, rng)
-                    errors = _validate_flow_sequence(flow_seq, user_facing)
+                    scenario_anchors = scenario.get('anchor_flows', [])
+                    flow_seq = _auto_repair(enrichment['flow_sequence'], user_facing, rng, anchor_flows=scenario_anchors)
+                    errors = _validate_flow_sequence(flow_seq, user_facing, anchor_flows=scenario_anchors)
                     if errors:
                         log.debug('Retry validation failed for %s: %s', sid, errors)
                         retry_failed.append(scenario)
@@ -796,6 +976,8 @@ def enrich_scenarios(
                     output_obj['edge_flow_pairs'] = edge_pairs
                     output_obj['enrichment_model'] = mc['model_id']
                     output_obj['enrichment_provider'] = mc['provider']
+                    if enrichment.get('example_utterances'):
+                        output_obj['example_utterances'] = enrichment['example_utterances']
 
                     wave_valid.append(output_obj)
 

@@ -1,21 +1,17 @@
 {
   "domain": "dana",
-  "total_input": 383,
-  "total_enriched": 382,
-  "new_enriched": 59,
-  "resumed_from": 323,
-  "failed": 1,
-  "failed_ids": [
-    "dana_418"
-  ],
+  "total_input": 384,
+  "total_enriched": 384,
+  "new_enriched": 1,
+  "resumed_from": 383,
+  "failed": 0,
+  "failed_ids": [],
   "model_distribution": {
-    "deepseek/deepseek-chat": 20,
-    "claude-sonnet-4-6": 20,
-    "gpt-5.2": 19
+    "claude-sonnet-4-6": 1
   },
-  "seed": 43,
-  "batch_size": 8,
-  "max_threads": 6,
-  "waves": 2,
+  "seed": 42,
+  "batch_size": 2,
+  "max_threads": 3,
+  "waves": 1,
   "output_file": "/home/lambda/pranav/handling-ambiguity/datasets/data_aug_pranav/scenarios_dana_enriched.jsonl"
 }
