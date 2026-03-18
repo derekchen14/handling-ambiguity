@@ -622,50 +622,59 @@ PROMPT_BUILDERS = {
 
 async def _call_anthropic_async(system_prompt: str, user_prompt: str, model_id: str) -> str:
     from anthropic import AsyncAnthropic
-    client = AsyncAnthropic()
-    resp = await client.messages.create(
-        model=model_id,
-        max_tokens=4096,
-        temperature=0.8,
-        system=system_prompt,
-        messages=[{'role': 'user', 'content': user_prompt}],
-    )
-    return next(b.text for b in resp.content if hasattr(b, 'text'))
+    client = AsyncAnthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+    try:
+        resp = await client.messages.create(
+            model=model_id,
+            max_tokens=4096,
+            temperature=0.8,
+            system=system_prompt,
+            messages=[{'role': 'user', 'content': user_prompt}],
+        )
+        return next(b.text for b in resp.content if hasattr(b, 'text'))
+    finally:
+        await client.close()
 
 
 async def _call_openai_async(system_prompt: str, user_prompt: str, model_id: str) -> str:
     from openai import AsyncOpenAI
-    client = AsyncOpenAI()
-    resp = await client.chat.completions.create(
-        model=model_id,
-        max_completion_tokens=4096,
-        temperature=0.8,
-        messages=[
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_prompt},
-        ],
-    )
-    return resp.choices[0].message.content or ''
+    client = AsyncOpenAI(api_key=os.environ['OPENAI_API_KEY'])
+    try:
+        resp = await client.chat.completions.create(
+            model=model_id,
+            max_completion_tokens=4096,
+            temperature=0.8,
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+        )
+        return resp.choices[0].message.content or ''
+    finally:
+        await client.close()
 
 
 async def _call_openrouter_async(system_prompt: str, user_prompt: str, model_id: str) -> str:
     from openai import AsyncOpenAI
     client = AsyncOpenAI(
         base_url='https://openrouter.ai/api/v1',
-        api_key=os.environ.get('OPENROUTER_API_KEY', ''),
+        api_key=os.environ['OPEN_ROUTER_API_KEY'],
     )
-    resp = await client.chat.completions.create(
-        model=model_id,
-        max_completion_tokens=4096,
-        temperature=0.8,
-        messages=[
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_prompt},
-        ],
-    )
-    if not resp or not resp.choices:
-        raise RuntimeError('OpenRouter returned empty choices (transient error)')
-    return resp.choices[0].message.content or ''
+    try:
+        resp = await client.chat.completions.create(
+            model=model_id,
+            max_completion_tokens=4096,
+            temperature=0.8,
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+        )
+        if not resp or not resp.choices:
+            raise RuntimeError('OpenRouter returned empty choices (transient error)')
+        return resp.choices[0].message.content or ''
+    finally:
+        await client.close()
 
 
 async def _call_model_async(
@@ -903,6 +912,7 @@ def generate_conversations(
     cursor = 0
     failed = 0
     generated = 0
+    failed_items: list[dict] = []
 
     while cursor < len(work_items):
         wave_specs = work_items[cursor:cursor + max_threads]
@@ -916,12 +926,14 @@ def generate_conversations(
             if isinstance(result, BaseException):
                 pbar.write(f'ERROR: {spec["convo_id"]} ({spec["model_config"]["name"]}): {result}')
                 failed += 1
+                failed_items.append(spec)
                 continue
 
             convo = _parse_conversation(result)
             if convo is None:
                 pbar.write(f'WARNING: {spec["convo_id"]}: failed to parse response')
                 failed += 1
+                failed_items.append(spec)
                 continue
 
             # Ensure correct metadata
@@ -944,6 +956,60 @@ def generate_conversations(
         pbar.set_postfix_str(f'wave {wave_num}, ok={generated}, fail={failed}')
 
     pbar.close()
+
+    # Retry failed conversations (up to 2 retry passes)
+    for retry_pass in range(2):
+        if not failed_items:
+            break
+
+        log.info('Retry pass %d: %d failed conversations', retry_pass + 1, len(failed_items))
+        retry_failed: list[dict] = []
+
+        pbar = tqdm(total=len(failed_items), unit='convos', desc=f'Retry {retry_pass + 1}')
+        retry_cursor = 0
+
+        while retry_cursor < len(failed_items):
+            wave_specs = failed_items[retry_cursor:retry_cursor + max_threads]
+            retry_cursor += len(wave_specs)
+
+            semaphore = asyncio.Semaphore(max_threads)
+            results = asyncio.run(_run_wave(wave_specs, system_prompt, semaphore))
+
+            wave_new = []
+            for spec, result in zip(wave_specs, results):
+                if isinstance(result, BaseException):
+                    pbar.write(f'RETRY ERROR: {spec["convo_id"]} ({spec["model_config"]["name"]}): {result}')
+                    retry_failed.append(spec)
+                    continue
+
+                convo = _parse_conversation(result)
+                if convo is None:
+                    pbar.write(f'RETRY WARNING: {spec["convo_id"]}: failed to parse response')
+                    retry_failed.append(spec)
+                    continue
+
+                convo['convo_id'] = spec['convo_id']
+                convo['category'] = spec['category']
+                convo['_model'] = spec['model_config']['model_id']
+                convo['_provider'] = spec['model_config']['provider']
+
+                wave_new.append(convo)
+
+            if wave_new:
+                with open(output_jsonl, 'a') as f:
+                    for obj in wave_new:
+                        f.write(json.dumps(obj, ensure_ascii=False) + '\n')
+                generated += len(wave_new)
+                failed -= len(wave_new)
+                pbar.update(len(wave_new))
+
+        pbar.close()
+        failed_items = retry_failed
+
+    if failed_items:
+        log.warning('%d conversations could not be generated after retries: %s',
+                    len(failed_items),
+                    [s['convo_id'] for s in failed_items[:20]])
 
     # Write meta
     meta = {
@@ -972,22 +1038,37 @@ def generate_conversations(
 # ── CLI ──────────────────────────────────────────────────────────────
 
 def main():
+    # Load .env
+    env_path = _PROJECT_ROOT / '.env'
+    if env_path.exists():
+        from dotenv import load_dotenv
+        load_dotenv(env_path)
+
     parser = argparse.ArgumentParser(description='Generate conversations from enriched scenarios')
     parser.add_argument('--domain', required=True, choices=['hugo', 'dana'])
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--models', nargs='+', default=None, help='Filter to specific model names')
+    parser.add_argument('--models', type=str, default=None,
+                        help='Comma-separated model filter (e.g. "anthropic,openai")')
     parser.add_argument('--max-threads', type=int, default=None)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
 
-    level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=level, format='%(levelname)s: %(message)s')
+    logging.basicConfig(
+        level=logging.WARNING,
+        format='%(asctime)s %(levelname)s %(name)s: %(message)s',
+        datefmt='%H:%M:%S',
+    )
+    log.setLevel(logging.DEBUG if args.verbose else logging.INFO)
+
+    models_filter = None
+    if args.models:
+        models_filter = [m.strip() for m in args.models.split(',')]
 
     generate_conversations(
         domain=args.domain,
         seed=args.seed,
-        models_filter=args.models,
+        models_filter=models_filter,
         dry_run=args.dry_run,
         verbose=args.verbose,
         max_threads=args.max_threads,

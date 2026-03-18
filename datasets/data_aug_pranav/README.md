@@ -78,6 +78,35 @@ python datasets/data_aug_pranav/dedup_scenarios.py \
 
 During backfill, deduped IDs are removed from the base and enriched JSONL files, then `generate_scenarios` and `enrich_scenarios` are called to fill the gap.
 
+### Step 4: Generate Conversations
+
+Convert 384 deduped enriched scenarios into 3-turn conversations (user → agent → user). Scenarios are split into 4 equal categories (96 each): `same_flow`, `switch_flow`, `ambiguous_first`, `ambiguous_second`. Models are assigned round-robin across 4 providers.
+
+```bash
+# Dry run — prints prompts, no API calls
+python datasets/data_aug_pranav/generate_conversations.py \
+    --domain hugo --dry-run
+
+# Single-provider smoke test
+python datasets/data_aug_pranav/generate_conversations.py \
+    --domain hugo --models anthropic --seed 42
+
+# Full run — round-robins across all 4 providers
+python datasets/data_aug_pranav/generate_conversations.py \
+    --domain hugo --seed 42 --max-threads 8
+```
+
+**CLI:** `--domain`, `--seed`, `--models` (comma-separated), `--max-threads`, `--dry-run`
+
+**Input:** `scenarios_<domain>_enriched_deduped.jsonl` (from Step 3)
+
+**Output:**
+- `conversations_<domain>_raw.jsonl` — one JSON object per line, appended incrementally
+- `conversations_<domain>.json` — sorted JSON array (final format matching eval_set.json)
+- `conversations_<domain>_meta.json` — generation counts, category splits, and model distribution
+
+Resumable — rerun the same command to pick up where it left off.
+
 ---
 
 **Providers:** Anthropic (Claude), OpenAI (GPT), Google (Gemini via OpenRouter), DeepSeek (via OpenRouter). Step 3 skips Gemini by default.
