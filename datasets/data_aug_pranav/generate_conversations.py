@@ -30,16 +30,16 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from datasets.data_aug_pranav.compute_metrics import (
-    check_conversation,
-    check_leakage_llm,
-)
-
 # ── Path setup ───────────────────────────────────────────────────────
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
+
+from datasets.data_aug_pranav.compute_metrics import (  # noqa: E402
+    check_conversation,
+    check_leakage_llm,
+)
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _DATA_DIR = _SCRIPT_DIR / "data"
@@ -377,28 +377,45 @@ def _build_system_prompt(
 You MUST output ONLY a single valid JSON object (no markdown fencing, no explanation).
 The JSON must conform exactly to the schema described in the user prompt.
 
+## HARD CONSTRAINTS (violations = instant rejection)
+
+### FORBIDDEN CHARACTERS — your output will be rejected if ANY of these appear:
+- NO em dashes (—), en dashes (–), or ellipsis characters (…)
+- NO curly/smart quotes (" " ' ') — use ONLY straight quotes (" ')
+- NO non-breaking spaces
+- Use ONLY: straight quotes, hyphens (-), commas, periods, question marks, exclamation marks
+
+### TURN 3 WORD LIMIT — MAXIMUM 9 WORDS
+Turn 3 MUST be 2-9 words. Count carefully. This is a hard limit, not a suggestion.
+Good examples (all <=9 words): "same for the conclusion" / "which platforms?" / "try 3 days instead" / "what about revenue?"
+
+### AGENT MUST NOT LEAK INFORMATION
+The agent in Turn 2 responds ONLY to what the user explicitly said in Turn 1.
+The agent does NOT know: the scenario description, the user's downstream goal, what happens next, or any metadata.
+If the user says "pull my baking posts" the agent CANNOT say "so we can compare wording" — the user never mentioned comparing.
+If the user says "new draft for the executive readout" the agent CANNOT reference specific topics unless the user named them.
+
 ## Quality Rules
 
 ### User utterances
 - IMAGINE THE USER IS TYPING ON THEIR SMARTPHONE. Mobile users are terse, rely on shared context, skip pleasantries, and don't repeat what's on screen.
-- USERS OBSERVE, THEY DON'T COMMAND. Describe what you see or what's wrong, not what the agent should do. "The ICD codes aren't matching" beats "Flag anything that doesn't match." "I think I see repeated employees?" beats "Check for duplicate employee IDs and clean those out."
-- DROP IMPERATIVES. State the problem without telling the agent what to do. "Signup dates are all over the place." Period. Don't append "Standardize them."
+- USERS OBSERVE, THEY DON'T COMMAND. Describe what you see or what's wrong, not what the agent should do. "The ICD codes aren't matching" beats "Flag anything that doesn't match."
+- DROP IMPERATIVES. State the problem without telling the agent what to do. "Signup dates are all over the place." Period.
 - DON'T GIVE AWAY THE ANSWER. Even unambiguous turns shouldn't spell out the operation. Wrong: "Can you expand and develop my bullet points into fully written paragraphs?" Right: "Flesh them out into actual paragraphs."
 - MORE IMPLICIT, LESS EXPLICIT. Users assume shared context. "Too smooth now, try 3 days instead" beats "Can you also perform the same rolling average smoothing operation on the revenue column using a 3-day window?"
-- Turn 1: 8-20 words (avg ~14). Turn 3: 2-9 words (avg ~5). Turn 3 is EXTREMELY terse — context from turns 1-2 makes elaboration unnecessary.
+- Turn 1: 8-20 words (avg ~14). Turn 3: 2-9 words (avg ~5). Turn 3 is EXTREMELY terse.
 - Turn 3 MUST depend on turns 1-2. Use anaphora: "Same thing for...", "That one too", "What about X instead?"
 - Turn 3 can be a follow-up question: "What's the percent change?", "Which sites?"
 - Use domain abbreviations: "MoM" not "month-over-month", "CTR" not "click-through rate".
 - NEVER include the flow name, intent name, or tool name in the user utterance.
 - Vary register: mix observations ("dates look weird"), terse commands ("fix the intro"), casual questions ("what's the word count?"), and brief follow-ups ("same thing for the conclusion").
-- Avoid em dashes, fancy punctuation, and overly polished prose. Use plain commas and periods.
 
 ### Agent utterances (Turn 2)
 - 1-2 sentences max. Directly responds to turn 1.
 - Agent explains WHY it's taking an action: "since that's the most common format" or "Biggest jump this quarter."
-- CRITICAL: Agent responds ONLY to what the user actually said. The agent does NOT know the user's downstream goal, the flow label, or what the user will ask next. Do NOT infer unstated goals.
 - No over-acknowledgment: NEVER start with "Absolutely!", "Great question!", "I'd be happy to!", "Sure thing!"
-- No filler: NEVER use "Just to confirm —", "To clarify,", "So what you're saying is..."
+- No filler: NEVER use "Just to confirm", "To clarify,", "So what you're saying is..."
+- Use ONLY straight hyphens (-), not em dashes or en dashes.
 
 ### General
 - The context field must be realistic and specific to the scenario.
@@ -406,41 +423,36 @@ The JSON must conform exactly to the schema described in the user prompt.
 - For parameters where the exact value depends on data the user hasn't provided, use null.
 
 ### Anti-patterns (NEVER do these)
-- Filler openers: "Before I...", "Just to confirm —", "I was wondering if..."
+- Filler openers: "Before I...", "Just to confirm", "I was wondering if..."
 - Hedging: "Can you maybe...", "Would it be possible to..."
 - Over-explaining intent: "so that I can then..." / "which will help me..."
 - Restating what's obvious: "Good call. Now, moving on to the next thing..."
 - Padding: "right now" / "at this point" / "at the moment"
-- Agent leaking label info: agent inferring user's goal that wasn't stated (e.g., user asks to "pull posts" and agent says "so we can compare wording")
+- Agent leaking info: agent inferring user's goal that wasn't stated
 
-## Style Examples — BAD vs GOOD (for calibration — DO NOT copy verbatim)
+## Style Examples (DO NOT copy verbatim)
 
 User turn 1:
   BAD:  "Before I cross-post the Lisbon guide, can you check if it's already live on Medium and whether the sync looks okay?"
   GOOD: "Is the Lisbon guide live on Medium yet?"
   BAD:  "Can you pull my beginner baking posts from the last 6 months?"
   GOOD: "beginner baking posts from the last 6 months"
-  BAD:  "The order_date column needs to be converted from string format to a proper datetime type."
-  GOOD: "The order_date is showing up as a generic string. That doesn't seem right."
 
-User turn 3:
+User turn 3 (MUST be <=9 words):
   BAD:  "Good. Can you pull up all my connected platforms and show me which ones have working integrations right now?"
   GOOD: "Which platforms are working?"
   BAD:  "Just publish it, we can worry about the rest later."
-  GOOD: "Publish now, worry about the rest later"
-  BAD:  "Just the ones tagged beginner or 101, and include anything that mentions laminated dough."
-  GOOD: "beginner tag is good, also anything that mentions laminated dough"
+  GOOD: "Publish now, rest later"
   GOOD: "Same thing for multi-head attention."
-  GOOD: "That's a terrible title, please try again."
-  GOOD: "What about job satisfaction rather than department?"
+  GOOD: "That one too"
+  GOOD: "What about revenue?"
+  GOOD: "Try 3 days instead"
 
-Agent turn 2:
+Agent turn 2 (NO em dashes, NO smart quotes):
   BAD:  "Yep, I'll list your recent beginner-friendly baking drafts and published posts so we can compare wording."
-  GOOD: "Are beginner posts those that contain the word '101' or those that have the tag 'beginner'?"
-  BAD:  "Just to confirm — do you want to publish it live on the blog right now, or push it across your connected platforms?"
-  GOOD: "Publish it live on the blog, or push it across all platforms?"
+  GOOD: "Are beginner posts those with the '101' tag or the 'beginner' tag?"
   BAD:  "Absolutely! I'll smooth out the transitions and tighten up the word choice in the intro for you."
-  GOOD: "I'll tighten the intro — the transitions between paragraphs are the main issue."
+  GOOD: "I'll tighten the intro - the transitions between paragraphs are the main issue."
 """
 
 
@@ -503,7 +515,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
+      "utterance": "<1-2 sentences. ONLY react to turn 1 text. The agent has ZERO knowledge of the scenario, downstream goals, or metadata. Do NOT add details, topics, or purposes the user did not mention.>"
     }},
     {{
       "turn_num": 3,
@@ -578,7 +590,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
+      "utterance": "<1-2 sentences. ONLY react to turn 1 text. The agent has ZERO knowledge of the scenario, downstream goals, or metadata. Do NOT add details, topics, or purposes the user did not mention.>"
     }},
     {{
       "turn_num": 3,
@@ -681,7 +693,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<clarifying question or proposal — respond ONLY to what the user said, do NOT infer unstated goals>"
+      "utterance": "<clarifying question or proposal. ONLY react to turn 1 text. The agent has ZERO knowledge of the scenario, downstream goals, or metadata. Do NOT add details the user did not mention.>"
     }},
     {{
       "turn_num": 3,
@@ -771,7 +783,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
+      "utterance": "<1-2 sentences. ONLY react to turn 1 text. The agent has ZERO knowledge of the scenario, downstream goals, or metadata. Do NOT add details, topics, or purposes the user did not mention.>"
     }},
     {{
       "turn_num": 3,

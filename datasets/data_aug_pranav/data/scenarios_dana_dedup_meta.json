@@ -1,0 +1,120 @@
+{
+  "domain": "dana",
+  "original_count": 76,
+  "duplicates_removed": 12,
+  "removed_ids": [
+    "dana_006",
+    "dana_007",
+    "dana_041",
+    "dana_043",
+    "dana_047",
+    "dana_078",
+    "dana_083",
+    "dana_085",
+    "dana_088",
+    "dana_089",
+    "dana_096",
+    "dana_098"
+  ],
+  "survivors_count": 64,
+  "final_count": 64,
+  "phase1_clusters": 7,
+  "phase2_clusters": 5,
+  "phase1_details": [
+    {
+      "keep": "dana_002",
+      "remove": [
+        "dana_007"
+      ],
+      "reason": "Both involve splitting a combined column containing two pieces of information (hostname+region vs IP+hostname) into separate fields for downstream processing. The specific fields differ but the scenario and conversation would be nearly identical — parsing a combined text field into two columns for filtering/ingestion."
+    },
+    {
+      "keep": "dana_042",
+      "remove": [
+        "dana_085"
+      ],
+      "reason": "Both involve merging separate first name and last name columns into a single full name field before sharing/exporting a report. The domain differs (grants vs school counseling) but the task, data structure, and conversation would be essentially identical."
+    },
+    {
+      "keep": "dana_041",
+      "remove": [
+        "dana_083"
+      ],
+      "reason": "Both involve checking whether a specific identifier (grant code vs student ID) exists across multiple datasets before submitting a consolidated/de-duplicated report. The conversation flow and operations would be interchangeable."
+    },
+    {
+      "keep": "dana_030",
+      "remove": [
+        "dana_043"
+      ],
+      "reason": "Both involve analyzing month-over-month or week-over-week growth trends in a key metric (user growth vs program enrollment) to present to investors/board. The analytical task and conversation structure are essentially the same."
+    },
+    {
+      "keep": "dana_040",
+      "remove": [
+        "dana_047"
+      ],
+      "reason": "Both involve bulk-correcting inconsistently entered categorical/status values in a contact or donor dataset before importing into a downstream system (CRM/mail merge). The scenario, data issue, and resolution are nearly identical."
+    },
+    {
+      "keep": "dana_093",
+      "remove": [
+        "dana_098"
+      ],
+      "reason": "Both involve reshaping a wide-format dataset with separate columns per category (survey questions vs test types) into a long/tidy format for charting. The core transformation task and conversation would be essentially the same."
+    },
+    {
+      "keep": "dana_046",
+      "remove": [
+        "dana_088"
+      ],
+      "reason": "Both scenarios are about checking whether a specific required code exists in a dataset prior to submitting it (program area code in a grant submission vs course code in a master schedule). The user action and validation task are effectively the same: confirm presence of required code(s) before deadline/submission."
+    }
+  ],
+  "phase2_details": [
+    {
+      "keep": "dana_001",
+      "remove": [
+        "dana_096"
+      ],
+      "reason": "Both involve defining/saving a reusable metric and then looking it up to confirm its definition for standardized reporting. dana_001 (cloud spend metric) and dana_096 (utilization metric) are in different domains, but the core scenario — creating then verifying a reusable metric definition — is essentially the same workflow. However, the domains differ enough (cloud IT vs staffing/operations) that conversations would not be interchangeable. Withdrawing this cluster."
+    },
+    {
+      "keep": "dana_001",
+      "remove": [
+        "dana_006"
+      ],
+      "reason": "dana_001 is building a reusable cloud spend metric; dana_006 is looking up an existing 'cloud waste' metric definition. Same domain (cloud governance/IT) and same goal (understanding a saved metric definition for reporting). These are close but dana_001 is about creating and dana_006 is about looking up — different user actions. Withdrawing."
+    },
+    {
+      "keep": "dana_092",
+      "remove": [
+        "dana_089"
+      ],
+      "reason": "Both involve a healthcare manager needing a vetted, standardized metric definition saved for reuse in reporting — dana_092 for 30-day readmission rate and dana_089 for no-show rate. Same domain (clinical/healthcare operations), same user goal (get an agreed metric definition before sharing reports), same workflow. The conversations would be structurally interchangeable with only the metric name differing."
+    },
+    {
+      "keep": "dana_046",
+      "remove": [
+        "dana_041"
+      ],
+      "reason": "Both involve checking whether specific codes/values exist across a dataset before a grant submission deadline. dana_041 checks for a grant code across multiple program datasets; dana_046 confirms required program area codes exist in a submission file. Same domain (nonprofit grants), same user action (existence/validation check before submission), same goal. Conversations would be nearly interchangeable."
+    },
+    {
+      "keep": "dana_074",
+      "remove": [
+        "dana_078"
+      ],
+      "reason": "Both are growth marketer scenarios involving cleaning/standardizing text values in a content-related dataset — dana_074 replaces outdated product names in a content calendar, dana_078 fixes inconsistent capitalization of tags and categories in blog post metadata. Different specific operations (find-replace vs case normalization) and different datasets, so these are NOT true duplicates. Withdrawing."
+    }
+  ],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}

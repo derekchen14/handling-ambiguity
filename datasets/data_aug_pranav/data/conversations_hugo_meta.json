@@ -1,0 +1,21 @@
+{
+  "domain": "hugo",
+  "seed": 42,
+  "total_scenarios": 65,
+  "total_generated": 39,
+  "total_failed": -12,
+  "quality_retries_total": 91,
+  "quality_warnings_count": 0,
+  "categories": {
+    "same_flow": 17,
+    "switch_flow": 16,
+    "ambiguous_first": 16,
+    "ambiguous_second": 16
+  },
+  "models": [
+    "anthropic",
+    "openai",
+    "gemini",
+    "deepseek"
+  ]
+}

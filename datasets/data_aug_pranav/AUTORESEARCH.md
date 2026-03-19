@@ -76,7 +76,7 @@ Generate 3-turn conversations (user -> agent -> user) from enriched scenarios, o
 - Each scenario gets assigned to exactly one category with pre-assigned flow and tool constraints
 - **Inline quality gate** (two-phase, up to 3 retries per conversation):
   1. **Regex checks** (fast): filler phrases, agent over-acknowledgment, banned unicode, turn-3 terseness, multi-request connectors
-  2. **LLM leakage judge** (async, batched): detects semantic label leakage — agent inferring unstated goals, revealing scenario metadata, or anticipating user's next turn. Uses `quality_checks.check_leakage_llm()` with Sonnet as judge.
+  2. **LLM leakage judge** (async, batched): detects semantic label leakage — agent inferring unstated goals, revealing scenario metadata, or anticipating user's next turn. Uses `compute_metrics.check_leakage_llm()` with Sonnet as judge. Same judge used by `agent_leak_rate` in post-hoc metrics.
 - Conversations that fail either check are regenerated (up to `MAX_QUALITY_RETRIES=3`). If retries exhausted, accepted with `_quality_warnings` field.
 - Meta output includes `quality_retries_total` and `quality_warnings_count`
 
@@ -118,12 +118,11 @@ These are the **only** optimization targets. No comparative metrics — we do no
 | `heuristic_filler_rate` | Filler phrases in user turns (I.2) | <= 0.05 | > 0.15 | Lower = better |
 | `heuristic_overack_rate` | Agent over-acknowledgment (I.2) | <= 0.05 | > 0.15 | Lower = better |
 | `heuristic_unicode_rate` | Curly quotes, em-dashes, etc. (I.7) | <= 0.02 | > 0.10 | Lower = better |
-| `heuristic_leakage_rate` | Flow/intent/tool names in user utterances (I.8) | <= 0.02 | > 0.10 | Lower = better |
 | `heuristic_multireq_rate` | ambiguous_second turn-3 has multi-req connector (I.6) | >= 0.90 | < 0.70 | Higher = better |
 | `heuristic_t3_terse_rate` | Turn-3 user utterances ≤9 words (I.2) | >= 0.70 | < 0.50 | Higher = better |
 | **Quality — LLM Judges** | | | | |
 | `turn_dependency_mean` | Turn-3 depends on prior context (I.1) | >= 3.5 | < 2.5 | Higher = better |
-| `agent_leak_rate` | Agent turn leaks labels/metadata (I.2) | <= 0.10 | > 0.25 | Lower = better |
+| `agent_leak_rate` | Agent/user leaks scenario metadata, unstated goals, or label names (I.2, I.8) | <= 0.10 | > 0.25 | Lower = better |
 | `naturalness_mean` | Mean naturalness score (LLM judge) | >= 3.5 | < 2.5 | Higher = better |
 | **Label Quality** | | | | |
 | `label_agreement_intent` | Multi-model intent label agreement | >= 0.95 | < 0.85 | Higher = better |

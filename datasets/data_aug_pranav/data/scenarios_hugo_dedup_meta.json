@@ -1,0 +1,121 @@
+{
+  "domain": "hugo",
+  "original_count": 78,
+  "duplicates_removed": 13,
+  "removed_ids": [
+    "hugo_009",
+    "hugo_011",
+    "hugo_016",
+    "hugo_031",
+    "hugo_041",
+    "hugo_043",
+    "hugo_049",
+    "hugo_077",
+    "hugo_083",
+    "hugo_090",
+    "hugo_094",
+    "hugo_097",
+    "hugo_099"
+  ],
+  "survivors_count": 65,
+  "final_count": 65,
+  "phase1_clusters": 12,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "hugo_003",
+      "remove": [
+        "hugo_041"
+      ],
+      "reason": "Both involve searching/checking whether past blog content has already been published on a specific topic before drafting a new post — hugo_003 is about NIST 800-53, hugo_041 is about housing instability, but the scenario structure (grant/compliance writer searching existing posts before drafting) is nearly identical and conversations would be interchangeable."
+    },
+    {
+      "keep": "hugo_041",
+      "remove": [
+        "hugo_049"
+      ],
+      "reason": "Both involve a non-profit grant writer searching past blog posts for published content on an environmental/social topic to pull into a new grant-related post. hugo_041 is about housing instability for HUD, hugo_049 is about environmental justice for EPA — same action, same role, same purpose, essentially interchangeable conversations."
+    },
+    {
+      "keep": "hugo_042",
+      "remove": [
+        "hugo_097"
+      ],
+      "reason": "Both involve auditing a draft blog post to ensure it matches established organizational voice, avoids AI-generated tone, and maintains consistent terminology/formatting before sharing with stakeholders. The roles and domains differ slightly but the conversation would be essentially the same."
+    },
+    {
+      "keep": "hugo_084",
+      "remove": [
+        "hugo_016"
+      ],
+      "reason": "Both involve checking publishing channel health before sending a post to multiple platforms (WordPress + another channel). The contexts differ (school vs. beauty blogger) but the specific action — verifying channel connectivity/health before publishing — produces essentially the same conversation."
+    },
+    {
+      "keep": "hugo_086",
+      "remove": [
+        "hugo_043"
+      ],
+      "reason": "Both involve comparing two versions of a specific section of a blog post to see what changed before the post is used for an important purpose. The roles differ (special ed coordinator vs. grant writer) but the core scenario — diff comparison of a revised section to ensure key content wasn't lost — is essentially the same."
+    },
+    {
+      "keep": "hugo_010",
+      "remove": [
+        "hugo_099"
+      ],
+      "reason": "Both involve comparing two versions of a specific section of a blog post to verify that important content (instructions/safety notes) was retained after revision. The domains differ (food blog vs. medical) but the conversation structure is interchangeable."
+    },
+    {
+      "keep": "hugo_021",
+      "remove": [
+        "hugo_094"
+      ],
+      "reason": "Both involve setting persistent writing style/preferences for a blog to ensure consistency across posts, including tone, formatting, and style guidelines. The domains differ (research lab vs. medical clinic) but the core action — configuring persistent style preferences — produces essentially the same conversation."
+    },
+    {
+      "keep": "hugo_076",
+      "remove": [
+        "hugo_031"
+      ],
+      "reason": "Both involve simplifying/revising a blog post that is too technical for a broader, non-technical audience. The contexts differ slightly but the core scenario is the same."
+    },
+    {
+      "keep": "hugo_079",
+      "remove": [
+        "hugo_009"
+      ],
+      "reason": "Both involve scheduling a blog post to publish simultaneously or at staggered times across the company blog and a second platform (Medium/LinkedIn). The topics differ but the scheduling-across-platforms action is the core scenario and conversations would be essentially the same."
+    },
+    {
+      "keep": "hugo_001",
+      "remove": [
+        "hugo_090"
+      ],
+      "reason": "Both involve scheduling a blog post to go live at a specific strategic time (first Monday / before Monday morning). The domains differ but the core scenario — time-specific scheduling of a post — is essentially the same conversation."
+    },
+    {
+      "keep": "hugo_020",
+      "remove": [
+        "hugo_083"
+      ],
+      "reason": "Both involve simplifying dense, complex written content into something accessible for a non-expert audience. hugo_020 converts a dissertation for general readers; hugo_083 simplifies an instructional post for new teachers. The core task is identical."
+    },
+    {
+      "keep": "hugo_082",
+      "remove": [
+        "hugo_077",
+        "hugo_011"
+      ],
+      "reason": "All involve comparing tone and structure across two blog posts/drafts to ensure a consistent voice and decide which version to use; differences are mainly the author/audience context."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}
