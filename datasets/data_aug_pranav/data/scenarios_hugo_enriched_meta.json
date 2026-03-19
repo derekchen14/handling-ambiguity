@@ -1,0 +1,33 @@
+{
+  "domain": "hugo",
+  "total_input": 40,
+  "total_enriched": 28,
+  "new_enriched": 28,
+  "resumed_from": 0,
+  "failed": 12,
+  "failed_ids": [
+    "hugo_010",
+    "hugo_011",
+    "hugo_039",
+    "hugo_020",
+    "hugo_021",
+    "hugo_022",
+    "hugo_023",
+    "hugo_024",
+    "hugo_025",
+    "hugo_026",
+    "hugo_027",
+    "hugo_003"
+  ],
+  "model_distribution": {
+    "gpt-5.2": 8,
+    "claude-sonnet-4-6": 9,
+    "deepseek/deepseek-chat": 9,
+    "google/gemini-3-pro-preview": 2
+  },
+  "seed": 42,
+  "batch_size": 8,
+  "max_threads": 20,
+  "waves": 1,
+  "output_file": "/Users/pranavraja/Documents/research/handling-ambiguity/datasets/data_aug_pranav/data/scenarios_hugo_enriched.jsonl"
+}

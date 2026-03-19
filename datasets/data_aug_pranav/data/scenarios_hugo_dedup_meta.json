@@ -1,0 +1,39 @@
+{
+  "domain": "hugo",
+  "original_count": 28,
+  "duplicates_removed": 2,
+  "removed_ids": [
+    "hugo_019",
+    "hugo_034"
+  ],
+  "survivors_count": 26,
+  "final_count": 26,
+  "phase1_clusters": 2,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "hugo_014",
+      "remove": [
+        "hugo_019"
+      ],
+      "reason": "Both involve a hobby blogger checking publishing channel health/status after a sync or publishing issue, with overlapping concerns about channel health and post publish status. The conversations would be nearly interchangeable despite different blog niches."
+    },
+    {
+      "keep": "hugo_000",
+      "remove": [
+        "hugo_034"
+      ],
+      "reason": "Both involve writing a transparent post about a service/infrastructure outage aimed at maintaining customer trust. The core scenario — crisis/incident communication post about an outage — is essentially the same."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}

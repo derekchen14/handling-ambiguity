@@ -1,0 +1,21 @@
+{
+  "domain": "dana",
+  "seed": 42,
+  "total_scenarios": 35,
+  "total_generated": 26,
+  "total_failed": -2,
+  "quality_retries_total": 31,
+  "quality_warnings_count": 0,
+  "categories": {
+    "same_flow": 9,
+    "switch_flow": 9,
+    "ambiguous_first": 9,
+    "ambiguous_second": 8
+  },
+  "models": [
+    "anthropic",
+    "openai",
+    "gemini",
+    "deepseek"
+  ]
+}

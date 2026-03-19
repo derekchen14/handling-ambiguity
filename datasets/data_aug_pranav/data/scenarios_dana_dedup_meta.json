@@ -1,0 +1,55 @@
+{
+  "domain": "dana",
+  "original_count": 39,
+  "duplicates_removed": 4,
+  "removed_ids": [
+    "dana_002",
+    "dana_009",
+    "dana_012",
+    "dana_015"
+  ],
+  "survivors_count": 35,
+  "final_count": 35,
+  "phase1_clusters": 4,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "dana_001",
+      "remove": [
+        "dana_009"
+      ],
+      "reason": "Both involve defining/looking up a reusable metric formula in a cloud infrastructure/capacity planning context. The core scenario — creating and verifying a metric definition for team use — is essentially the same, with dana_009 adding a trivial 'look it up to confirm' step that doesn't meaningfully differentiate the conversation."
+    },
+    {
+      "keep": "dana_000",
+      "remove": [
+        "dana_002"
+      ],
+      "reason": "Both involve fixing a column in an imported dataset where values were stored in the wrong format — dana_000 is about inconsistently formatted text labels in AWS tags, dana_002 is about date strings imported as text. However, these are actually different data problems (string normalization vs. type casting), so I will not flag these as duplicates."
+    },
+    {
+      "keep": "dana_016",
+      "remove": [
+        "dana_012"
+      ],
+      "reason": "Both are lifestyle/wellness bloggers validating that column values conform to an allowed list before publishing stats to readers. The specific domain differs slightly (budget categories vs. fitness check-ins), but the scenario structure — blogger + validate values against fixed allowed set + share with audience — is essentially interchangeable."
+    },
+    {
+      "keep": "dana_010",
+      "remove": [
+        "dana_015"
+      ],
+      "reason": "Both are hobby/lifestyle bloggers cleaning a personal spreadsheet where date or measurement fields have inconsistent formats that are breaking a chart, and need values cast correctly and out-of-range entries flagged before publishing. The specific domain (cooking vs. gardening) does not differentiate the core conversation meaningfully."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}

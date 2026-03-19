@@ -1,0 +1,22 @@
+{
+  "domain": "dana",
+  "total_input": 40,
+  "total_enriched": 39,
+  "new_enriched": 39,
+  "resumed_from": 0,
+  "failed": 1,
+  "failed_ids": [
+    "dana_006"
+  ],
+  "model_distribution": {
+    "google/gemini-3-pro-preview": 10,
+    "gpt-5.2": 10,
+    "deepseek/deepseek-chat": 10,
+    "claude-sonnet-4-6": 9
+  },
+  "seed": 42,
+  "batch_size": 8,
+  "max_threads": 20,
+  "waves": 1,
+  "output_file": "/Users/pranavraja/Documents/research/handling-ambiguity/datasets/data_aug_pranav/data/scenarios_dana_enriched.jsonl"
+}
