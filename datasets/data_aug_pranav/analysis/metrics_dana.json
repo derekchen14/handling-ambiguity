@@ -1,6 +1,6 @@
 {
   "domain": "dana",
-  "generated_at": "2026-03-19T09:23:10.092545+00:00",
+  "generated_at": "2026-03-19T09:39:12.917534+00:00",
   "seed": 42,
   "counts": {
     "eval_convos": 128,
@@ -7928,6 +7928,2212 @@
           15
         ]
       }
+    },
+    "naturalness": {
+      "per_conversation": {
+        "dana_055": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'The trend looks suspicious' has genuine personality, and Turn 3's terse follow-up ('Get the stats on the order_id column then') uses realistic shorthand with 'then' implying continuity from prior context. Minor tell: Turn 1 is slightly polished for an opener, but overall the flow and brevity feel like a real analyst poking around data.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_040": {
+          "score": 3,
+          "reason": "Turn 1 is a reasonable analytical query, but Turn 3 is a suspiciously meta question \u2014 real users typically ask for a specific breakdown they already have in mind rather than asking what columns are available, which reads more like a scripted exploration of tool capabilities. No personality, shorthand, or natural messiness throughout.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_050": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic analytical progression \u2014 asking for comparison, then pulling back to check basic stats before charting is a very human workflow. Turn 3 feels genuine (a cautious analyst wanting to ground-truth before visualizing). Minor tells: Turn 1 is slightly clean/complete for a casual query, and the agent's Turn 2 response naming the exact field 'retention_rate_6mo' is suspiciously precise, suggesting possible scripted setup. Overall reads like a real analyst but with some scaffolding visible.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_042": {
+          "score": 5,
+          "reason": "Feels like a real data analyst mid-workflow. Turn 1 uses casual shorthand ('dedupe'), Turn 3 builds naturally on the agent's response with a specific, actionable follow-up rather than restating context. No over-explanation, uses imperative tone ('validate... flag'), and the scenario (deduplication prep, checking order IDs) is completely realistic for someone working with transactional data.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_033": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic business context and casual phrasing ('Churn spiked,' 'dig in further'). Turn 3 is a plausible pivot \u2014 pausing to understand data structure before drilling deeper is something real analysts do. Minor tell: Turn 3 is slightly too well-formed and complete for someone mid-investigation who would likely already know their dataset columns, making it feel slightly staged, but not egregiously so.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_034": {
+          "score": 5,
+          "reason": "Feels like a real analyst workflow \u2014 casual shorthand ('sanity check', 'Cool'), natural progression from validation to calculation, realistic financial context. Turn 3 is a concise follow-up that doesn't over-explain, consistent with someone who knows what they want.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_056": {
+          "score": 5,
+          "reason": "Highly natural \u2014 frustrated user correcting an overzealous find-replace, uses shorthand ('dk'/'DK'), specific and terse follow-up instruction with no over-explanation. Realistic scenario for a knitting/crafting pattern editor. No formulaic phrasing or templated structure.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_060": {
+          "score": 3,
+          "reason": "Turn 1 is natural enough, but Turn 3 reads like a textbook instruction \u2014 'forward fill using the last recorded value for each volunteer' is very precisely worded, more like documentation than how a real user would phrase it. A real user might say 'yeah just carry forward whatever the last number was' or 'fill it with the previous week's value.' The scenario is plausible but the technical precision in Turn 3 feels scripted.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_057": {
+          "score": 4,
+          "reason": "Mostly natural \u2014 the scenario is realistic (researcher checking data quality before analysis), Turn 1 has a casual hedge ('that seems like it might be'), and Turn 3 shows sensible methodological thinking. Minor tells: Turn 3 is slightly over-explained ('I want to make sure...are actually numeric' reads a touch didactic), but the flow between turns feels like genuine exploratory data work rather than a scripted template.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_009": {
+          "score": 5,
+          "reason": "Feels like a real data engineer or analyst mid-task. Turn 1 uses natural shorthand ('so it catches all variants'), Turn 3 shows realistic caution before running another operation \u2014 checking first rather than blindly applying. The 'Actually' pivot and 'before I run another replace' phrasing is natural self-correction, not scripted. Realistic scenario for someone working with sensitive data in a tool like this.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_071": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 shorthand like 'my recap post' and the practical concern of 'so I don't lose the edits' add personality and realistic motivation. Turn 3 is a believable follow-up action. Slight tell is how cleanly the two requests are separated into distinct turns rather than bundled, but overall reads like a real user managing a fitness log workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_015": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow \u2014 casual shorthand ('Pull together', 'switch the estimates'), no over-explanation of intent, and Turn 3 is a natural mid-task correction rather than a scripted follow-up. The domain context fits someone actually iterating on a data dashboard.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_066": {
+          "score": 5,
+          "reason": "Very natural data analyst workflow \u2014 terse commands, assumes shared context, uses shorthand ('clicks over impressions' instead of spelling out the formula formally), Turn 3 is a realistic organic follow-up that builds on the previous result rather than introducing a new scripted requirement. No over-explanation of intent.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_076": {
+          "score": 5,
+          "reason": "Highly natural \u2014 'drop the dupes' is casual shorthand, 'pct' abbreviation, no over-explanation of intent, flows like a real analyst iterating on a data task. Turn 3 is a natural follow-up that combines confirmation with a new instruction, exactly how real users chain requests.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_103": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 1 uses casual shorthand ('consistently like'), Turn 3 has a realistic pivot with informal 'Cool' and a practical follow-up request. Minor tell: Turn 3 is suspiciously complete and well-scoped for a single message, but overall the tone and flow feel like a real analyst using a data tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_011": {
+          "score": 3,
+          "reason": "Turn 3 has a somewhat natural pivot/correction feel, but the overall phrasing is overly precise and technical in a templated way \u2014 'pull the schema info' and 'to see if it includes threads' reads like a scripted follow-up designed to demonstrate tool capability rather than organic curiosity. No shorthand, contractions, or personality markers anywhere.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_095": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual opener ('Can you'), shorthand like 'a couple,' and Turn 3 is a realistic mid-task add-on with practical preferences. Slight polish in how the requests are packaged (two distinct asks bundled cleanly), but nothing overtly scripted. The scenario fits someone actually building a dashboard.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_104": {
+          "score": 5,
+          "reason": "Natural shorthand commands, no over-explanation of intent, realistic workflow for someone managing scheduling data. 'Okay' as a transition word and the casual 'now' at the end of Turn 3 feel genuinely human. The scenario (editing provider/department data then visualizing it) is a plausible real-world task sequence.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_091": {
+          "score": 5,
+          "reason": "Highly natural \u2014 casual opener ('I think I imported'), realistic Etsy data scenario, shorthand in Turn 3 ('Cool. Now add...'), doesn't over-explain intent, flows like an actual data cleaning session.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_101": {
+          "score": 5,
+          "reason": "Highly natural \u2014 the user jumps in mid-workflow with 'No, don't merge' implying ongoing context, uses casual shorthand ('org variant', 'clean them'), and the request reflects realistic data hygiene caution a real donor database user would have. No over-explanation of intent, natural shorthand throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_081": {
+          "score": 3,
+          "reason": "The request sequence is plausible but feels slightly templated \u2014 each turn is clean and complete with no typos, hesitation, or personality. Turn 3 is a natural follow-up conceptually, but the phrasing 'so I can see the full history' reads like an explicit intent declaration that real users often omit. No shorthand or casual language anywhere.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_123": {
+          "score": 4,
+          "reason": "Turn 3 feels genuinely natural \u2014 'before I pivot it' and 'any weird nulls' reads like someone who actually works with data and is thinking ahead practically. The shorthand and workflow logic feel authentic. Minor tell: Turn 1 is slightly formal/complete for a casual data request, but overall the progression and domain-specific language (CTR, nulls, pivot) suggest a real analyst user.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_117": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic follow-up questions and practical context. Turn 3 is a genuine-feeling response to the agent's output rather than scripted. Minor tell: the requests are slightly too clean and complete, lacking the typos, hedging, or messiness of typical real user input. But the scenario (volunteer log, holiday gaps) feels grounded and the shorthand ('those missing weeks') shows some natural reference behavior.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_030": {
+          "score": 5,
+          "reason": "Feels like a real analyst working with detector data \u2014 uses shorthand ('so I can trend it'), doesn't over-explain the domain, and Turn 3 is a natural, efficient follow-up that builds directly on the agent's clarifying question without restating context. The phrasing 'color by run' is casual and realistic rather than spelled out formally.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_026": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse phrasing, realistic data cleaning scenario, and the follow-up in Turn 3 is a plausible next question. Minor tell: Turn 3 is slightly too clean and complete for a typical user mid-investigation, but overall reads like a real analyst poking around dirty data.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_114": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the pivot from a data integrity check to a visualization request is realistic, and the phrasing is casual ('OK good to know'). Turn 3 is a plausible follow-up but reads slightly like a spec ('broken down by plan_tier' is precise and complete), which is a minor tell. Overall the shorthand and flow feel like a real analyst or ops person poking around their data.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_110": {
+          "score": 4,
+          "reason": "The conversation flows naturally with a logical progression \u2014 the user builds on the agent's response and uses reasonable shorthand ('pull the latest,' 'at their current growth rate'). The 85% threshold reference carries over organically. Minor tells: the requests are unusually clean and complete with no typos, hesitation, or ambiguity, and the scenario feels slightly too well-structured for casual use. But the domain context (storage monitoring) is realistic and the follow-up in Turn 3 is exactly what a real analyst would ask after seeing that APAC is at 78%.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_122": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user speaks casually ('Ok', 'Actually can you'), uses shorthand references to column names, and the workflow (export then pivot to visualization) is realistic. The axis label request is specific but plausible for someone preparing a district report. Minor tell: the label string 'Location (Teacher - Room)' is suspiciously complete and polished for a casual follow-up, suggesting slight scripting, but overall reads like a real admin or data coordinator using this tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_001": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 'good call' opener, shorthand like 'single bucket,' and the 60% threshold feels like a real analyst's heuristic. Turn 1 has a slightly polished framing ('diversification review') but the follow-up in Turn 3 is genuinely how someone would drill down after getting pivot advice. Minor tell: context is suspiciously complete and domain-appropriate without any friction or ambiguity.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_002": {
+          "score": 5,
+          "reason": "Feels like a real user workflow: terse command in T1, practical clarifying question in T3 before acting (checking data definition before export is a very realistic hesitation). No over-explanation, uses shorthand like 'no chart stuff' and references the actual field name 'billable_hours' naturally. The pivot between tasks feels organic, not scripted.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_003": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'valus' typo in turn 3 is a strong authenticity signal, the follow-up is logical rather than scripted, and the domain context (cost center codes, legacy Azure subscriptions) feels grounded. Slight deduction because turn 1 is a bit formally phrased ('validate them against the standard 6-character alphanumeric pattern') but overall reads like a real data analyst workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_004": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 3 uses casual shorthand ('Yeah'), realistic messy-data frustration, and a natural pivot to a related column issue. Slightly polished in that both problems are conveniently adjacent data quality issues, but the phrasing and flow are believable for someone actually cleaning a fitness dataset.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_005": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 the instructions are terse and directive, like a real analyst configuring a tool to their workflow preferences. The shorthand ('came in as strings', 'rounded defaults') feels authentic. Minor tell: the two preferences are suspiciously clean and non-overlapping, like someone writing a spec rather than discovering issues mid-task. But the domain specificity (p-values, significant figures, parsing flags) and casual phrasing lean toward a real data analyst user.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_006": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 shorthand requests, no over-explanation of intent, and Turn 3 is a realistic follow-up that ignores the agent's question (common real-user behavior). Minor tell: the requests are suspiciously clean and sequential, like a scripted demo flow. But the casual phrasing ('pull a quick table') and the way Turn 3 just moves forward without answering the hover/tooltip question feels authentic.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_007": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'just to be safe' is a realistic verbal hedge, and the two-step workflow (export then save state) mirrors how someone actually works. The versioning convention 'v2' adds authenticity. Minor tell: Turn 1 assumes a lot of prior context without any shorthand or personality quirks, reads slightly too clean.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_008": {
+          "score": 5,
+          "reason": "Natural shorthand in both turns - 'from 2022 to now' and 'what about the adult program during the same period' are exactly how real users pivot in data exploration. No over-explanation of intent, implicit reference to prior context ('the same period'), conversational brevity throughout.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_010": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic shorthand ('Cool, can you draft'), and the follow-up in Turn 3 is a logical next step rather than a scripted prompt. Minor tell: Turn 1 is slightly too clean and domain-aware for a cold opener, but overall reads like a real analyst working iteratively with a data tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_012": {
+          "score": 3,
+          "reason": "Turn 3 is a natural follow-up and uses reasonable shorthand ('raw data columns it pulls from'), but the overall conversation feels slightly templated \u2014 questions are clean and sequential without any personality, hesitation, or real-world messiness. The scenario is plausible for a data/analytics tool user, but the exchanges read more like a scripted demo than an organic session.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_013": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses casual shorthand ('dropped hard') and a realistic analyst request. Turn 3 is a plausible follow-up showing hesitation before acting, which real users do. Minor tell: Turn 3 is slightly too cleanly phrased ('what columns do I actually have available') \u2014 a real user might say 'wait what fields can I even use for attribution?' but it's close. Overall scenario is realistic for a marketing analyst using a data tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_014": {
+          "score": 2,
+          "reason": "Turn 3 is a textbook scripted follow-up \u2014 it reads like a data analyst writing a requirements doc rather than a real user talking to a tool. A real user would likely say something like 'oh wait, make sure it's only the last 12 months' or assume the agent already understood. The phrasing 'filter to the most recent 12 months and sum costs by month and category' is overly explicit and procedural, spelling out exact ETL steps rather than expressing intent naturally. No personality, shorthand, or conversational texture throughout.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_016": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow. Turn 1 has a practical, task-driven framing ('before joining'). Turn 3 uses casual shorthand ('Yeah, then write a quick script'), doesn't re-explain context, and assumes the agent knows what 'the other table' refers to \u2014 exactly how a real user talks when they're in flow. No over-explanation, natural abbreviation, realistic data QA scenario.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_017": {
+          "score": 5,
+          "reason": "The conversation flows naturally \u2014 Turn 1 uses casual shorthand ('like what percent'), Turn 3 is an organic follow-up that a real analyst would ask after seeing cohort data, wanting to explore further. The phrase 'or something else' is a natural hedge, not scripted. The scenario (querying retention data, then asking about available columns) is realistic for a data/analytics tool user.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_018": {
+          "score": 5,
+          "reason": "Very natural data wrangling conversation. Turn 1 uses shorthand ('it's like 1842|How to pick a CRM' as an example rather than formal specification), Turn 3 is a realistic follow-up QA check that a real analyst would do after a transformation. No over-explanation of intent, uses casual phrasing, and the workflow (split \u2192 validate) matches how people actually work with data.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_019": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the workflow is realistic (validate data before visualizing), shorthand is used ('run stats', 'the range is good'), and Turn 3 is a logical follow-up without over-explaining. Minor tell: the instructions are slightly too clean and sequential, like a demo script, but nothing overtly robotic.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_020": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic data workflow. Turn 3 is a plausible follow-up pivot but is slightly polished ('calculated metrics we have for cohorts' is a bit complete/formal). No strong personality markers but shorthand usage and lack of filler reads like a real analyst.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_021": {
+          "score": 4,
+          "reason": "Turn 3 feels natural with casual shorthand ('Yeah'), realistic follow-up logic, and imprecise but human instruction ('split it on the dot'). Minor tell: the setup in Turn 1 is slightly too clean and self-aware about the data issue, but overall reads like a real analyst working through a messy dataset.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_022": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'quick check' and the casual phrasing in Turn 3 read like a real user mid-workflow. The context is realistic (cleaning a book database before standardizing status). Minor tell: Turn 1 is slightly too well-structured with the 'isbn13 or title+author' specificity, but overall the back-and-forth has a plausible iterative feel rather than a scripted template.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_023": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the workflow makes sense (profile data, then act on it), shorthand like 'aren't in the youtube_uploads table yet' is realistic, and the goal is practical. Minor tell: Turn 1 is slightly explicit about intent ('repurpose') in a way that feels slightly staged, but overall the progression is organic and the user doesn't over-explain.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_024": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic shorthand ('Try parsing') and a practical goal (weekly deployment counts). The context is plausible for a data analyst. Minor tell: Turn 3 is slightly polished and complete in its intent statement, but overall reads like a real user working through a data problem.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_025": {
+          "score": 5,
+          "reason": "Conversation flows naturally with realistic pre-work caution ('before touching anything'), domain-appropriate shorthand ('nulls and dupes'), and a logical progression that mirrors how an actual analyst would approach data validation before running a report. No over-explanation of intent, natural pickup of the agent's suggestion about email/client_id for duplicates.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_027": {
+          "score": 4,
+          "reason": "Reads naturally \u2014 terse commands, realistic data debugging scenario, no over-explanation of intent. Turn 3 is a logical follow-up without scripted preamble. Minor tell: the progression is almost too clean and cooperative, but shorthand like 'flag any rows' and 'fee column' (not repeating full column name) feels like a real analyst.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_028": {
+          "score": 3,
+          "reason": "Turn 3 is a reasonably natural follow-up, but the conversation overall reads slightly templated \u2014 the user spells out full column names and table references cleanly, and the workflow feels a bit too linear and complete. The agent's unprompted 'Ready to proceed with the merge' is oddly anticipatory, suggesting a scripted setup. Some domain authenticity (healthcare/call-center context) adds realism, but the phrasing lacks the shorthand or messiness of a real analyst mid-task.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_029": {
+          "score": 4,
+          "reason": "Mostly natural \u2014 the workflow is realistic (profile before splitting is a sensible data prep step), and Turn 3 has a practical, slightly terse quality ('land in the right spot after channel'). However, it's a bit too complete and well-structured for a typical user message; real users might be less precise about schema positioning or use more shorthand. No strong synthetic tells, but it reads slightly polished.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_031": {
+          "score": 5,
+          "reason": "Terse, task-focused language with natural shorthand ('Make it a line chart' with no over-explanation). The data cleaning instruction in Turn 1 is specific and practical, not templated. Turn 3 is a minimal, realistic follow-up that assumes shared context \u2014 exactly how a real user would pivot after seeing results.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_032": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic data cleaning scenario. Turn 3 is a logical follow-up using shorthand ('same domain fix') rather than spelling everything out. Minor tell: the context is suspiciously clean and complete, and the user's phrasing is slightly too polished/efficient, but overall reads like a real analyst working through a URL normalization problem.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_035": {
+          "score": 3,
+          "reason": "The workflow is realistic for data validation in a clinical/research context (dose dates, site IDs, facility schema), and Turn 1 has a natural conditional phrasing. However, Turn 3 reads slightly templated \u2014 'verify... against... to ensure they're valid' is very explicit and complete, lacking the shorthand or casual phrasing a real analyst would likely use (e.g., 'can you check site_id against the facility schema?' or 'now check site_ids are valid'). The transitions are clean but feel like scripted steps rather than organic conversation.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_036": {
+          "score": 5,
+          "reason": "Conversation flows naturally with casual shorthand ('weird values'), realistic data QA scenario, and Turn 3 is a genuine pivot to another column without over-explaining intent \u2014 exactly how someone would actually explore a dataset interactively.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_037": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 Turn 1 has realistic exec-prep urgency with casual run-on phrasing, and Turn 3 shows a plausible nitpick with a specific suggested title rather than a vague complaint. Minor tells: the suggested title in Turn 3 is suspiciously well-formatted and complete, and the overall context is very tidy, but the shorthand and flow feel like a real user working in a BI/cloud cost tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_038": {
+          "score": 5,
+          "reason": "Terse, directive language ('Yep', 'Cool'), uses shorthand and assumes shared context, natural follow-up that builds on prior step without over-explaining. Realistic workflow between a data engineer and a tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_039": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user speaks in shorthand ('fill those', 'we're actually tracking'), has a logical workflow, and Turn 3 is a realistic pause-and-check before acting. Minor tell: the context is suspiciously clean and the progression is almost too pedagogically tidy, but the phrasing and decision-making pattern match a real analyst or ops user.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_041": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow \u2014 casual shorthand ('pull up the schema'), natural pivot after getting partial info, realistic pre-merge data validation scenario. Turn 3 is a genuine course correction, not a scripted next step. 'before I go further' adds authentic hesitation/process thinking.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_043": {
+          "score": 5,
+          "reason": "Feels like a real mid-task conversation \u2014 user interrupts their own workflow, uses casual shorthand ('hold off', 'for a second'), and the correction in Turn 3 is the kind of spontaneous rethinking real users do. No over-explanation of intent, no templated phrasing.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_044": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural for a data task, but Turn 3 reads as slightly scripted \u2014 'confirm it's ready for the heatmap tool' is very explicit about intent in a way real users often aren't. Real users might say 'can you check the schema?' or 'does it look right?' without spelling out the downstream purpose so cleanly. No shorthand or personality, but the scenario itself (soil samples, heatmap) is plausible.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_045": {
+          "score": 5,
+          "reason": "Reads like a real power user mid-workflow \u2014 terse, directive, uses internal field name ('reward_tier') naturally without explaining it, builds on prior correction without restating context. Turn 3 feels like genuine preference-setting from someone who knows their data model.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_046": {
+          "score": 5,
+          "reason": "Conversation feels genuinely natural \u2014 Turn 1 opens mid-context with a dismissive redirect ('Skip that'), implying prior conversation history and real workflow familiarity. Turn 3 is a realistic pause-and-check before acting, the kind of practical 'wait, let's not duplicate work' instinct a real analyst would have. Shorthand like 'we already track it' and 'split it out cleanly' reads like someone who knows their domain. No over-explanation of intent, no formulaic structure.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_047": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 the 'Wait, first' redirect and 'weird variations' phrasing suggest a real user mid-workflow who changed their mind, which is authentic behavior. The shorthand 'pull up the stats' and casual 'weird variations' add personality. Minor tell: Turn 1 is slightly over-specified with the explicit list format, but overall reads like someone actually working through a data cleaning task.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_048": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses casual shorthand ('so I can confirm it looks right') and Turn 3 is a realistic follow-up request. However, Turn 3 is suspiciously specific and complete ('magnitude and distance columns') without any hesitation or ambiguity, which is slightly too clean. The domain context (data analysis) fits the tool usage well, and the progression is logical, but a real user might reference the actual column names more casually or ask a messier follow-up.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_049": {
+          "score": 4,
+          "reason": "Reads like a real SRE or on-call engineer doing post-incident analysis \u2014 the follow-up is a natural drill-down (region breakdown + time bucketing) that someone actually investigating an outage would ask. The 15-minute interval request shows domain familiarity. Minor tells: the initial query is slightly too well-formed with exact timestamps, and the follow-up is very clean/complete without the shorthand or typos you'd expect mid-incident. Overall feels authentic but a touch polished.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_051": {
+          "score": 4,
+          "reason": "The conversation flows naturally with a realistic investigative pattern \u2014 someone questioning a metric definition then wanting to verify it against the underlying data. Turn 3 is a genuine follow-up rather than a scripted pivot. Minor tell: the context is suspiciously clean and the user's phrasing is slightly polished ('which features are actually logged' reads as purposeful), but overall feels like a real analyst or data person digging into reporting definitions.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_052": {
+          "score": 3,
+          "reason": "Turn 1 feels natural \u2014 checking stats before a merge is realistic workflow behavior. But Turn 3 is overly complete and formal ('client profiles with their portfolios using client_id as the key') \u2014 a real user who just confirmed the key in Turn 1 would likely say something like 'ok go ahead and merge' or 'merge them on that.' The full restatement reads like a scripted prompt designed to be self-contained.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_053": {
+          "score": 4,
+          "reason": "The conversation flows naturally with a clear analytical purpose \u2014 checking sample sizes before splitting data, then validating whether low-count states are also outliers. Turn 3 is a logical, unprompted follow-up that feels like genuine exploratory data analysis. The mention of ArcGIS and 'social trust score' adds domain specificity that feels real. Minor tells: the phrasing is slightly polished and the context is suspiciously complete, but the shorthand ('thin for geospatial mapping,' 'main outcome variable') and incremental reasoning pattern are consistent with a real researcher working through a problem.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_054": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'Nice.' as a turn opener, the shorthand request for rolling average, and the incremental refinement pattern all feel like a real analyst user. Minor tell: the requests are suspiciously well-scoped and technically precise without any ambiguity or correction, which is slightly too clean for a typical user session.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_058": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 3 is a realistic pivot to a separate but related task, uses shorthand like 'one manual row' and a specific client ID/date that feels like real data work. Minor tell: Turn 1 is slightly polished ('so we can mark test and placeholder rows' reads a bit explanatory), but overall the flow and domain specificity (outreach visit, client ID format) feel authentic.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_059": {
+          "score": 5,
+          "reason": "Natural data cleaning workflow with realistic shorthand ('that header' instead of 'the sub_plan column header'), casual acknowledgment before next request, and practical column renaming task that fits real analyst behavior. No over-explanation of intent.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_061": {
+          "score": 5,
+          "reason": "Highly natural conversation. Turn 1 uses casual shorthand ('it's a mess'), realistic mixed-format data problem, and domain-specific column names. Turn 3 is a perfectly natural follow-up question someone would actually ask after a data transformation\u2014short, uses 'we' (collaborative tone), and references the prior context without over-explaining. No robotic phrasing or template-like structure anywhere.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_062": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 shorthand like 'dedupe' and 'rows got dropped' feel authentic, the back-and-forth is realistic for a data/music catalog tool (ISRC is a real music industry identifier). Turn 3 is a clean, direct follow-up that fits the flow. Minor tell: the context is suspiciously complete and tidy, and the user's asks are perfectly scoped without any ambiguity or messiness typical of real sessions.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_063": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'where we're losing people' and 'both groups' feel like real analyst shorthand, and the task progression is logical. Minor tell: Turn 3 is slightly too clean and complete for a follow-up ('exact conversion rate from activated to purchased for both groups' spells out the full spec without any ambiguity or mid-thought correction), but overall the scenario and phrasing are plausible for a data/product analyst using this tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_064": {
+          "score": 2,
+          "reason": "Turn 3 feels redundant and scripted \u2014 a real user who just saw a distribution chart would already have the education levels visible. Asking for 'the full list' after seeing a distribution is an oddly naive follow-up that suggests a templated conversation rather than genuine exploration. The phrasing is also overly formal and complete with no shorthand or personality.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_065": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'get a feel for' and 'like cancelled divided by total' are casual shorthand, and the follow-up in Turn 3 is a realistic iterative refinement rather than a scripted next step. Minor tell: the context is suspiciously clean and complete, and the clarification in Turn 3 ('like cancelled divided by total customers in each plan') is slightly over-explained for someone already comfortable with churn analysis, but overall feels like a real analyst workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_067": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 domain-specific shorthand ('reshaping for R', 'nullable'), realistic workflow of checking nulls before data transformation, and Turn 3 is a logical follow-up rather than scripted. Minor tell: the phrasing is slightly too clean and complete, lacking typos or casual truncation you'd expect from a real analyst in a hurry.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_068": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic data analysis context and reasonable follow-up. Turn 3 adds a practical caveat (exclude test accounts) that feels like genuine domain knowledge rather than scripted response. Minor tell: the instructions are slightly too clean and complete, but overall reads like a real analyst working through a RI (Reserved Instance) cost analysis task.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_069": {
+          "score": 5,
+          "reason": "Highly natural \u2014 uses casual shorthand ('nice', 'break it out', 'i can see if'), doesn't over-explain intent, builds organically on the agent's response by referencing the implied next question (prod vs staging). The multi-dimensional follow-up (environment + color by region) feels like a real analyst iterating on a viz, not a scripted prompt.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_070": {
+          "score": 4,
+          "reason": "The conversation flows naturally with reasonable shorthand ('Yeah,' 'clean copy') and a realistic ops/devops scenario. Turn 3 is a genuine-feeling follow-up that mirrors the agent's suggestion organically. Minor tell: the setup is slightly too clean and purposeful, but overall reads like a real user working through a task.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_072": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'Yeah' is casual shorthand, and the follow-up is a realistic refinement. However, the request is suspiciously complete and well-structured for a chat response, specifying exactly three distinct formatting details in one clean sentence. Real users often send these as separate messages or forget one detail. Still, plausible for a technically fluent user.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_073": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic domain context (grant reporting, headcount, funders). Turn 3 is a genuine follow-up that builds on the agent's advice rather than introducing a new scripted prompt. Minor tells: the phrasing is slightly polished and the scenario is suspiciously complete, but the shorthand ('data note') and organic progression feel authentic to someone actually working through a reporting problem.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_074": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 terse phrasing, 'not just visual' shows genuine analytical thinking, and the follow-up in Turn 3 feels like a real analyst who knows what they want. Minor tell: the progression is almost too clean and pedagogically complete, like it was designed to demonstrate a workflow. But shorthand and tone are convincing.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "dana_075": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('visualize that as a bar chart' rather than 'please create a visualization in the form of a bar chart'). Turn 3 is a genuine follow-up that builds on the agent's response. Minor tell: the setup feels slightly clean/demo-like, but the brevity and directness of the requests are consistent with a real analyst or ops user working in a data tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "dana_077": {
+          "score": 5,
+          "reason": "Highly natural progression: casual opener ('How bad is the vendor field?'), practical before-acting mindset, then Turn 3 assumes a specific operation ('fill those down' \u2014 a real data term, not 'populate the missing values') and pivots immediately to the next analytical question without over-explaining. No robotic preamble, uses shorthand, realistic data exploration workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "dana_078": {
+          "score": 5,
+          "reason": "Feels like a real user mid-workflow \u2014 'Actually' signals a natural pivot, the request is slightly vague ('exactly where the money is going' rather than specifying output format), and the follow-up is a realistic course-correction rather than a scripted next step. Shorthand like 'pull the data from' and no over-explanation of intent reads as authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_079": {
+          "score": 5,
+          "reason": "Turn 3 is the key tell \u2014 'Nah, don't pull rows or auto-fix anything yet, just give me the counts' reads as genuinely natural. The pushback is casual, uses shorthand ('Nah'), and reflects realistic caution from someone who wants to review before acting. The scenario (cap table email audit) is plausible for a finance/ops user, and the conversation has a natural back-and-forth rhythm without over-explaining intent.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_080": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing ('basically'), shorthand task chaining, realistic data analysis workflow. Turn 3 is a logical follow-up without over-explaining. Minor tell: 'the whole table' is slightly more explicit than a real user might be, but overall reads like someone actually working through an analysis.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_082": {
+          "score": 5,
+          "reason": "Feels completely natural \u2014 Turn 1 uses casual shorthand ('coming in as a string', 'so we can actually do math on it'), no over-explanation of intent. Turn 3 is a realistic curiosity follow-up triggered by the agent's own mention of 'coerce', exactly how a real user would pivot to a quick clarifying question mid-task. No templated structure, natural voice throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_083": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses casual phrasing ('like key totals'), Turn 3 uses shorthand ('they're messy text right now') and drops the subject pronoun, which reads authentically. The field names in Turn 3 are suspiciously precise/formatted (Award_Date, Report_Due with underscores), suggesting some awareness of the data schema that feels slightly staged, but overall the flow and tone are consistent with a real grants manager or nonprofit admin using this tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_084": {
+          "score": 4,
+          "reason": "The pivot in Turn 3 feels natural \u2014 users often change their mind mid-task. Shorthand like 'quick breakdown' and 'urgent stuff' adds personality. Minor tell: the requests are suspiciously clean and sequential, like a demo script, but nothing overtly robotic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_085": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing ('quick overview', 'so I can draft'), realistic data analysis workflow, and the follow-up in Turn 3 is a logical next step rather than scripted. Minor tell: the context is suspiciously clean and the transitions are a bit too smooth, but shorthand and purpose-driven language feel genuine.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_086": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 the 'Before I validate...' framing shows realistic workflow thinking and the phrasing is conversational rather than formulaic. Minor tell: the context is suspiciously clean and the user spells out column names precisely each time without shorthand, but the logical progression and hedging language ('actually stored as') reads like a real analyst double-checking their work.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_087": {
+          "score": 5,
+          "reason": "Conversation flows naturally with realistic shorthand ('Q2', 'Cool'), task-specific context (data profiling before visualization), and Turn 3 is a genuine follow-up refinement rather than a scripted next step. The user doesn't over-explain intent and uses casual acknowledgment before pivoting to chart formatting \u2014 very typical of a real analyst workflow.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_088": {
+          "score": 5,
+          "reason": "Feels like a real data analyst mid-workflow. Turn 1 uses casual shorthand ('showing up as strings'), Turn 3 is a natural pivot \u2014 they don't explain why they want summary stats, just redirect as someone would when sanity-checking data. No over-explanation, realistic domain context (p-values suggest stats/bioinformatics work), and the 'actually' opener is a very human mid-task correction.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_089": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 Turn 1 is a realistic terse data request, and Turn 3 has a good natural pivot ('Actually') with casual shorthand ('check if we have enough data'). Minor tell: the scenario is suspiciously clean and the agent response is oddly precise with round numbers, but the user turns themselves read authentically.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_090": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 the domain context (stacking session files, reaction time data) is realistic for a researcher or data analyst, and Turn 3 has a casual 'all over the place' phrasing that feels genuine. Minor tells: the problem descriptions are suspiciously complete and sequential, and the user spells out the exact format string rather than saying something like 'standard datetime format' or attaching an example. Overall plausible but slightly too tidy.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_092": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 short, directive messages with no over-explanation, realistic for a dashboard/analytics tool user. Turn 3 is a plausible follow-up that shows the user is iterating on their visualization. Minor tell: the transition from setting a global color scheme to immediately overriding it with green for a specific condition is slightly abrupt but not unnatural. Overall reads like a real user customizing a sales or real estate analytics view.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_093": {
+          "score": 5,
+          "reason": "Conversation feels genuinely natural \u2014 'Quick check' opener, casual 'Yeah' follow-up, shorthand like 'invalid ones by count' rather than spelling out full intent. Turn 3 is a realistic pivot that builds on the agent's response rather than following a script. The scenario (validating activity codes against an approved list) is plausible for a data/admin context. No over-explanation of intent or robotic phrasing.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_094": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 the user has a clear, realistic scenario (prepping for a board meeting), uses shorthand like 'the board chart' and 'the board is going to ask' which feels authentic. Turn 3 is a plausible follow-up rather than a scripted pivot. Minor tells: the context is suspiciously complete and tidy, and the phrasing is slightly too polished for someone under board-prep pressure, but overall reads like a real analyst or risk manager using an internal tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_096": {
+          "score": 3,
+          "reason": "Turn 3 has natural shorthand ('stack it onto this list') that feels genuine, but Turn 1 reads like a scripted prompt \u2014 overly precise and formal without any conversational context or personality. The scenario is plausible for a data/legal analyst, but the lack of any pronouns, reactions, or follow-up texture across turns makes it feel like constructed examples rather than an organic session.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_097": {
+          "score": 4,
+          "reason": "The conversation flows naturally with reasonable shorthand ('Yeah') and a logical follow-up request. Turn 3 feels authentic in tone, though the specificity of 'using Python' and the clean progression from exploration to action is slightly too tidy. Overall reads like a plausible real user with minor polish tells.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_098": {
+          "score": 5,
+          "reason": "Feels like a real analyst or ops person \u2014 casual shorthand ('yeah'), specific axis preferences without over-explaining, natural follow-up that builds on the agent's suggestion rather than introducing a scripted new topic. The domain context (coverage metrics, regional teams) and the way they delegate axis labeling reads like someone who knows what they want but is working iteratively.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_099": {
+          "score": 5,
+          "reason": "Turn 3 is the key tell \u2014 a real user changing their mind mid-task, pulling back scope after seeing the agent's plan. The phrasing 'reject that' is casual and idiomatic, not scripted. The initial request uses natural shorthand ('it's like...') with concrete examples rather than formal spec language. Realistic data cleaning scenario with believable mixed-format problem.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_100": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the pivot in Turn 3 ('Actually, check...') is a realistic mid-task correction, and 'I bet it's stored as a generic object' reads like genuine domain intuition rather than scripted phrasing. Minor tell: the initial Turn 1 is slightly too well-structured with two clear sub-tasks, but overall the shorthand and reasoning flow feel like a real data practitioner.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_102": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic grant data management tasks and reasonable follow-up. Turn 3 is a logical next step rather than a scripted pivot. However, the phrasing is consistently polished and complete \u2014 a real user might say 'can you break that down by agency and FY?' or use more shorthand. The scenario is plausible for someone working with grants data, but it reads slightly too clean and sequential to be fully organic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_105": {
+          "score": 5,
+          "reason": "Terse, task-focused messages with no over-explanation. 'to verify the split' implies prior context the user holds in their head but doesn't re-explain. Natural follow-up workflow: cast types, then sanity-check values. Shorthand phrasing ('Show me') and implicit references feel like a real data engineer mid-task.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_106": {
+          "score": 5,
+          "reason": "Casual lowercase, contractions ('i', 'so i can'), practical workflow chaining (fill \u2192 transpose \u2192 export), realistic wiki editing scenario. Turn 3 is a natural next step without over-explaining. No robotic formality or template feel.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_107": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow. Turn 3 is a natural backtrack \u2014 user realizes they should verify column names before proceeding, which is realistic and slightly disorganized in a human way. 'Yep' is casual shorthand, and the self-correction ('check what columns we have first') mirrors how real users think out loud rather than presenting a clean, pre-planned request.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_108": {
+          "score": 4,
+          "reason": "Turn 1 references a prior action ('you just flagged') suggesting ongoing session context, and Turn 3 has natural shorthand ('run the stats') with a reasonable follow-up flow. Minor tell: Turn 3 spells out 'amount_awarded column' somewhat formally, but overall reads like a real analyst iterating on data exploration.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_109": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic data cleaning tasks and a logical follow-up. The user uses shorthand and doesn't over-explain intent. Minor tell: the progression is almost too clean and sequential, like a scripted demo workflow, but the language itself is terse and task-focused in a believable way.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_111": {
+          "score": 5,
+          "reason": "Conversation feels completely natural \u2014 Turn 1 uses casual shorthand ('keep the rest as-is'), Turn 3 is an organic pre-send sanity check that a real analyst would think of last minute. No over-explanation of intent, realistic workflow context, and the follow-up flows naturally from the task rather than feeling scripted.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_112": {
+          "score": 4,
+          "reason": "Turn 3 feels natural with the casual 'annoying' and shorthand 'with nothing' phrasing, and the task flow is realistic for a data analyst. Minor tell: the context is suspiciously clean and sequential, but the language itself reads like a real user.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_113": {
+          "score": 5,
+          "reason": "Highly natural \u2014 user pivots mid-conversation with 'Actually just' which is classic real-user behavior, uses shorthand references to column names without over-explaining, and the scenario (working with a logic model/dataset) is realistic. No formulaic structure, genuine task-switching.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_115": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 Turn 1 uses shorthand field names and assumes shared context (no over-explanation), and Turn 3 is a realistic pivot from a specific task to a broader 'what else?' question that real users commonly ask. Minor tell: the context is suspiciously clean and progressive, like a demo scenario, but the language and flow are plausible for someone actually prepping a data import.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_116": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 the first turn has good specificity and a casual explanation ('it's combining...'), and Turn 3 is a reasonable follow-up. Minor tells: Turn 3 is slightly too clean and complete ('give me a summary of the stats for the order_value column' is polished but not unnatural). Overall feels like a plausible data analyst workflow, just slightly too tidy.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_118": {
+          "score": 5,
+          "reason": "Highly natural \u2014 Turn 1 uses casual shorthand ('send these out' implies real workflow context), Turn 3 responds organically to the agent's warning with specific observation ('some are MM/DD/YYYY and some are written out') that feels like someone actually looking at their data, not scripted. Pronoun use, informal tone, and the reactive follow-up all read as genuine.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_119": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand in Turn 3 ('top recipes and any week-to-week dropoffs') reads like a real user who knows what they want without over-explaining. The pivot from export to summary email is a realistic workflow. Minor tell: the request is suspiciously complete and well-scoped for a follow-up, but not implausibly so for someone familiar with the tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_120": {
+          "score": 5,
+          "reason": "Highly natural workflow: terse commands, no over-explanation, realistic data wrangling follow-up (date column type issues are extremely common after appending data), uses shorthand like 'that' instead of restating the column name, and the scenario fits a real analyst maintaining a recurring report.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_121": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Give me the stats' and 'Show me' are casual shorthand, and the curriculum switch scenario is realistic. Turn 3 is a logical follow-up rather than scripted. Minor tell: the context is suspiciously clean and complete, with no ambiguity, clarifying questions, or messiness typical of real data conversations.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_124": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user speaks in a direct, task-oriented way with reasonable shorthand ('give me a quick profile,' 'scan and flag'). The scenario is plausible for someone managing bibliographic data. Turn 3 is a logical, organic follow-up rather than a scripted pivot. Minor tells: the table names are suspiciously clean and descriptive ('supplemental_list,' 'bibliography_master'), and the requests are unusually well-scoped without any ambiguity or correction, which is slightly too polished for a typical user session.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_125": {
+          "score": 4,
+          "reason": "The conversation flows naturally with reasonable shorthand ('IG ads') and a logical follow-up request. Turn 3 feels like a genuine analyst digging deeper rather than a scripted prompt. Minor tells: the progression is almost too clean and purposeful, and 'statistically' in Turn 3 is slightly formal but plausible for someone analytically minded. Overall reads like a real user in a data/CRM tool context.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_126": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand 'Ok good enough for now' and pivot to a practical next step (sharing with district office) reads like a real analyst workflow. Turn 1 has slightly explicit framing ('before I dig deeper') but not unnaturally so. The scenario is realistic for someone doing equity/education data work. Minor tell: the context is suspiciously complete and the handoff between turns is very clean.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_127": {
+          "score": 5,
+          "reason": "Highly natural \u2014 casual opener ('Nah'), shorthand references to field names without over-explaining, Turn 3 pivots naturally mid-thought ('but first') like a real user redirecting themselves. No scripted feel, reads like someone actively working through a data task.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_128": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic data validation context and casual phrasing ('throw that into a bar chart'). The follow-up in Turn 3 is a logical, unscripted-feeling next step. Minor tell: the scenario is suspiciously clean and complete, but overall reads like a real analyst working through a data quality task.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_129": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'before I reshape this' implies real workflow context and uses shorthand. The user doesn't over-explain and responds directly to the agent's observation about data types, which is a realistic follow-up. Minor tell: Turn 1 is slightly formal ('each environment column in this config table') but not implausibly so for a technical user.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_130": {
+          "score": 5,
+          "reason": "Turn 3 is the key tell \u2014 'undo that last change I made' is exactly how a real user talks mid-workflow, implying prior context and a change of mind. The shorthand ('start the cleanup fresh'), lack of over-explanation, and realistic pivot from reviewing to undoing all feel authentic. No robotic spelling-out of intent, natural data cleaning scenario.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_131": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 shorthand like 'fill it down' and 'weekly ops deck' are realistic domain-specific phrases a data analyst would use. Turn 3 is a plausible follow-up that assumes context without re-explaining. Minor tell: the workflow is suspiciously clean and linear, but overall reads like a real ops/analytics user.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_132": {
+          "score": 3,
+          "reason": "Turn 1 and Turn 3 are plausible contract management tasks, but Turn 3 reads slightly scripted \u2014 a real user might say 'can you add a column' or reference the prior output more naturally rather than issuing a clean, fully-formed instruction with exact column name and logic spelled out so precisely. No shorthand or personality, but the scenario itself is realistic for a data/contracts tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_133": {
+          "score": 5,
+          "reason": "Natural shorthand ('Undo that last cleanup'), implicit context (no over-explanation of what cleanup was), and Turn 3 is a realistic verification follow-up a real user would make after an undo \u2014 not scripted, just cautious confirmation behavior.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_134": {
+          "score": 4,
+          "reason": "Turn 1 is a fairly natural analyst request with reasonable specificity. Turn 3 feels authentic \u2014 'undo that last change' is casual shorthand and a realistic reaction to a visual issue. Minor tell: Turn 1 is slightly polished/complete for a casual user, but overall the flow feels like a real analyst iterating on a chart.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_135": {
+          "score": 4,
+          "reason": "Turn 1 is natural and direct with realistic shorthand. Turn 3 feels slightly scripted \u2014 'basic stats first' is a reasonable request but the phrasing 'break down deal amounts by owner rep and region' is a bit formal and complete for a follow-up in the same breath. Minor tell: a real user might say 'can you also show me a breakdown by rep and region?' rather than listing two dimensions so explicitly. Overall feels mostly natural for a CRM/sales data context.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_136": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'sanity check the volume' and 'clean for the foundation' are realistic domain shorthand, and the flow between turns is logical. Turn 3 is a believable follow-up rather than a scripted pivot. Minor tell: the context is suspiciously tidy and complete, with no ambiguity, typos, or back-and-forth clarification you'd expect in real data work.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_137": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('pull up the schema') and a logical problem-solving progression. Turn 3 is a genuine follow-up that builds on the agent's response rather than introducing a new scripted prompt. Minor tell: the context is suspiciously clean and the user's technical fluency is consistent throughout, suggesting a somewhat idealized scenario, but overall reads like a real data/ops user working through a data quality issue.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_138": {
+          "score": 4,
+          "reason": "The conversation reads mostly natural \u2014 the user gives terse, task-focused instructions without over-explaining, uses shorthand like 'lines up correctly' and 'plain-language summary,' and the follow-up in Turn 3 is a logical next step rather than a scripted pivot. Minor tells: the phrasing is slightly too clean and complete for a casual user, and 'focusing on which hours and days are busiest' feels a touch over-specified, but overall it fits someone doing real data analysis work.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_139": {
+          "score": 5,
+          "reason": "Conversation flows naturally with casual acknowledgment ('Cool'), implicit context carryover (no re-explaining what monthly_waste_cost is), and a terse follow-up request typical of someone iterating in a data/analytics tool. No over-explanation of intent, realistic domain scenario (cloud cost analysis), and shorthand phrasing throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_140": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand request in Turn 1, the casual 'just so you know' preference note in Turn 3, and the realistic workflow of requesting stats before a visualization all feel authentic. Minor tell: the preference disclosure in Turn 3 is slightly convenient/clean, but not implausibly so for a real analyst establishing workflow preferences.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_141": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('so I can share it') and a logical follow-up question in Turn 3. The user doesn't over-explain intent and uses 'we' casually, which feels authentic. Minor tell: the scenario is almost too clean and sequential, but it's plausible for someone using a booking management tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_142": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic shorthand ('CAC', 'null spend values') and a logical follow-up. Turn 3 is a plausible analyst response, though 'linear interpolation based on surrounding dates' is slightly too technically precise for casual speech \u2014 a real user might say 'can you estimate the missing ones based on nearby dates' rather than naming the method explicitly. Overall reads like a knowledgeable analyst but with minor polish tells.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_143": {
+          "score": 5,
+          "reason": "Feels like a real analyst session \u2014 casual 'Cool,' natural pivot from data cleaning to aggregation, uses actual column name 'net_payout' without over-explaining, shorthand phrasing, no robotic formality.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_144": {
+          "score": 5,
+          "reason": "Conversation flows naturally with realistic domain context (data reporting for a funder), Turn 3 shows genuine human reasoning ('that's expected') and casual shorthand rather than restating the problem. The user doesn't over-explain intent and responds to the agent's finding in a way that reflects actual institutional knowledge. No robotic phrasing or template-like structure.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_145": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 short, task-focused turns with realistic shorthand and no over-explanation. Turn 3 is a plausible follow-up pivot (checking context before adding data), though it's slightly suspicious how cleanly it transitions without acknowledging the agent's question about adding July. A real user might say 'not yet, first tell me...' rather than just ignoring the prompt. Overall reads like a real finance/ops user working in a tool, minor tell in the non-acknowledgment.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_146": {
+          "score": 5,
+          "reason": "Conversation feels genuinely natural \u2014 Turn 1 uses casual phrasing ('filled in and not blank') rather than technical jargon, Turn 3 shows realistic pragmatic decision-making ('good enough for now' despite known gaps), and the handoff to 'the legal team' is a believable real-world workflow detail. No over-explanation of intent, natural shorthand throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_147": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 is casual and realistic ('smooth it a bit' is genuine shorthand), and Turn 3 has a practical, task-oriented feel with specific formatting detail. Minor tells: the column name 'cpi_inflation_yoy' is suspiciously precise and technical for a casual follow-up, and the example '2.3%' feels slightly templated. Overall reads like a real analyst user but with a few overly clean details.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_148": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, realistic tool usage scenario, and Turn 3 is a plausible follow-up preference correction. Minor tell: the formatting instruction in Turn 3 is slightly polished/complete for a casual user, but shorthand like 'from now on' adds authenticity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_149": {
+          "score": 3,
+          "reason": "Turn 3 has a somewhat natural 'undo' request, but the overall conversation is very clean and formulaic \u2014 no shorthand, typos, or personality. The scenario is plausible for a data/analytics tool, but each turn reads like a scripted demo of features rather than a real user exploring a problem. 'Undo that last query' feels slightly natural but is suspiciously convenient as a feature showcase.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_150": {
+          "score": 5,
+          "reason": "Reads like a real analyst cleaning data before a report deadline. Turn 1 uses casual shorthand ('a bunch of variants like pers'), Turn 3 has natural goal-oriented follow-up with domain-specific language ('approved line-item totals for the narrative') that implies real workflow context rather than a scripted demo. No over-explanation of intent, pronouns/shorthand used naturally throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "dana_151": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses shorthand ('plot', 'basic stats too') without over-explaining, and Turn 3 has a casual opener ('Cool') with a compressed, multi-part follow-up question that reads like a real analyst drilling down. Minor tell: the phrasing 'what's driving those spikes by sensor and config?' is slightly polished and domain-complete, suggesting the user knows exactly what variables exist, which could indicate a scripted scenario. Overall though, the flow and shorthand feel authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "dana_152": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 1 uses casual shorthand ('this dataset' implies shared context), and Turn 3 is a reasonable pivot that sounds like genuine exploratory analysis. However, Turn 3 is slightly too clean and purposeful, reading like a well-formed next step rather than a messier real-world follow-up (e.g., no reaction to the agent's suggestion, no 'ok' or acknowledgment). Overall it mimics real data exploration behavior but feels slightly polished.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_153": {
+          "score": 5,
+          "reason": "Terse, task-focused language ('out of the way' is casual and natural), no over-explanation of intent, and Turn 3 is a logical but unscripted pivot to a different data concern \u2014 exactly how a real analyst would work through a dataset.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "dana_154": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 uses a dash, imperative tone, and explains the 'why' without being overly formal. Turn 1 is slightly polished but realistic for a data/marketing analyst. Minor tell: the context is suspiciously complete and clean, but the shorthand and direct response style in Turn 3 feel genuine.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_155": {
+          "score": 5,
+          "reason": "Turn 3 feels genuinely natural \u2014 'weird segments' is casual shorthand rather than formal language, the request is additive but not over-specified, and the phrasing 'how many were estimated' reflects a realistic data-quality concern someone actually working with estimated income data would have. No robotic over-explanation of intent.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_156": {
+          "score": 3,
+          "reason": "Turn 1 is plausibly natural but lacks any actual vendor data or context, which is suspicious. Turn 3 is genuinely natural shorthand. However, the overall exchange feels like a scripted demo of tool capabilities rather than a real workflow \u2014 a real user would likely reference specific vendors or paste data, not issue a bare command with no content.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_157": {
+          "score": 5,
+          "reason": "Extremely natural exchange \u2014 terse initial request with no over-explanation, agent asks a clarifying question, user responds with casual shorthand ('Just the count for now') that feels like real iterative data work. No artificial context-setting or formulaic structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_158": {
+          "score": 5,
+          "reason": "Highly natural throughout \u2014 casual shorthand ('patch those up', 'flat carry-forward'), realistic data scenario, and Turn 3 shows genuine domain reasoning ('my income isn't steady') that directly responds to the agent's concern rather than just saying 'yes.' No over-explanation of intent, personality comes through, reads like an actual freelancer or small business owner managing invoices.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_159": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the initial ask is casual and uses shorthand ('sticking around'), and Turn 3 is a reasonable follow-up that mirrors the agent's framing without being robotic. Minor tell: Turn 3 is slightly too clean and complete, directly echoing the agent's exact terminology ('data health check,' 'cohort and engagement columns look sane') in a way that feels slightly coached rather than spontaneous. Overall reads like a real analyst user, just a touch polished.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_160": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 casual shorthand ('a couple'), real slang examples, and a tacked-on follow-up task ('Check the counts after') that mirrors how real users think out loud. Minor tell: Turn 1 is slightly terse and context-free in a way that feels like a prompt setup, but overall the progression reads authentically.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_161": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse, task-focused phrasing ('show up right,' 'just export') and the casual 'remember my date format for next time' reads like a real user expecting persistent preferences. Slight tell is that the context is minimal but the request is suspiciously clean and complete without any ambiguity or messiness typical of real users.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_162": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow. Turn 1 is terse and task-specific with no over-explanation. Turn 3 uses natural phrasing ('so I know what I'm dealing with before validating') that reflects genuine reasoning process rather than scripted intent. The user doesn't spell out unnecessary context and responds directly to the agent's clarifying question without being overly formal or complete.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_163": {
+          "score": 3,
+          "reason": "Turn 1 feels natural and task-oriented, but Turn 3 is overly explicit and complete \u2014 a real user might say 'yeah do the full one' or 'full breakdown, worst first' rather than restating both parameters so cleanly. The phrasing reads slightly like a scripted confirmation of the agent's offered options.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_164": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 the user reorders the task casually ('Run the stats first though') with a conversational 'though' that signals real personality and informal shorthand. The initial prompt is slightly vague/terse in a realistic way. Minor dock because Turn 1 lacks any grounding context (what data? what gaps?) that a real user would likely hint at, even briefly.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_165": {
+          "score": 5,
+          "reason": "Terse, direct commands with no over-explanation. 'needs to go' and 'Just delete' are natural shorthand. The back-and-forth feels like a real workflow interaction \u2014 user doesn't re-explain context in Turn 3, just answers the agent's clarifying question minimally.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_166": {
+          "score": 5,
+          "reason": "Conversation reads as completely natural \u2014 casual opener with vague 'something looks really off' mirrors how real users flag issues without over-explaining, Turn 3 uses shorthand ('yeah do the side-by-side') and shows realistic decision-making caution ('before I revert anything') that feels like genuine workflow context rather than a scripted prompt.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_167": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 is casual and context-light (realistic for someone mid-workflow), Turn 3 uses shorthand and drops filler words ('Export it, just...'). Minor tell: the agent's Turn 2 response is suspiciously complete with exact field names, suggesting a somewhat staged setup, but the user's replies feel genuine.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_168": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'Chart it' is casual shorthand and the follow-up request to use Python first is a realistic power-user preference. Minor tell: the instruction is suspiciously complete and well-structured for a single follow-up, but overall reads like someone comfortable with data tools giving a quick directive.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_169": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Just the stats for now' is casual shorthand with implied future intent, which is realistic user behavior. The initial request is terse and task-focused. Minor tell is how cleanly the two turns set up a clarifying question and response, but nothing overtly scripted.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_170": {
+          "score": 5,
+          "reason": "Feels like a real analyst or marketer mid-workflow. Turn 1 jumps straight into a request with implicit context ('those outlier posts'), no over-explanation. Turn 3 is a clipped, natural dismissal of the agent's clarifying offer \u2014 exactly how a real user responds when they know what they want. No formulaic setup, natural shorthand throughout.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_171": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'sanity check' is realistic shorthand, the follow-up builds on the agent's offered options without restating everything. Minor tell: the initial question is fairly clean and well-scoped for a casual inquiry, but overall reads like a real analyst or eng manager checking on onboarding metrics.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_172": {
+          "score": 2,
+          "reason": "The conversation feels templated and thin. Turn 1 is oddly formal and context-free ('the cycles' assumes shared context that isn't established). Turn 3 is a minimal but plausible response, though it pivots from 'variance/calculate' to 'visualize trend' in a way that feels like it's hitting scripted decision-tree branches rather than a real user refining their actual need. No personality, shorthand, or domain-specific texture that would ground this as a real interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_173": {
+          "score": 2,
+          "reason": "The conversation is minimal and functional but reads like a template interaction. Turn 1 is a generic, perfectly formed request with no personality or context. Turn 3 is a direct, clean response to the agent's binary choice \u2014 realistic in structure but suspiciously tidy. No shorthand, no hedging, no real-world messiness. The phrasing 'Break it down by state segments first' mirrors the agent's exact terminology, which feels scripted rather than organic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_174": {
+          "score": 5,
+          "reason": "Terse, task-focused language with no over-explanation. 'just one chart, each site as its own line' is exactly how a real user pushes back on an over-engineered suggestion \u2014 minimal words, clear preference, no hand-holding. The scenario (progress report, enrollment tracking) is realistic and grounded.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_175": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull up' and 'Do the reverse-engineer one' have casual shorthand energy, and the sanity check request is a realistic analyst move. Minor tell: Turn 3 is slightly too clean/complete in specifying the exact formula to test, but overall reads like someone who knows their data stack.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_176": {
+          "score": 3,
+          "reason": "Turn 1 is natural and casual, but Turn 3 feels slightly contrived \u2014 the pivot to requesting a formal definition of 'damping off' alongside the summary is oddly specific and reads like a scripted multi-task prompt designed to test tool use. A real user might ask these separately or more conversationally. No strong personality or shorthand present, but not robotic either.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_177": {
+          "score": 5,
+          "reason": "Terse, task-focused language typical of a real analyst. Turn 3 narrows scope naturally mid-conversation without over-explaining, uses shorthand ('The first one'), and adds a realistic domain constraint ('primary care visits') that feels like genuine institutional knowledge rather than a scripted prompt.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_178": {
+          "score": 4,
+          "reason": "Turn 3 is natural and terse ('Chart please, grouped bar by client.') which feels like a real user. Turn 1 is plausible for a finance/analyst context. Minor tell: Turn 1 is slightly polished and complete for an opening query, but overall the shorthand and confirmation flow feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_179": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, direct response with shorthand phrasing ('Do the pivot') and no over-explanation \u2014 feels like a real user picking from a menu. Turn 1 is plausible for someone preparing a funder report. Minor tell: the scenario is suspiciously clean and the user's needs align perfectly with the agent's offered options, but overall the shorthand and task-focused tone read as genuine.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_180": {
+          "score": 4,
+          "reason": "The conversation flows naturally with reasonable shorthand ('Plot the averages on a line chart' is concise and direct), and the scenario is realistic for a health/wellness tracking app. Minor tell: the user's requests are clean and unambiguous, lacking the typos, hesitations, or mid-thought corrections typical of real users. Still, it reads more like a real person than a template.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_181": {
+          "score": 4,
+          "reason": "Turn 3 feels natural with shorthand ('Chart it', 'avg cpu as bars') and doesn't over-explain intent. Turn 1 is a realistic casual query. Minor tell: the progression is almost too clean and purposeful, but the language style is genuinely conversational rather than templated.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_182": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'it's a mess' and 'sort it out' have casual personality, and Turn 3 is a realistic follow-up that directly answers the agent's question without over-explaining. Minor tell: the context is suspiciously clean and complete for a first message, but the shorthand and tone read like a real data analyst frustrated with dirty data.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_183": {
+          "score": 5,
+          "reason": "Very natural \u2014 terse initial request with implicit context ('it's all over the place'), no over-explanation of intent. Turn 3 is a direct, minimal response to a clarifying question, exactly how a real user would reply. No formulaic structure or spelled-out reasoning.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_184": {
+          "score": 5,
+          "reason": "Turn 3 is a hallmark of real user behavior \u2014 terse, dismissive of the extra option, no over-explanation. 'Just break it down for now' uses natural shorthand and implies the user is moving quickly. Turn 1 skips pleasantries and uses domain-specific language casually. No templated phrasing or artificial completeness anywhere.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_185": {
+          "score": 4,
+          "reason": "The shorthand coupon codes, terse phrasing, and 'The second one' follow-up feel natural and user-like. Minor tell is that Turn 1 is almost too clean a setup, but overall reads like a real user familiar with the tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_186": {
+          "score": 5,
+          "reason": "Turn 3 is a natural, clipped follow-up ('Chart please') with a quick clarification added on \u2014 exactly how a real user responds when given options. No over-explanation, uses shorthand, and the scenario (leasing analytics dashboard) is realistic for someone actually using this tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_187": {
+          "score": 4,
+          "reason": "The request is realistic for an educator using a data tool \u2014 subgroup proficiency breakdowns are common in Title I/federal reporting contexts. Turn 3 is a natural follow-up that adds a reasonable clarification (plain language definitions). Minor tells: the phrasing is slightly polished and the context is suspiciously complete (Title I notes, specific acronyms), but the shorthand use of ELL, IEP, FRL and the casual 'Written summary please' feel authentic. Not fully contrived, but a bit too tidy.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_188": {
+          "score": 5,
+          "reason": "Turn 3 feels genuinely natural \u2014 'slow squads' is casual shorthand with personality, not formal language. The user doesn't restate the full context or over-explain, just pivots naturally. The scenario (engineering metrics, build duration by team) is realistic for someone using a data/analytics tool. No robotic phrasing or template-like structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_189": {
+          "score": 5,
+          "reason": "Very natural shorthand communication \u2014 Turn 1 drops straight into a command with implicit context ('each service', 'its variables'), Turn 3 gives a terse, purposeful answer with a real-world justification ('migration docs') that feels like genuine task context rather than a scripted explanation. No over-explanation, no robotic phrasing.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_190": {
+          "score": 5,
+          "reason": "Feels completely natural \u2014 the user has a clear, mundane task (fixing a roster before sending to parents), doesn't over-explain their intent, and Turn 3 gives a practical reason ('for the greeting in the letter') that feels like genuine context dropped in casually rather than scripted exposition. Shorthand and direct phrasing throughout.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_191": {
+          "score": 4,
+          "reason": "Turn 1 is natural and terse \u2014 'behaving right together' is realistic shorthand. Turn 3 pivots unexpectedly to a different variable (Temp_C) and ignores the agent's framing, which feels authentic and slightly distracted, like a real analyst. Minor tell: the scenario is suspiciously well-structured with clean column names, but the conversational style itself reads naturally.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_192": {
+          "score": 5,
+          "reason": "Turn 3 is a natural, terse response \u2014 'Just plot the monthly totals' is exactly how a real user would reply when given options, dropping unnecessary words and showing mild impatience. No over-explanation, no restating context. Feels like a genuine back-and-forth.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_193": {
+          "score": 3,
+          "reason": "Turn 1 is natural and terse, but Turn 3 reads like a clean reformulation of the agent's exact options \u2014 real users often just say 'yeah the trend one' or 'time-based, broken out' rather than composing a polished sentence that mirrors both offered choices. The scenario is plausible but the response feels slightly too well-formed.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_194": {
+          "score": 5,
+          "reason": "Feels like a real data analyst mid-session. Turn 1 is a casual pushback with no over-explanation, Turn 3 uses natural shorthand ('Yeah go ahead') and gives a concrete reason without being formulaic. The domain context (wide vs long format, seasonal score columns) is specific and realistic. No signs of scripted intent-spelling or template structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_195": {
+          "score": 5,
+          "reason": "Highly natural \u2014 uses shorthand ('break out', 'yeah'), responds directly to agent's clarifying questions without over-explaining, realistic data engineering/analytics request with domain-appropriate terminology. Turn 3 is a casual, efficient follow-up that mirrors how a real analyst would respond.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_196": {
+          "score": 5,
+          "reason": "Feels like a real user mid-task \u2014 they pivot naturally in Turn 3 ('Actually, just...'), which is a classic real-user behavior of changing their mind after hearing options. Uses casual shorthand, doesn't over-explain, and the scenario (cleaning up a spreadsheet/database with missing affiliate links) is completely plausible. No robotic formality or template-like structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_197": {
+          "score": 2,
+          "reason": "Extremely terse and transactional with no personality, context, or natural shorthand. Turn 1 reads like a command prompt rather than a real user request. Turn 3 is a robotic clarification response that simply echoes back one of the agent's offered options \u2014 real users typically add context, rephrase, or show some personality. No domain-specific details (ingredient names, what they're cooking/budgeting for) that a real user would naturally include.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_198": {
+          "score": 5,
+          "reason": "Turn 3 is the tell \u2014 'actually just remember that' is a natural mid-thought redirect, lowercase casual tone, shorthand phrasing ('grant stuff'), and the pivot from asking a question to just delegating a preference feels genuinely spontaneous rather than scripted. No over-explanation of intent, realistic workflow for someone using a data tool repeatedly for grant reporting.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_199": {
+          "score": 4,
+          "reason": "Turn 3 is fairly natural with shorthand phrasing ('Chart it') and specific but conversational chart specs. However, the request is suspiciously complete and well-formed for a typical user \u2014 most would say 'yeah a chart' and let the agent decide the type, or ask what options exist. The overall flow is clean and purposeful without much personality or messiness, suggesting a polished synthetic example, though not robotic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_200": {
+          "score": 5,
+          "reason": "Feels like a mid-conversation snippet with natural shorthand ('It's fine'), implicit context (no over-explanation of what's being combined), and a realistic correction in Turn 3 ('Sorry, I meant...') that reflects genuine human miscommunication rather than scripted intent-stating.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_201": {
+          "score": 5,
+          "reason": "Very natural exchange \u2014 casual opener, agent offers options, user responds with brief informal confirmation 'Yeah, plot it' using shorthand. No over-explanation, realistic back-and-forth for a data analysis tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_202": {
+          "score": 5,
+          "reason": "Highly natural \u2014 casual shorthand ('put together the hardware refresh numbers'), realistic workplace scenario, Turn 3 gives a practical business reason without over-explaining, reads like someone actually under deadline pressure with a real stakeholder concern.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_203": {
+          "score": 5,
+          "reason": "Feels genuinely natural \u2014 casual phrasing ('gig money', 'like month to month'), and Turn 3 is a realistic, slightly impatient simplification after being offered too many options. No over-explanation of intent, uses shorthand, realistic scenario for a gig worker checking income trends.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_204": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 the 'Actually, ...' self-correction is a realistic mid-thought redirect that real users do. The initial request in Turn 1 is terse and domain-specific (ED ops shorthand), which feels authentic. Minor tell: the follow-up is unusually precise (median + 95th percentile) without any hedging or casual phrasing, suggesting someone comfortable with the tool but possibly a slightly polished synthetic example.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_205": {
+          "score": 3,
+          "reason": "The conversation is plausible but feels slightly scripted \u2014 Turn 1 is natural and terse, but Turn 3 is a verbatim echo of one of the agent's offered options, which real users sometimes do but often rephrase or add context. The agent's Turn 2 response is suspiciously well-structured with technical column name references that feel inserted for training purposes. Overall functional but lacks personality or messiness of real interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_206": {
+          "score": 5,
+          "reason": "Feels genuinely natural \u2014 terse opener with deadline pressure, no over-explanation of intent. Turn 3 uses casual shorthand ('yeah just'), implicit trust in the agent to know what investors care about, and doesn't restate context unnecessarily. Realistic scenario for a founder or analyst using a data tool pre-fundraise.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_207": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses casual shorthand ('numeric stuff'), and Turn 3 is a direct, slightly terse follow-up that doesn't over-explain. Minor tell is that Turn 3 is suspiciously clean and complete in scope, but overall reads like a real user refining their request rather than a scripted template.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_208": {
+          "score": 4,
+          "reason": "The user speaks in natural shorthand ('Get me', 'Save a copy') without over-explaining intent, and Turn 3 is a realistic pivot that doesn't directly answer the agent's question \u2014 which feels human. Slight dock because the scenario is suspiciously clean and the context ('external counsel') is conveniently complete without any ambiguity a real user might leave in.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_209": {
+          "score": 5,
+          "reason": "Turn 3 is highly natural \u2014 'pivot it' is real analyst shorthand, not spelled out as 'create a pivot table analysis.' The clarifying question from the agent prompts a realistic, concise response. No over-explanation, uses casual shorthand, fits a data/marketing analytics workflow perfectly.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_210": {
+          "score": 5,
+          "reason": "Highly natural \u2014 Turn 1 uses casual shorthand ('pop more'), Turn 3 is a direct, terse follow-up that doesn't re-explain context, just adds specifics. The user doesn't spell out intent formally, responds to the agent's clarifying question with exactly the needed detail. Realistic workflow for someone prepping presentation slides.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_211": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow. Turn 1 is vague and casual ('looks messy'), Turn 3 uses shorthand ('stuff like'), gives concrete examples without over-explaining, and the normalization request is exactly the kind of practical follow-up a real user would make after seeing the agent's options.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_212": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 short commands, realistic back-and-forth, and Turn 3 uses casual shorthand ('Just verify presence') that feels like a real user. Minor tell: the clarification in Turn 2 is slightly too structured/agentic, and Turn 3's pivot to 'run a python check' is a bit technically specific in a way that feels slightly coached, but overall plausible for a data-savvy user in a healthcare/scheduling context.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_213": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('standard domain' instead of spelling out the full requirement), and the problem described is a genuine data quality issue. Turn 3 is a plausible follow-up. Minor tell: 'standard domain' is slightly vague in a way that feels like it's leaving context deliberately open rather than how a real user would clarify (they'd likely name the domain or say 'our company domain').",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_214": {
+          "score": 5,
+          "reason": "Feels like a real analyst prepping a leadership report \u2014 casual lowercase, natural shorthand ('i'm', 'exec audience'), practical concern about using the right definition for a specific audience. Turn 3 is a realistic follow-up that adds a second concern organically rather than restating intent. No over-explanation of context, no robotic structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_215": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'sanity check' is casual shorthand, and the request to add column types is a realistic, organic follow-up rather than a scripted expansion. The opening 'how messy is it' also has personality. Minor tell: the context is suspiciously clean and the conversation flows almost too efficiently, but overall reads like a real analyst poking at data quality.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_216": {
+          "score": 5,
+          "reason": "Turn 3 is a natural, practical follow-up with a specific data manipulation request ('merge county and state fields') that reflects real-world experience with messy label data. The user uses shorthand ('Do a chart'), doesn't over-explain intent, and the request feels like someone who's actually looked at county-only labels before and knows they'll be ambiguous. No robotic phrasing or templated structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_217": {
+          "score": 5,
+          "reason": "Extremely natural \u2014 Turn 1 drops straight into context with no setup, assuming shared knowledge. Turn 3 uses casual shorthand ('Yeah, add it') with a pronoun reference rather than restating the full item. This mirrors how real users interact with tools they're already working in.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_218": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the opening caveat about 'loaded term' reads like a real analyst being precise, and Turn 3 uses casual shorthand ('like what else') with a genuine follow-up that builds on the agent's clarification. Slightly polished in how cleanly the scenario unfolds, but the domain-specific framing (supply usage, service lines) and conversational hedging feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_219": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'take a quick look' and 'messy county health file' are realistic shorthand, and Turn 3 is a plausible pivot that sounds like someone exploring rather than following a script. Minor tell: the domain context ('county health file') is introduced a bit conveniently in Turn 3, but overall the casual phrasing and clarifying follow-up feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_220": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'check the column definitions first' and 'grabbing the right metric' are realistic shorthand a data-savvy user might use. The flow is logical and not overly scripted. Minor tell: the response is suspiciously well-structured and complete, addressing both the action and a precautionary step in a way that feels slightly too composed for casual use, but not implausible.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_221": {
+          "score": 5,
+          "reason": "Very natural - casual phrasing in T1, no over-explanation of intent, T3 uses shorthand 'Just the inactive ones, thanks.' with a polite but brief acknowledgment. No robotic spelling-out of parameters or context-dumping. Realistic account management query.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_222": {
+          "score": 5,
+          "reason": "Feels completely natural \u2014 Turn 1 is casual and task-driven with implicit context ('my client meeting'), Turn 3 uses shorthand ('chart please'), gives specific technical details (stacked bars, hex codes) in a clipped, real-user style without over-explaining. Having brand colors memorized and ready is realistic for someone who regularly preps client materials. No robotic preamble or formulaic structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_223": {
+          "score": 5,
+          "reason": "Feels like a real analyst or RCM user \u2014 uses domain shorthand ('clean claim rate', 'first-pass rejects'), doesn't over-explain intent, and Turn 3 is a natural, slightly impatient redirect ('just run...', 'don't save anything yet') that reflects realistic workflow caution about premature field creation. No robotic preamble or templated structure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_224": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'Actually just give me' is a realistic mid-course correction with casual shorthand. However, Turn 1 is slightly terse and generic, and the overall arc feels a bit too clean/purposeful without any real friction, typos, or personality markers. Plausible but slightly polished.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_225": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 short, task-focused turns with reasonable shorthand. Turn 3 is a plausible follow-up that adds a specific formatting preference without over-explaining. Minor tell: the x-axis specification feels slightly too technically precise for a casual user, though not implausible for someone familiar with data tools. Overall reads like a real user in a data/analytics context.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_226": {
+          "score": 5,
+          "reason": "Very natural \u2014 casual shorthand ('yeah go ahead'), implicit context ('this ledger'), and Turn 3 is a clipped, slightly impatient confirmation that reads exactly like a real user who just wants the task done. No over-explanation, natural pronoun use, realistic approval flow.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "dana_227": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the follow-up is direct and task-focused, uses shorthand ('CSV please'), and the filename is realistic. Minor tell: the filename is suspiciously clean and complete, and 'then I'll download it' feels slightly explanatory for a real user who'd likely just say 'CSV please, call it census_1880_filtered_clean' and stop there.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "dana_228": {
+          "score": 5,
+          "reason": "Terse, directive language ('Just give me'), implicit context (assumes shared understanding of 'services' and 'db versions'), practical preference for raw output with specific technical instruction ('handle the version parsing there') \u2014 all hallmarks of a real engineer who knows what they want and doesn't over-explain.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_229": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with 'we've done' and casual phrasing, but Turn 3 is overly generic and slightly robotic \u2014 a real user would likely say something like 'yeah do that' or reference the specific environments mentioned (prod/staging/dev) rather than the vague 'see the differences.' The agent's offer in Turn 2 already named the breakdown options, so a real user would typically echo that language or be more specific.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "dana_230": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural for a data/analytics tool user, but Turn 3 reads like a UI specification rather than casual user speech \u2014 the exact quoted title string and precise layout instruction ('move the cohort comparison block to the top') feel overly deliberate and template-like. Real users might say 'can you put the cohort stuff first?' or abbreviate the title request. The scenario is plausible but the phrasing is too clean and complete.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_231": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses shorthand column names and a realistic data-cleaning request. Turn 3 chains two tasks in a casual, efficient way without over-explaining, which is authentic. Minor tell: the sequence is suspiciously clean and complete, like a scripted demo workflow, and 'our allowed tag list' assumes shared context that wasn't established, which could go either way (natural assumption or contrived setup).",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_232": {
+          "score": 3,
+          "reason": "Turn 1 is natural and terse, but Turn 3 feels slightly scripted \u2014 it bundles two distinct tasks (distribution check + Python fix) in a way that reads like a test prompt covering multiple requirements. A real user would more likely address one thing at a time or show some reaction to the outliers mentioned by the agent before moving on. No personality or shorthand beyond basic brevity.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_233": {
+          "score": 4,
+          "reason": "Reasonably natural \u2014 shorthand commands, no over-explanation of intent, realistic data workflow scenario. Turn 3 is a logical follow-up that feels genuine. Minor tell: the requests are suspiciously clean and sequential, like a demo script, but the phrasing is terse enough to feel like a real power user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_234": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with the time pressure context ('before the board meeting'), but Turn 3 is a bit too neatly bundled \u2014 asking for a definition lookup AND a label fix in one breath feels slightly scripted. Real users tend to send these as separate messages or phrase them more casually ('also can you change the label?'). No strong personality or shorthand present, but not robotic either.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_235": {
+          "score": 5,
+          "reason": "Feels like a real analyst mid-workflow \u2014 casual 'Cool', shorthand like 'day30 active over day0 generated', no over-explanation of intent, natural progression from confirmation to action. Turn 3 especially reads like someone who knows what they want and trusts the tool to fill in gaps.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_236": {
+          "score": 5,
+          "reason": "The pivot in Turn 3 ('Actually no, forget that') is very natural user behavior \u2014 changing their mind mid-task with casual dismissal. The terse, directive tone throughout, lack of over-explanation, and realistic workflow context (data cleaning then pivoting to analysis) all feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_237": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'Switch to grayscale' is casual shorthand, and the follow-up question about why defaults are saturated shows genuine curiosity rather than scripted intent. Minor tell: the two-part request in Turn 3 is slightly too clean and complete, combining a practical fix with a conceptual question in a way that feels slightly composed rather than spontaneous. Overall reads like a real researcher or designer working on a poster, but with a hint of polish.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_238": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual shorthand, realistic data cleaning scenario, and the follow-up in Turn 3 combines a logical next step (correlation check) with a preference instruction. Slightly suspicious because Turn 3 is unusually complete and well-structured for a casual user, bundling two distinct requests cleanly, but the tone and domain context are plausible for a data analyst using an AI tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_239": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'pull quick stats so I know what I'm dealing with' is realistic shorthand a data analyst would use. The initial request is slightly formal but plausible for a domain tool. Minor tell: the progression is suspiciously clean and complete, like a scripted demo scenario, but the phrasing and casual hedging feel genuine enough.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_240": {
+          "score": 2,
+          "reason": "Turn 3 is a giveaway \u2014 it chains two distinct analytical tasks (validation + pivot) in a single, perfectly articulated request with exact column names and valid category values spelled out. Real users typically ask one thing at a time, use shorthand, or express uncertainty. The conversation reads like a scripted demo of data cleaning and analysis steps rather than organic back-and-forth.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_241": {
+          "score": 4,
+          "reason": "Conversation flows naturally with reasonable shorthand ('Show me the unapproved ones') and a practical follow-up request. The scenario is realistic for a data analyst or ops role. Minor tell: 'highlight them in red' is slightly ambiguous in a database context (more of a UI/spreadsheet request), but not unnatural for someone who may be thinking in spreadsheet terms. Overall reads like a real user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_242": {
+          "score": 5,
+          "reason": "Highly natural \u2014 uses shorthand ('went dark', 'retro doc'), doesn't over-explain intent, combines two reasonable follow-up tasks in one casual ask. The scenario (post-outage analysis, prepping for a retrospective) is realistic and the language feels like an engineer actually working through an incident review, not a scripted prompt.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_243": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic data analyst workflow. Turn 3 is a reasonable follow-up that builds on Turn 2. Minor tell: the request is suspiciously complete and well-structured ('MoM growth rate' + 'this year vs last year' in one clean sentence), but shorthand like 'MoM' and skipping pleasantries keeps it grounded.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_244": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual phrasing ('run a quick check'), but Turn 3 is suspiciously clean and sequential \u2014 a real user might ask where the official definition comes from, express frustration, or ask which variation to standardize to rather than assuming there's one authoritative source. The workflow is too tidy and the requests too perfectly staged, though the domain context (data cleaning) is realistic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_245": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic financial advisor use case. Turn 3 is a genuine follow-up that builds on Turn 1 rather than introducing a scripted new topic. Minor tells: the requests are unusually complete and well-formed without typos or hesitation, and 'target mix' is slightly jargon-precise. But overall the shorthand ('show me how they compare') and task chaining feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_246": {
+          "score": 5,
+          "reason": "Feels like a real analyst or researcher working with interview data across cities. Turn 1 uses natural shorthand ('stack them' instead of 'concatenate/append'), Turn 3 combines a practical action request with a meta-need (documentation for methodology) that reflects genuine workflow context. The dual ask in Turn 3 is exactly how a real user thinks \u2014 doing the task while also covering their process documentation needs. No robotic over-explanation of intent.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_247": {
+          "score": 5,
+          "reason": "Feels like a real data prep session \u2014 Turn 3 chains naturally onto the previous task without re-explaining context, uses casual shorthand ('proper case instead of ALL CAPS'), and adds a practical downstream goal (Mailchimp export) that feels like genuine workflow, not a scripted prompt.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_248": {
+          "score": 4,
+          "reason": "The pivot in Turn 3 feels natural \u2014 'actually, disregard that' is a realistic mid-task redirect with casual shorthand. Turn 1 uses domain-appropriate brevity ('run a profile'). Minor tell: the scenario is almost too clean, with the agent's response perfectly setting up the follow-up, but overall the user voice feels genuine.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_249": {
+          "score": 4,
+          "reason": "The scenario is realistic and the task is specific enough to feel genuine (Gumroad double-export is a real pain point). Turn 3 is a natural follow-up with clear deduplication logic. However, the phrasing is slightly too clean and complete \u2014 a real user might say 'keep the newest one' or ask a clarifying question rather than specifying 'always keep the latest row by timestamp' so precisely. Minor tells of polish, but overall believable.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_250": {
+          "score": 4,
+          "reason": "Turn 1 is natural and task-specific with realistic shorthand ('jammed together'). Turn 3 is slightly too polished \u2014 a real user would likely separate these into two messages or phrase it more casually, and 'under the hood' feels like a prompted phrase. The dual request (profile + explain) reads a bit like a scripted evaluation prompt, but overall the scenario and language are plausible for a data analyst using a tool like Dana.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_251": {
+          "score": 2,
+          "reason": "Turn 3 is highly contrived \u2014 it reads like a technical specification rather than natural user speech. A real user would likely say something like 'can you fill in the missing emails?' rather than precisely naming fields ('firm_name/investor_name') and specifying 'basic email regex' validation. The technical jargon is too precise and complete, suggesting a scripted prompt designed to elicit a specific capability demonstration. Turn 1 is plausible but generic; there's no personality, shorthand, or organic flow between turns.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_252": {
+          "score": 4,
+          "reason": "The conversation flows naturally with a realistic mid-task correction in Turn 3, which feels genuine \u2014 users often realize edge cases after seeing initial results. The phrasing is fairly natural ('undo that,' 'first') and the scenario is plausible for a data analyst. Minor tell: Turn 1 is slightly formal and complete for a casual user, but overall reads as authentic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_253": {
+          "score": 2,
+          "reason": "Reads like a scripted demo sequence \u2014 commands are unnaturally clean and sequential, no personality, shorthand, or friction. Turn 3 is a textbook follow-up that feels templated rather than organic. A real user would likely ask something messier, reference specific client names, or show uncertainty about what they want.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_254": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic database/analytics tasks and reasonable follow-up. Turn 3 is a logical next step after deduplication. However, it's slightly too complete and polished \u2014 a real user might use more shorthand, reference specific numbers, or ask in a less perfectly structured way. The scenario is plausible for a data/storage analyst using an AI tool, but reads a touch too clean.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_255": {
+          "score": 5,
+          "reason": "Highly natural \u2014 terse commands, casual 'Yep', realistic data-cleaning workflow where someone notices mislabeled headers and immediately pivots to QA checks. No over-explanation of intent, uses shorthand ('nulls and uniques', 'bad hostnames'), and the follow-up feels like genuine muscle memory from someone who does data work regularly.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_256": {
+          "score": 5,
+          "reason": "Casual, directive language ('dump that list', 'for me'), natural progression from profiling to action, realistic data engineering workflow, no over-explanation of intent or context.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_257": {
+          "score": 2,
+          "reason": "Turn 3 is a dead giveaway \u2014 it's a two-part compound request that spells out exactly what it wants ('AZs as rows, time windows as columns') plus asks for an explanation of the analytical value. Real users either know why a pivot helps (and don't ask for the explanation) or ask one thing at a time. The phrasing is textbook/instructional, not conversational. Turn 1 is plausibly natural, but the overall pattern reads like a scripted demo or training example.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_258": {
+          "score": 3,
+          "reason": "Turn 1 feels natural \u2014 shorthand like 'pull up' and 'mixed in there' reads authentically. But Turn 3 is a tell: combining a task command ('normalize all those') with a meta-request ('walk me through how detection worked') in one clean sentence feels scripted. Real users typically separate operational requests from curiosity about methodology, or phrase the latter more casually like 'wait, how did it even figure that out?' The context is plausible for a data tool, but the turns feel slightly too complete and purposeful together.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_259": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 shorthand phrasing ('Also add'), no over-explanation of intent, and the follow-up in Turn 3 is a realistic pivot. Minor tell: Turn 3 is slightly polished and combines two distinct asks (add column + suggest rubric) in a way that feels slightly constructed, but not implausibly so for a product/ops user working in a dana-style tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_260": {
+          "score": 5,
+          "reason": "Highly natural \u2014 Turn 1 assumes shared context ('those rows') with no over-explanation, Turn 3 chains two tasks casually in one breath with shorthand ('summary stats', 'plot the distribution'). No robotic intent-spelling, realistic data analysis workflow, conversational tone throughout.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_261": {
+          "score": 5,
+          "reason": "Terse, command-style language ('Melt the wide permissions') shows domain fluency with data reshaping concepts. No over-explanation of intent, uses shorthand naturally, and the follow-up is a logical next step rather than a scripted pivot. Feels like a data engineer or analyst actually working through a task.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_262": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic data engineering concerns \u2014 verifying columns before building, then checking for duplicates in the semantic layer before computing. Turn 3 has good shorthand ('save it', 'go ahead') and shows domain awareness (mentioning both 'mean_time_to_resolve' and 'mttr' as aliases). Slight tell is that the request is unusually complete and well-structured for a chat message, but overall reads like a competent analyst using a data tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_263": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user speaks in shorthand ('pull a quick top talkers query', 'canonical format'), uses domain-appropriate jargon without over-explaining, and Turn 3 is a realistic follow-up that adds scope mid-task. Minor tell: the two requests in Turn 3 are slightly too cleanly paired, but overall reads like a real analyst working through a data profiling task.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_264": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural for a data task, but Turn 3 is suspiciously compound \u2014 real users typically ask one thing at a time or follow up separately. Combining 'get a count' with 'explain how the split handled edge cases' in one message feels scripted, like a test case designed to evaluate two capabilities simultaneously. No shorthand, personality, or messiness typical of real users.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_265": {
+          "score": 4,
+          "reason": "Mostly natural \u2014 Turn 1 is a direct, realistic data manipulation request with reasonable formatting spec. Turn 3 has natural shorthand ('for my doc') and a dual ask (show + explain) that feels like a real user wanting to document their work. Minor tell: the progression is suspiciously clean and pedagogically complete, but the casual 'for my doc' grounds it in a plausible real-world scenario.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_266": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic business context (board reports, NPS, CAC, LTV metrics) and Turn 3 shows a practical dual request that feels like a real analyst trying to save time. Minor tells: the phrasing is slightly polished and the context is suspiciously complete, but the shorthand (no over-explanation of what 'exec notes' means) and the pragmatic combo request feel authentic to someone actually using a data tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_267": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'Before we touch it' is a realistic cautious opener, and Turn 3 combines two requests in a practical, shorthand way that feels like a real analyst. Minor tells: the phrasing is slightly too complete and well-structured (specifying 'latest service_date' as the de-dup rule is suspiciously precise for a casual follow-up), but overall the scenario and voice are plausible for a data/analytics context.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_268": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 combining two related but distinct requests in one message is realistic user behavior, and the pivot from data validation to business analysis mirrors how analysts actually work. However, the phrasing is slightly too clean and complete, with no shorthand, typos, or implicit references (e.g., a real user might say 'also can you check ratings for oily vs dry?' rather than the polished parallel structure). The scenario itself is plausible for a data/product analyst working on a skincare dataset.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_269": {
+          "score": 3,
+          "reason": "Turn 1 reads like a configuration prompt someone might actually type, but Turn 3 is oddly combined \u2014 asking for both formatting application AND a trend chart in one message feels slightly scripted. A real user would more likely just ask for the chart or reference the settings more casually ('can you chart my grocery spending with those settings?'). No real shorthand or personality, but not robotic either.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_270": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'so I can see what's in there' and 'flag anything outside that range' feel like real analyst shorthand, and the follow-up logically builds on the profiling results. Turn 3 combines two related but distinct tasks in one message, which is realistic for someone in a workflow. Minor tell: the range check (0.5 to 12) is suspiciously precise and complete, suggesting the user already knows exactly what they want, which could indicate a scripted scenario, but is also plausible for someone familiar with their data domain.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_271": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'Before I convert it' shows realistic workflow thinking, and the dual-question in Turn 3 feels like a real analyst multitasking. Minor tell: the second clause ('explain why grouping by hour breaks') is slightly too pedagogically framed, like someone who wants documentation rather than just a fix. Overall though, the shorthand and sequencing feel authentic to a data/analytics tool user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_272": {
+          "score": 2,
+          "reason": "Turn 3 is a non-sequitur \u2014 jumping from email validation to updating a chart title and fixing name capitalization feels like two unrelated scripted tasks stitched together rather than a natural follow-up. A real user would likely respond to the null email issue (e.g., 'can we get those 35 fixed?') before pivoting to unrelated UI/data tasks. The phrasing is also overly clean and complete, with no reaction to the agent's findings.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_273": {
+          "score": 5,
+          "reason": "Turn 3 is a natural compound question that combines a broad analytical ask with a specific follow-up about an anomaly the user likely noticed \u2014 exactly how a real analyst would think out loud. The shorthand ('count so high'), lack of over-explanation, and implicit context (they already know Dr. Smith stands out) all feel authentic. No scripted preamble or formulaic structure.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_274": {
+          "score": 5,
+          "reason": "Highly natural \u2014 casual tone ('nice', 'quick'), realistic workflow (checking data before sending), practical follow-up request combining two tasks in one breath, mentions PI which grounds it in a real academic/research context. No over-explanation of intent, uses shorthand, feels like someone actually mid-task.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_275": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 3 uses casual shorthand ('Yeah do both') and builds logically on the agent's clarifying question. The request is realistic for a property manager using a dashboard tool. Minor tell: the metrics are suspiciously well-aligned and complete across both turns, suggesting possible scripting, but the conversational rhythm and pronoun use feel genuine.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_276": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual phrasing ('blank out', 'that one needs to be anonymous'), but Turn 3 is a jarring tonal shift \u2014 it's oddly specific and complete, combining an analytical directive with a technical method request in a way that feels scripted. Real users typically either ask for analysis OR specify the tool, not both in one polished sentence. The transition between turns also lacks continuity; a real user would likely reference the fraud context more organically.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_277": {
+          "score": 3,
+          "reason": "Turn 3 is the most telling \u2014 it's a compound, well-structured instruction that combines data validation with visualization and a specific threshold, which feels slightly scripted. However, the shorthand ('customer_ids', 'our $35 target') adds some naturalness. The overall flow is plausible for a data analyst but reads a bit too complete and sequenced, like a test case rather than organic exploration.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_278": {
+          "score": 2,
+          "reason": "Turn 3 is a giveaway \u2014 it awkwardly bundles two unrelated questions (technical join explanation + domain naming conventions) in a way that feels like a checklist rather than natural curiosity. A real user would likely ask one thing at a time or show more conversational flow. The phrasing 'walk me through' and 'tell me if there's a standard naming convention' reads like a prompt template. Turn 1 is reasonably natural, but the overall arc feels scripted rather than organic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_279": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses shorthand ('dedupe', backtick-style column names) and skips pleasantries, which is realistic. Turn 3 is a reasonable pivot that a real analyst would make mid-task. Slight 'too complete' feel in Turn 3 (two distinct asks bundled cleanly), but not unnatural for someone who just thought of the next steps. No robotic over-explanation of intent.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_280": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic frustration-driven workflow. Turn 3 chains two tasks casually without spelling out why, which is authentic. Minor tell: 'duplicate entity IDs' and 'alert type' are slightly domain-precise in a way that feels slightly curated, but overall reads like a real analyst working through a data pipeline issue.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_281": {
+          "score": 3,
+          "reason": "Turn 1 feels natural enough, but Turn 3 is suspiciously complete and task-oriented \u2014 a real user would more likely ask about missing data as a reaction ('wait, there are gaps?') rather than proactively requesting two distinct imputation tasks in one clean, structured sentence. The use of underscored field names (active_users, churned_users) reads like someone writing a prompt template rather than a person casually querying a dashboard. No personality, shorthand, or organic follow-up cues.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_282": {
+          "score": 3,
+          "reason": "Turn 1 feels natural \u2014 a real user checking schema before querying. But Turn 3 is overly structured and complete, combining two distinct requests (validation + join) in a single polished sentence with explicit technical framing ('pull in the iep_records table so we have the full IEP details alongside it'). Real users tend to be choppier or more casual, e.g. 'also can you join in iep_records?' The phrasing reads slightly like a scripted prompt designed to test multi-step capability.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_283": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Cool' opener, shorthand like 'valid 1-5' and 'bad rows' give it personality. Turn 3 is a realistic compound follow-up (distribution + fix) that a real analyst would chain together. Minor tell: 'whatever fix you recommended' is slightly convenient since no fix was explicitly recommended yet, making it feel slightly scripted to prompt agent action. Overall reads like a real data analyst workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_284": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with realistic professional context, but Turn 3 shifts abruptly into precise technical column-name syntax ('list_price', 'annual_gross_rent', 'cap_rate') that reads like a scripted tool invocation rather than organic follow-up. A real user would likely say something like 'can you run the numbers on price vs rent?' rather than citing exact column names. The transition between conversational framing and structured data request feels contrived.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_285": {
+          "score": 2,
+          "reason": "Turn 3 reads like a scripted task specification \u2014 overly precise and complete ('calculated as signups divided by clicks, then check that all values are between 0 and 1'). A real user would likely say something like 'can you add a conversion rate column? signups/clicks' without the formal validation clause tacked on. The setup feels like a templated instruction sequence rather than organic tool use.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_286": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 casual 'Ok go ahead' and practical motivation ('share it at the meeting') read like a real user. However, the setup is suspiciously clean: Turn 1 asks a precise definitional question that perfectly primes the agent's response, which then perfectly primes a build request. Real users might have pushed back, asked a clarifying question, or jumped straight to building. The context is realistic for a data/analytics tool user, but the conversation flows too neatly from definition \u2192 confirmation \u2192 action with no friction or personality quirks.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_287": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull quick stats' and 'plain-English takeaway' are realistic shorthand a business user would use. Turn 3 is a reasonable follow-up that builds on Turn 2 without being scripted. Minor tell: the request is suspiciously well-structured and complete, covering multiple analytical asks in one clean sentence, which feels slightly polished rather than organic back-and-forth.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_288": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual phrasing ('is a mess', 'force it'). Turn 3 is where it gets suspicious \u2014 combining a data quality check with a completely unrelated metric calculation (monthly acquisition growth) in one message feels like a scripted attempt to pack multiple intents into a single turn. Real users tend to focus on one thing at a time, especially after a formatting fix. The pivot is abrupt and the two requests have no logical connection to each other.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_289": {
+          "score": 3,
+          "reason": "Turn 1 is a reasonable ops/infra query but reads like a spec. Turn 3 is the most natural moment \u2014 combining a visual tweak with a data quality check feels like real workflow thinking \u2014 but the phrasing 'make the chart labels clearer' assumes a chart was shown when the agent only returned text, which is a mild inconsistency suggesting scripted follow-up rather than genuine reaction to the actual response.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_290": {
+          "score": 4,
+          "reason": "The requests are coherent and task-focused with natural shorthand ('drop into my blog caption' feels genuine), but the conversation is suspiciously clean \u2014 perfectly sequential, no ambiguity, no corrections, and the context is fully self-contained. Turn 3's dual request (chart + blog caption) is a realistic combo but reads slightly too polished and complete for a typical user mid-workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_291": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'quick check', 'worst offenders' are casual shorthand, and the follow-up in Turn 3 flows logically from the agent's mention of E.164 normalization. Minor tell: the agent planted the E.164 seed, making Turn 3 feel slightly prompted/scripted, but the phrasing itself is realistic for a data analyst.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_292": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural with casual phrasing ('has gaps'), but Turn 3 feels slightly scripted \u2014 a real user would more likely ask one thing at a time or phrase it more casually (e.g., 'wait how does that work?' or 'what do the numbers look like now?'). The dual request in Turn 3 ('explain the math AND summarize stats') reads like a prompt designed to elicit a comprehensive response. No real personality or shorthand present, but the scenario itself (data cleaning in a real estate/analytics context) is plausible.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_293": {
+          "score": 2,
+          "reason": "Reads like a scripted demo or template for a finance/expense tool. Turn 1 is an oddly formal policy declaration with no context, and Turn 3 is a textbook task instruction \u2014 both spell everything out explicitly with no personality, shorthand, or natural messiness. The two turns don't flow conversationally; they feel like separate test cases strung together rather than a real user session.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_294": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 the investor context adds realistic urgency and the dual request (sort + validate) mirrors how real users batch tasks. Minor tell: the request is slightly too complete and well-structured, but the shorthand ('sort the table', 'all between 0 and 1') and practical motivation feel authentic. Overall reads like a real analyst prepping a deliverable.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_295": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 shorthand like 'last night's window' and 'pull up' are realistic, and the pivot request in Turn 3 is a plausible power-user follow-up. Slight tell: Turn 3 is a bit dense and well-structured for casual speech, combining two distinct requests cleanly, but not implausibly so for a technical user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_296": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, domain-appropriate shorthand ('latency_ms', 'algo version'), and the follow-up in Turn 3 logically builds on the agent's response about latency. Minor tell: Turn 3 is slightly over-specified ('1000 divided by latency') in a way that reads a touch instructional, but overall consistent with a data analyst actually using this tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_297": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic data exploration pattern (inspect \u2192 clean \u2192 export). Turn 3 is a logical follow-up without over-explaining intent. Minor tells: the fix value 'UNKNOWN|UNKNOWN' is suspiciously well-matched to the pipe-separated format revealed in Turn 2, suggesting the user absorbed and applied that detail very cleanly. Real users might ask 'what should I fill nulls with?' or use a less perfectly formatted placeholder. Overall reads like a competent analyst but slightly too tidy.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_298": {
+          "score": 2,
+          "reason": "Turn 3 is a tell \u2014 the user pivots from fixing 'watering_frequency' issues to correcting 'plant_type' entries without explanation, then immediately requests a survival rate analysis. This feels like two separate scripted tasks stitched together rather than a natural follow-up. A real user would likely stay focused on the watering frequency fix or ask a clarifying question. The phrasing is also suspiciously complete and polished, with no shorthand, hesitation, or personality.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_299": {
+          "score": 3,
+          "reason": "Turn 1 feels natural and task-oriented, but Turn 3 is a jarring pivot \u2014 jumping from schema/privacy concerns to dashboard creation without acknowledging the agent's response or the prior thread. The phrasing 'put it into a simple dashboard the evaluator can review' is somewhat natural, but the abrupt topic shift and the suspiciously complete context (program_site, service_track, evaluator) reads like a scripted multi-task prompt rather than organic follow-up.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_300": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 combining a visualization request with a cosmetic tweak in one message is realistic user behavior. The initial Turn 1 is slightly formal/exploratory in a way that feels slightly templated, but the axis label request adds a believable practical touch. Minor tell: the phrasing is consistently clean and complete without any typos or shorthand, which is slightly too polished for a typical user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_301": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'show me the stats' is casual shorthand, and the 'remember this breakdown' request is a realistic power-user behavior. However, the initial Turn 1 prompt is unusually precise and well-structured for a first message, with no greeting or context-setting. The scenario (sales/real estate analytics) is plausible, but the combination of perfect specificity in Turn 1 and the clean follow-up in Turn 3 gives slight synthetic polish.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_302": {
+          "score": 4,
+          "reason": "Turn 3 is mostly natural \u2014 the user gives a practical reason for keeping the last row ('that one usually has the notes filled in') which feels like genuine domain knowledge rather than scripted instruction. The phrasing 'Before we clean anything' and 'go ahead and dedupe' reads conversationally. Minor tells: the column names (dog_name, session_date, skill) are spelled out very precisely and the full deduplication logic is delivered in one clean sentence, which is slightly more complete than a typical user who might ask in two steps or use shorthand. Overall feels like a real analyst or trainer working with dog training session data.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "dana_303": {
+          "score": 3,
+          "reason": "Turn 1 is natural and concise, but Turn 3 is suspiciously specific and technical \u2014 combining date standardization with a precise new row insertion (exact date, platform, zero spend) reads more like a scripted test case than an organic follow-up. Real users rarely pivot this cleanly from a reporting request to a data transformation task with such complete, well-formed parameters.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "dana_304": {
+          "score": 4,
+          "reason": "The requests are technically coherent and use realistic shorthand (e.g., '/24 subnet', 'src_ip', 'dst_ip') consistent with a network analyst or security engineer. Turn 3 is a natural follow-up that builds on Turn 2. Minor tells: the progression is suspiciously clean and complete, with no ambiguity, typos, or course corrections typical of real exploratory data work. Still reads as plausibly real for a technical user in a network/security context.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "dana_305": {
+          "score": 3,
+          "reason": "The task is plausible for a data analyst working with insurance/claims data, and the shorthand is somewhat natural ('nearby rows', 'append the latest visit data'). However, Turn 3 feels slightly scripted \u2014 it bundles two distinct operations (adding a column + appending data) in a way that reads like a checklist item rather than organic follow-up. No personality, hesitation, or domain-specific shorthand that a real user would likely show. Borderline contrived but not fully formulaic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        }
+      },
+      "synth_summary": {
+        "mean": 4.114754098360656,
+        "std": 0.7829821231076443,
+        "n": 305,
+        "by_category": {
+          "same_flow": {
+            "mean": 4.1688311688311686,
+            "std": 0.7099039152579975,
+            "n": 77
+          },
+          "switch_flow": {
+            "mean": 4.302631578947368,
+            "std": 0.5624134282411187,
+            "n": 76
+          },
+          "ambiguous_first": {
+            "mean": 4.315789473684211,
+            "std": 0.7815390739430261,
+            "n": 76
+          },
+          "ambiguous_second": {
+            "mean": 3.6710526315789473,
+            "std": 0.8643244684165785,
+            "n": 76
+          }
+        },
+        "by_model": {
+          "anthropic": {
+            "mean": 4.337662337662338,
+            "std": 0.6952601981467103,
+            "n": 77
+          },
+          "openai": {
+            "mean": 4.25,
+            "std": 0.6514154628677139,
+            "n": 76
+          },
+          "openrouter": {
+            "mean": 3.9342105263157894,
+            "std": 0.8403559132545141,
+            "n": 152
+          }
+        }
+      },
+      "contrived_ids": [
+        "dana_014",
+        "dana_064",
+        "dana_172",
+        "dana_173",
+        "dana_197",
+        "dana_240",
+        "dana_251",
+        "dana_253",
+        "dana_257",
+        "dana_272",
+        "dana_278",
+        "dana_285",
+        "dana_293",
+        "dana_298"
+      ]
+    },
+    "diversity": {
+      "synth": {
+        "topic": 3.0625,
+        "task": 2.75,
+        "complexity": 2.375
+      }
     }
   },
   "comparative": {
@@ -9915,33 +12121,33 @@
         "attrition": 14,
         "satisfaction": 8,
         "hey": 8,
-        "shipping": 7,
         "feature": 7,
+        "shipping": 7,
         "every": 6,
         "survey": 6,
         "oh": 6,
         "warehouse": 6,
-        "rid": 5,
-        "readmission": 5,
         "patient": 5,
         "age": 5,
-        "tenure": 4,
+        "readmission": 5,
+        "rid": 5,
         "likes": 4,
         "warehouses": 4,
-        "flip": 4,
         "apart": 4,
         "shares": 4,
+        "tenure": 4,
         "repeated": 4,
-        "stick": 3,
+        "flip": 4,
         "feed": 3,
-        "last_name": 3,
-        "adoption": 3,
-        "previous": 3,
-        "monday": 3,
         "phone": 3,
-        "satisfaction_score": 3,
+        "stick": 3,
         "comments": 3,
-        "first_name": 3
+        "satisfaction_score": 3,
+        "last_name": 3,
+        "monday": 3,
+        "first_name": 3,
+        "adoption": 3,
+        "previous": 3
       }
     },
     "tools": {
@@ -19296,6 +21502,41 @@
           "cluster": 2
         }
       ]
+    },
+    "naturalness": {
+      "gap": 0.7423887587822007,
+      "t_stat": 9.171729182022542,
+      "t_pval": 1.0556723086489027e-12,
+      "eval_summary": {
+        "mean": 4.857142857142857,
+        "std": 0.3499271061118826,
+        "n": 28
+      }
+    },
+    "ambiguity": {
+      "eval_mean": 2.5,
+      "eval_std": 0.9519716382329886,
+      "synth_mean": 1.8666666666666667,
+      "synth_std": 0.9030811456096044,
+      "gap": 0.6333333333333333,
+      "t_stat": 3.770917214768458,
+      "t_pval": 0.00025219826293834143,
+      "n_eval": 64,
+      "n_synth": 60
+    },
+    "diversity": {
+      "eval": {
+        "topic": 2.7142857142857144,
+        "task": 1.1428571428571428,
+        "complexity": 1.8571428571428572
+      },
+      "synth": {
+        "topic": 3.0625,
+        "task": 2.75,
+        "complexity": 2.375
+      },
+      "n_eval_batches": 7,
+      "n_synth_batches": 16
     }
   },
   "intrinsic_scorecard": [
@@ -19315,6 +21556,15 @@
       "rating": "yellow",
       "green_threshold": 0.85,
       "yellow_threshold": 0.7,
+      "higher_is_better": true
+    },
+    {
+      "signal": "Naturalness (synth)",
+      "metric": "mean = 4.11",
+      "value": 4.114754098360656,
+      "rating": "green",
+      "green_threshold": 3.5,
+      "yellow_threshold": 2.5,
       "higher_is_better": true
     }
   ],
@@ -19398,6 +21648,24 @@
       "rating": "red",
       "green_threshold": 0.05,
       "yellow_threshold": 0.15,
+      "higher_is_better": false
+    },
+    {
+      "signal": "Naturalness gap",
+      "metric": "|\u0394| = 0.74",
+      "value": 0.7423887587822007,
+      "rating": "red",
+      "green_threshold": 0.3,
+      "yellow_threshold": 0.7,
+      "higher_is_better": false
+    },
+    {
+      "signal": "Ambiguity quality gap",
+      "metric": "|\u0394| = 0.63",
+      "value": 0.6333333333333333,
+      "rating": "yellow",
+      "green_threshold": 0.5,
+      "yellow_threshold": 1.0,
       "higher_is_better": false
     }
   ]

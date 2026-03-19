@@ -1,6 +1,6 @@
 {
   "domain": "hugo",
-  "generated_at": "2026-03-19T09:23:15.989823+00:00",
+  "generated_at": "2026-03-19T09:44:53.446249+00:00",
   "seed": 42,
   "counts": {
     "eval_convos": 128,
@@ -7864,6 +7864,2229 @@
           15
         ]
       }
+    },
+    "naturalness": {
+      "per_conversation": {
+        "hugo_054": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing ('pull up anything', 'I want the one with'), realistic workflow of hunting for a specific draft section. Turn 3 is a plausible follow-up but slightly too precise/clean in how it specifies 'JSON response examples section' and 'code blocks' as if narrating intent for clarity rather than just talking. Minor tell of over-specification, but overall reads like a real developer using a content tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_040": {
+          "score": 5,
+          "reason": "Very natural \u2014 terse, directive language ('same thing for'), no over-explanation, realistic iterative editing workflow. Feels like someone actually using an AI writing assistant to polish a document.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_049": {
+          "score": 2,
+          "reason": "The scenario mixes domains awkwardly \u2014 the conversation starts with WordPress but the domain context is Hugo, a static site generator. Turn 3 reads like a scripted follow-up designed to test a 'list recent posts' capability rather than a natural continuation. The phrasing 'Want to make sure nothing is outdated' is a formulaic justification tacked on, and the user spells out intent very explicitly. Real users in this context would likely use more shorthand or reference specific post titles/slugs they already know about.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_042": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing ('what we touched'), realistic editorial workflow scenario, and Turn 3 has a genuine follow-up feel with the dual search terms. Minor tells: the agent's response is unusually polished and anticipatory, and the user's requests are suspiciously well-scoped for a content audit task. Overall reads like a real content manager or editor using a CMS/Hugo-based tool, but slightly too clean.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_033": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural with casual phrasing ('like what order should I tackle things'), but Turn 3 reveals a slight scripted quality \u2014 the user asks the agent about 'the developer portal's conventions' as if the agent would know their internal tooling. A real user would know their own portal's conventions or ask a colleague, not an AI assistant. The Hugo domain context also never surfaces organically. Mixed signals: casual tone but logically inconsistent question.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_034": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'I might have a newer intro draft' is a realistic, slightly uncertain qualifier a real user would add. Turn 3 is a plausible organic follow-up rather than a scripted next step. Minor tell: the initial request is fairly clean and complete for a first message, but overall the shorthand and hedging read like a real person managing content workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_055": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user speaks in shorthand ('macro', 'inflation numbers'), has a clear editorial workflow motivation, and Turn 3 is a logical, self-interested follow-up ('so I don't repeat everyone else') that feels like a real journalist or content strategist. Minor tell: the scenario is almost too clean and purposeful, with each turn neatly advancing a single coherent task. But the casual phrasing and practical reasoning keep it feeling genuine.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_061": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 drops straight into context without over-explaining, Turn 3 uses casual shorthand ('that one made sense') referencing a prior suggestion without spelling it out. Minor tell: the scenario is suspiciously clean and the agent's response is very polished, but the user turns themselves read like a real person mid-workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_058": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the follow-up in Turn 3 narrows the request organically and adds a specific detail (laminated dough) that feels like genuine user recall rather than a scripted addition. The shorthand 'Just the ones' and casual phrasing read authentically. Minor tell: the scenario is suspiciously clean and the agent's Turn 2 response is unusually well-structured for a casual tool interaction, suggesting possible staging.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_009": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user speaks in shorthand ('Pull up', 'not the whole thing'), doesn't over-explain intent, and Turn 3 is a realistic refinement after seeing too much output. Minor tell: the scenario is suspiciously clean and the agent's Turn 2 response conveniently lists exactly the sections the user will ask about in Turn 3, suggesting the exchange may have been constructed to demonstrate a narrowing workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_072": {
+          "score": 3,
+          "reason": "The scenario is plausible (someone working on a Hugo content draft), and the shorthand 'pantry reset draft' feels somewhat natural. However, the turns read like sequential task prompts rather than a real conversation \u2014 no reactions to the agent's output, no personality, no 'hm' or 'okay cool' or follow-up nuance. Turn 3 is a clean pivot to a new checklist item, which feels scripted. The user also spells out intent very explicitly each time ('Check for keyword density and heading structure') rather than using natural shorthand like 'how's the SEO on it?'",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_015": {
+          "score": 5,
+          "reason": "Casual, directive language ('Stick the...', 'Great, also change') with natural shorthand. Turn 3 is an organic follow-up that adds a new but related task without over-explaining. Realistic school communication scenario using Hugo (meeting notes/parent communication tool). No robotic phrasing or template-like structure.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_067": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation of intent, and Turn 3 is a realistic pivot that builds on the agent's output rather than introducing a pre-planned next step. Slight 'too clean' quality in how the user zeroes in on exactly one keyword, but the shorthand phrasing ('sketch out a structure') and lack of filler language read as genuine.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_077": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull up' and 'what shape the metadata and structure are in' sound like real editorial shorthand, and Turn 3 is a casual, abbreviated follow-up rather than a scripted prompt. Minor tell: the scenario is suspiciously clean and cooperative, with the agent's diagnosis perfectly setting up the user's next ask.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_103": {
+          "score": 3,
+          "reason": "Turn 1 and 3 feel reasonably natural with casual shorthand ('engineer-y', 'Cool'), but Turn 3 references rewriting an intro that was never actually produced in the conversation \u2014 the agent only asked a clarifying question. This disconnect feels scripted, as if turns were assembled without full coherence. The domain context 'hugo' also doesn't align with the DBaaS/CIO content, suggesting synthetic generation. Overall mix of natural phrasing and structural oddities.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_014": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing ('pull up', 'spot any weirdness'), realistic workflow for a content creator checking a post before publishing. Turn 3 is a reasonable follow-up that picks up on the agent's offered choice. Minor tell: the context is suspiciously complete and the request is very clean/purposeful without any of the false starts or ambiguity real users often have.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_093": {
+          "score": 3,
+          "reason": "Turn 1 and 3 have natural shorthand ('the rest,' 'that intro angle we discussed earlier') that feels realistic, but the overall exchange is minimal and Turn 3 references prior context that doesn't exist in this conversation, which feels like a scripted attempt to simulate continuity rather than genuine callback. The scenario is plausible for a content scheduling tool, but the brevity and clean structure lean slightly contrived.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_104": {
+          "score": 4,
+          "reason": "Turn 3 is a natural pivot that feels like a real user redirecting mid-conversation, using casual shorthand ('intro bullets', 'flesh them out'). The scenario is plausible \u2014 someone with existing draft material asking for help. Minor tell: Turn 1 is slightly polished and complete for an opener, but overall the conversational flow and informal register feel authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_089": {
+          "score": 2,
+          "reason": "The conversation lacks realistic context \u2014 no actual draft content is referenced, the agent's response is suspiciously generic, and Turn 3 reads like a scripted follow-up prompt rather than a natural reaction. A real user would likely reference specific sections, use shorthand, or show frustration/approval. The scenario also doesn't clearly connect to Hugo (static site generator), making it feel like a domain-agnostic template dropped into the wrong context.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_101": {
+          "score": 2,
+          "reason": "Turn 3 is a non-sequitur pivot that doesn't follow naturally from Turn 2 \u2014 a real user would likely say 'yes' or ask to see the details first before jumping to editing an outline. The phrase 'pull up the current outline so we can add new subsections' reads like a scripted task injection rather than an organic follow-up. No personality, shorthand, or realistic conversational texture throughout.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_081": {
+          "score": 2,
+          "reason": "The conversation feels templated and contrived. Turn 1 uses 'our' but there's no established context for who 'we' are or what platform this is on. Turn 3's pivot from 'top-performing posts' to 'the new email post' is an abrupt, unnatural jump with no connective tissue \u2014 a real user would likely reference something specific or ask a follow-up about the results first. The phrasing is overly clean and demo-like, lacking any personality, typos, or organic reasoning. Feels like a scripted showcase of two different features rather than a real workflow.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_123": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand in Turn 3 ('hypey adjectives', 'tighten up') and the practical editorial instruction read like a real content editor. The scenario is plausible for someone managing a Hugo site. Minor tell: Turn 2's agent response is suspiciously smooth and anticipates the 'Our Team' detail before the user mentions it, which slightly frames Turn 3 as a scripted follow-up rather than organic. Still, the user's voice has personality and realistic brevity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_117": {
+          "score": 4,
+          "reason": "Turn 1 is fairly directive but has a realistic content creator feel\u2014specific word count, practical but warm tone, named sections. Turn 3 is natural shorthand ('This looks solid') with a plausible real-world reason (cross-posting to Medium). Minor tells: Turn 1 reads slightly like a prompt template with its comma-separated requirements, and the domain tag 'hugo' doesn't clearly connect to the conversation (static site generator vs. content creation), which is slightly suspicious. Overall feels like a real blogger or content creator, not robotic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_030": {
+          "score": 2,
+          "reason": "The scenario doesn't fit Hugo's domain (static site generator) \u2014 Substack is a newsletter platform with no real Hugo integration. Turn 1 uses natural shorthand ('phone check' is a bit odd but casual), but Turn 3 is suspiciously task-complete and reads like a scripted demo prompt. The agent's response in Turn 2 is also oddly accommodating of a vague request, suggesting a contrived back-and-forth rather than organic tool use.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_026": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user has a specific workflow in mind, uses reasonable shorthand ('looks tiny'), and Turn 3 is a genuine follow-up that adds detail prompted by the agent's question. Slight polish and completeness of context nudge it just below fully natural, but the phrasing and scenario are plausible for a real Hugo user managing a photo blog.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_114": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 stepping back to read the full post is a realistic, human response after a targeted edit. The user doesn't over-explain their intent and uses casual phrasing ('let me just read through'). Minor tell: Turn 1 is slightly polished for a beginner, but overall the flow feels like a real content editing session.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_110": {
+          "score": 2,
+          "reason": "The domain context says 'hugo' but the conversation is about WordPress, which is an odd mismatch. Turn 1 is overly explicit and formal for someone using a tool they're familiar with. The agent's response in Turn 2 is suspiciously detailed and polished, reading like a demo script. Turn 3 is the most natural moment, but the overall scenario feels contrived \u2014 the setup exists mainly to showcase an agent capability rather than reflect genuine user behavior.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_122": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 1 has a realistic impatient tone ('before I do anything else'), Turn 3 uses casual shorthand ('Ok', run-on phrasing) and a genuine editorial reaction ('feels rough in places'). Minor tells: the context is suspiciously complete and the progression is very clean/linear, but the language itself reads like a real user rather than a template.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_001": {
+          "score": 3,
+          "reason": "Turn 1 feels relatively natural with casual shorthand ('cross-post', 'sync looks okay'), but Turn 3 reads more like a scripted feature-demo prompt \u2014 it's a clean, complete request that conveniently showcases a 'list all integrations' capability. The scenario is plausible but the pivot feels slightly formulaic, like it's designed to demonstrate platform coverage rather than reflecting organic user curiosity.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_002": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'as-is' and the sequential platform strategy read like real workflow shorthand, and the EJ (environmental justice) domain specificity adds authenticity. Minor tell: Turn 1 assumes shared context a bit too cleanly, and the agent's Turn 2 response is suspiciously well-structured, suggesting a somewhat scripted exchange. Still, the casual pacing and implied familiarity with the tool feel genuine.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_003": {
+          "score": 4,
+          "reason": "The conversation flows naturally with casual shorthand ('That nails it'), no over-explanation of intent, and a realistic back-and-forth editing workflow. Minor tell: the context is slightly thin (no specifics about what the mission section actually says), but the tone and brevity feel authentic. The Hugo domain context (static site generator) fits a developer/content workflow scenario plausibly.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_004": {
+          "score": 2,
+          "reason": "Turn 3 reads like a checklist of requirements rather than natural follow-up \u2014 a real user would likely say something like 'can you draft an outline?' or 'how long should each section be?' The phrasing 'word counts per section' is suspiciously precise and task-spec-like. No personality, shorthand, or conversational texture throughout. The domain context 'hugo' (static site generator) doesn't clearly connect to the conversation, adding to the contrived feel.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_005": {
+          "score": 4,
+          "reason": "Turn 3 feels natural and shows genuine editorial thinking ('before I lock this in', 'rehashing the same stuff') with casual shorthand. The request flows logically from Turn 1 without over-explaining intent. Minor tell: the setup in Turn 1 is slightly too complete and structured for a first message, but overall the voice is consistent and realistic for a technical writer or engineer using a content tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_006": {
+          "score": 5,
+          "reason": "Highly natural \u2014 uses casual shorthand ('Yeah'), references specific content ('knife sharpening section') without over-explaining, realistic iterative workflow for someone managing a Hugo blog post, no formulaic phrasing or explicit intent-spelling. Turn 3 feels like a genuine follow-up from someone actually looking at their content.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_007": {
+          "score": 5,
+          "reason": "Terse, directive language ('Swap out', 'Pull up') with no over-explanation. User doesn't spell out what 'the draft' is or why they want it \u2014 assumes shared context. Turn 3 is a natural editorial follow-up after a content change, not a scripted next step. Feels like a real writer or editor working iteratively on a document.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_008": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'that angle feels wrong' is a genuine editorial voice, not robotic. The shorthand reference to the draft without over-explaining is realistic. Minor tell: both cancellations are thematically related in a suspiciously tidy way, and the user never asks for confirmation or shows uncertainty, which real users often do. Still, the casual phrasing and editorial reasoning read as authentic.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_010": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 the user gives partial info in a casual way ('Ok, what would you change') and doesn't over-explain. Minor tell is that the style rules are conveniently complete and cleanly formatted, but the shorthand and conversational tone ('Ok') feel authentic. The scenario (lab document formatting in Hugo) is plausible.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_011": {
+          "score": 4,
+          "reason": "The shorthand ('Do the same for'), implicit reference to prior context, and task-specific requests feel natural. The domain (Hugo, likely a meeting notes/docs tool) fits the use case. Minor tell: Turn 3 is suspiciously well-structured with a clean parallel request, but overall reads like a real user iterating on a document.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_012": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Pull up' and 'Yeah' are casual shorthand, the two-turn flow is realistic, and the follow-up in Turn 3 is a plausible refinement. Minor tell: the context is suspiciously clean and the request is very task-complete without any ambiguity or messiness a real user might introduce.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_013": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand ('SEO is solid'), implicit context (no need to re-explain what post), and casual phrasing ('you're all set') read like a real back-and-forth. Turn 3 is a plausible last-minute check before publishing. Minor tell: the keyword is suspiciously clean and quotable, and the scenario is a bit too tidy, but overall it tracks as a real Hugo/CMS user workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_016": {
+          "score": 2,
+          "reason": "Turn 1 sounds natural enough, but Turn 3 is a significant red flag: if the agent just said the post is 'unpublished,' a real user would likely react to that info rather than ask to check if it's published on WordPress. The follow-up ignores the agent's answer and introduces WordPress in a Hugo context, suggesting a scripted scenario testing cross-platform functionality rather than organic conversation. The setup feels like a template designed to trigger a specific tool call.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_017": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the workflow (check metadata before review, then preview) is realistic, Turn 3 uses casual shorthand 'Ok show me' rather than formal phrasing, and the context is specific enough to feel genuine. Minor tell: the agent's response in Turn 2 is suspiciously complete and polished, and the user's requests are almost too cleanly sequential, but overall reads like a real content editor using a CMS tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_018": {
+          "score": 5,
+          "reason": "Turn 3 is highly natural \u2014 'I think it lost the little origin story bits' is casual, uncertain phrasing with personality. User uses shorthand ('diff the intro') rather than spelling out full intent. The scenario (reviewing content changes in Hugo, possibly a static site or docs) is realistic. No robotic over-explanation of context or goals.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_019": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'Lock it in' and 'Yeah, that grabs attention way better' are casual, realistic shorthand a real user might use. However, the context is suspiciously clean with no friction, typos, or ambiguity, and the three-turn arc feels a bit too tidy. The 'hugo' domain context (likely a contract/document tool) fits the LinkedIn content editing scenario reasonably well.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_020": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 3 is a realistic follow-up question someone would actually ask, using shorthand rather than restating full context. The user doesn't over-explain their intent. Minor tell: the agent's response in Turn 2 is suspiciously polished and complete, which slightly signals a constructed scenario, but the user turns themselves read authentically.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_021": {
+          "score": 3,
+          "reason": "Turn 1 and 2 feel fairly natural for a content creator brainstorming post angles. Turn 3 is a bit of a tell \u2014 asking the AI to 'look up what other gardening blogs do' reads slightly scripted and misunderstands the tool's capabilities in a way that feels constructed rather than organic. A real user would more likely just ask for troubleshooting content directly. The domain context (hugo) also doesn't clearly connect to the conversation, which feels slightly off. Overall mixed \u2014 casual tone but some forced elements.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_022": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user is terse, directive, and uses casual language ('Nah', 'drop') without over-explaining. Turn 3 is a realistic follow-up refinement rather than a scripted next step. Minor tell: the conversation is very clean and purposeful without any of the typical messiness of real editing sessions (e.g., no 'wait, actually' or ambiguity). The Hugo context (likely a presentation or doc tool) fits the scenario plausibly.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_023": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'Open up' and 'Actually, just show me' are realistic shorthand, and the scenario (editing a post-mortem in a Hugo-based tool) is plausible. Turn 3 is a genuine-feeling correction/refinement. Minor tell: the agent's response is suspiciously clean and the setup feels slightly staged, but overall reads like a real user workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_024": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand 'CTA-free' and casual 'a bit punchier' read like real user language, and the back-and-forth is plausible for someone iterating on content. Minor tell: the conversation is suspiciously clean and minimal, with no typos, hesitation, or messiness typical of real editing sessions. Still, the scenario (refining a Hugo blog post) is realistic and the phrasing doesn't feel templated.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_025": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual tone ('Cool', 'before I commit'), realistic content planning scenario for a blogger, and Turn 3 is a logical follow-up. Minor tell: the agent's response in Turn 2 is suspiciously complete and well-organized, which slightly inflates the scripted feel, but the user's side reads authentically.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_027": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, realistic editorial workflow (checking content before newsletter), and a logical follow-up narrowing to a specific section. Minor tell: the post title 'Our Mission: 2024 and Beyond' feels slightly too polished/generic, and the section name 'Community Pledge' is conveniently specific. But the shorthand and task flow are believable for someone actually using a Hugo content tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_028": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural\u2014terse commands, no over-explanation, realistic back-and-forth editing flow. Turn 3 is a plausible follow-up that references the prior action without restating everything. Minor tell: the context is slightly thin (no specifics about what document or stats), which could indicate a stripped-down synthetic example, but could also just be a real user who assumes shared context with the tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_029": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the request is task-focused with realistic shorthand ('Pull up,' 'how they phrased'), and the follow-up in Turn 3 is a logical, organic next step after the agent's comparison. Minor tell: the context is suspiciously complete and clean for a first interaction, and 'Mostly care about' in Turn 1 is slightly too polished. But overall reads like a real content/docs person working in Hugo.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_031": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'slot in,' 'bring up,' and 'that part completely' are realistic shorthand, and Turn 3 is a genuine pivot rather than a scripted follow-up. Minor tell: the context is suspiciously complete and tidy for a first interaction, but the casual phrasing and task-switching behavior read like a real user mid-workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_032": {
+          "score": 2,
+          "reason": "Turn 1 asks about WordPress but the domain is Hugo \u2014 a mismatch that suggests a poorly constructed synthetic prompt. Turn 3 is overly imperative and formal ('Render a preview with the expanded outcomes section included') with no natural shorthand or personality. The conversation reads like a template demonstrating a preview/iteration workflow rather than a real user interaction. A real user would likely say something like 'can you show me that with the outcomes part filled in?' rather than issuing a structured command.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_035": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual shorthand and a real editorial decision. Turn 3 is plausible but slightly generic \u2014 'render a preview for the corporate portal' is clean and complete in a way real users often aren't (they'd more likely say 'can you show me how it looks' or reference a specific portal name). The agent's response in Turn 2 is oddly specific with the word count unprompted, which feels scripted. Overall the scenario is plausible for Hugo but the exchanges are a bit too tidy and purposeful.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_036": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic context (password change, draft ready), and Turn 3 is a genuine organic follow-up rather than a scripted pivot. The macrame detail adds personality. Minor tell: the agent's response is suspiciously complete and helpful, but the user side reads authentically with shorthand and natural progression.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_037": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the dismissive 'not our style' opener, the shorthand 'this values post,' and the timing-check rationale in Turn 3 all read like a real user. Minor tell: the agent's response implies persistent memory/context that's a bit too clean, and the scenario (managing Medium drafts via a Hugo-domain tool) is slightly mismatched, which could indicate a contrived setup. But the user's voice itself is casual and believable.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_038": {
+          "score": 3,
+          "reason": "Turn 1 and 3 feel fairly natural \u2014 shorthand like 'sanity check' and 'tighten those up' reads authentically. However, Turn 2 is a tell: the agent unprompted mentions 'WordPress formatting' with suspicious specificity, suggesting injected context rather than organic conversation. The overall flow is plausible but the agent's response feels scripted to establish domain context artificially.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_039": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual shorthand ('Pull up', 'double-check'), but Turn 3 is suspiciously terse and context-switching \u2014 jumping from tag verification to Substack preview without any reaction to the loaded metadata feels scripted. The scenario is plausible for Hugo, but the pivot lacks the natural connective tissue a real user would include (e.g., 'ok looks good, now...' or acknowledging the tags first).",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_041": {
+          "score": 2,
+          "reason": "The conversation feels contrived \u2014 the user speaks in complete, well-formed sentences with no typos, shorthand, or personality. Turn 3 is suspiciously clean and instructional, reading like a scripted next step rather than a natural follow-up. Also, the domain tag says 'hugo' but the conversation is about Medium publishing, which is an odd mismatch suggesting template generation. A real user would likely reference the diagram more casually ('can you throw in that enzyme diagram I mentioned?' or 'what about the image?') rather than formally specifying placement and purpose in one polished sentence.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_043": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the 'skip the glossary idea' opener implies prior context and sounds like a real mid-project pivot, and Turn 3 is a plausible follow-up request. Minor tells: the requests are suspiciously clean and complete, no typos or hesitation, and the domain specificity (SEC approval order, spot ETFs) feels slightly curated. But the shorthand and directive tone read like a real user in a workflow.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_044": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'real quick' is casual shorthand, Turn 3 is a realistic follow-up narrowing focus rather than a scripted next step. Slight dock because the context is thin and the agent's Turn 2 response is suspiciously well-structured, but the user turns themselves read authentically.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_045": {
+          "score": 5,
+          "reason": "Turn 3 is highly natural \u2014 casual grammar ('Yeah do that'), self-aware editorial concern phrased colloquially ('pity party'), no over-explanation of intent. Feels like a real person iterating on a draft with genuine voice concerns. The domain (Hugo, likely a writing/publishing tool) fits the scenario perfectly.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_046": {
+          "score": 4,
+          "reason": "Reads naturally \u2014 'bullet-y' is genuine shorthand, the request is realistic (converting internal docs to thought leadership is a common task), and Turn 3 is a plausible follow-up that narrows scope rather than restating everything. Minor tell: the agent's Turn 2 response is suspiciously well-articulated for a tool reply, but the user side feels authentic. Hugo domain context is plausible for engineering blog/docs work.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_047": {
+          "score": 5,
+          "reason": "Turn 3 is a natural follow-up with casual shorthand ('slot in the aftercare bit'), implicit context, and a realistic workflow reason \u2014 feels like someone actually navigating content in a Hugo site, not a scripted prompt.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_048": {
+          "score": 3,
+          "reason": "Turn 1 is natural and casual, but Turn 3 feels slightly scripted \u2014 'find some inspiration on how others are explaining this' is a bit formal and vague for a real user who would more likely say something like 'can you show me examples' or 'what are other landlords saying.' The scenario is plausible but the phrasing across turns is inconsistently natural. No real shorthand or personality markers.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_050": {
+          "score": 5,
+          "reason": "Turn 3 is a very natural follow-up \u2014 the user second-guesses themselves mid-task ('I might be mixing them up'), uses casual shorthand ('hiring stats'), and expands the search scope organically. No over-explanation of intent, realistic self-correction behavior, and the scenario (searching drafts in a CMS like Hugo) is plausible for a content editor or HR writer.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_051": {
+          "score": 5,
+          "reason": "Highly natural exchange: terse commands, realistic workplace scenario (legal review), and Turn 3 is a classic 'oh, also...' afterthought that feels genuinely unscripted. No over-explanation of intent, uses shorthand ('pull'), and the context is plausible for a content scheduling tool.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_052": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 3 is a realistic, terse follow-up with shorthand ('Got it') and no over-explanation. The scenario (coordinating content around a webinar) is plausible. Minor tell: Turn 1 assumes prior context that feels slightly staged, as if designed to demonstrate a specific feature, but the overall flow and brevity read like a real user.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_053": {
+          "score": 5,
+          "reason": "Turn 3 is a highly natural correction with a realistic, casual reason ('the team needs more time to review'). The user doesn't re-explain context, uses shorthand, and the scenario of rescheduling a post after a quick second thought is completely believable. No robotic over-explanation or templated phrasing.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_056": {
+          "score": 4,
+          "reason": "Conversation flows naturally with realistic shorthand ('Yeah'), progressive task refinement, and a plausible home improvement/Hugo content scenario. Turn 3 feels like a genuine follow-up. Minor tell: the context is suspiciously complete and tidy, but the casual register and logical progression feel authentic.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_057": {
+          "score": 5,
+          "reason": "Turn 3 is a highly natural follow-up \u2014 checking existing content before reinventing the wheel is exactly what a real content strategist or writer would do. The phrasing 'Have we written anything like this before?' uses casual shorthand and implies an ongoing working relationship with the tool/team. No over-explanation of intent, no formulaic structure, and the scenario (bridging dev/IT manager audiences for a technical post) is realistic and specific without being suspiciously complete.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_059": {
+          "score": 5,
+          "reason": "Very natural follow-up question \u2014 terse, uses shorthand ('What about'), assumes shared context from previous turn without re-explaining. The concern about platform rendering compatibility (Dev.to + Mermaid + LaTeX) is a realistic, specific workflow question someone actually publishing technical content would ask. No over-explanation of intent, no formulaic structure.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_060": {
+          "score": 2,
+          "reason": "The conversation feels templated and task-demonstration-like. Turn 1 is unusually terse and command-like without context (why does a Hugo user need to 'find' reviews \u2014 are they searching their own site's content?). Turn 3 is a clean, well-formed follow-up that reads like a scripted next step rather than a natural reaction. No personality, shorthand, or realistic friction. The scenario of using an AI agent to search Hugo content is plausible but the execution feels like a demo script.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_062": {
+          "score": 3,
+          "reason": "Turn 1 is reasonably natural with 'our youth mentorship post' suggesting real context, but the phrasing is quite clean and directive. Turn 3 has a natural feel with 'pull a few examples' shorthand, but overall the conversation reads like a template scenario \u2014 the back-and-forth is too tidy and purposeful without any personality, hesitation, or messiness typical of real users. The Hugo domain context also doesn't clearly connect to the task (blog post outlining), which feels slightly off.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_063": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user speaks in shorthand ('Fix those'), has a clear editorial voice, and the reasoning in Turn 3 is contextually coherent rather than scripted. The slight tell is how cleanly the context is established ('purely conceptual,' 'without the case studies') \u2014 a real user might be slightly less articulate about their own constraints, but this could easily be an editor or technical writer who thinks this way professionally. Not robotic, has personality and urgency.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_064": {
+          "score": 5,
+          "reason": "Feels like a real user mid-workflow \u2014 casual 'Yeah,' natural chaining of requests, shorthand references to existing context ('our current tier structure'), and realistic incremental doc editing behavior in Hugo. No over-explanation of intent.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_065": {
+          "score": 3,
+          "reason": "The conversation has a plausible workflow (keyword research \u2192 trend/gap analysis) but feels slightly templated. Turn 3 is a reasonable follow-up but reads a bit too cleanly structured \u2014 a real user might say something like 'cool, what about trending topics?' or ask about a specific keyword rather than pivoting so neatly to 'content gaps.' No real personality, shorthand, or friction. The scenario is realistic for a content marketer using Hugo, but the phrasing is suspiciously complete and polished throughout.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_066": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual tone ('Cool'), shorthand references ('my last big infra post'), and the follow-up in Turn 3 flows organically from the agent's prompt. Minor tell: the request in Turn 3 is suspiciously clean and complete, almost echoing the agent's exact phrasing back verbatim, which real users sometimes do but feels slightly templated here.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_068": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 short, task-focused turns with no over-explanation, realistic Hugo content editing scenario. Turn 3 is a plausible follow-up (updating front matter tags after adding content). Minor tell: the tasks are suspiciously clean and sequential, like a scripted demo, but the brevity and lack of filler language lean natural.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_069": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 casual shorthand ('Nice.'), realistic workflow of iterating through document sections, specific VC name-dropping feels authentic to someone actually writing a pitch deck. Minor tell: the context is suspiciously complete and the request is very clean/purposeful, but the tone and progression feel like a real user working through a document.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_070": {
+          "score": 5,
+          "reason": "Turn 3 is a natural, casual confirmation ('Yeah') with specific placement instruction that feels like a real user building on the agent's suggestion. Uses shorthand, no over-explanation, and the back-and-forth mirrors how someone would actually iterate on a document in Hugo.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_071": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 shorthand like 'hit the right terms' and 'structure the timeline right' sounds like real user speech, and the workflow (research first, then outline, then SEO check) is realistic. Turn 3 is a plausible organic follow-up rather than scripted. Minor tell: the initial request is slightly too well-framed ('pivot story,' 'lessons right') suggesting someone who knows exactly what they want, but that's not unusual for a marketing/content professional.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_073": {
+          "score": 3,
+          "reason": "Turn 1 and 3 have a natural, casual tone with shorthand like 'pull up' and 'hit publish,' but the scenario is slightly off \u2014 asking to preview a Hugo post 'on WordPress' is a domain mismatch that feels like a template error rather than a real user. The context is suspiciously clean and the agent's response is perfectly complete, which adds a contrived feel.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "anthropic"
+        },
+        "hugo_074": {
+          "score": 3,
+          "reason": "Turn 1 is plausible but oddly specific with the post ID format. Turn 3 is a natural follow-up to the agent's offer, which feels realistic, but the overall flow reads slightly templated \u2014 the user spells everything out clearly with no shorthand, typos, or personality. The scenario (WordPress scheduling check) is realistic for the domain, but the conversation feels like it was constructed to demonstrate tool capabilities rather than emerge organically.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openai"
+        },
+        "hugo_075": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Got it' opener, shorthand phrasing, and the pivot to SEO density mid-task reads like a real user multitasking. The scenario is plausible for a content editor using a Hugo-based workflow tool. Minor tell: the SEO keyword is suspiciously complete and specific, and the overall flow is a bit too clean/sequential, but nothing overtly scripted.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_076": {
+          "score": 4,
+          "reason": "The conversation has a natural, casual tone with shorthand ('Pull up', 'back up the hype') and implicit context that feels like a real user who has an established workflow. Turn 3 is a plausible organic follow-up. Minor tell: the agent's response in Turn 2 is suspiciously clean and the overall arc feels slightly too purposeful, but the user's voice is convincingly informal and personality-driven.",
+          "source": "synth",
+          "category": "same_flow",
+          "model": "openrouter"
+        },
+        "hugo_078": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, slightly abrupt pivot that feels realistic \u2014 'didn't land right' is casual and human. However, Turn 1 is a bit polished for a real user (complete context, clear goal), and Turn 3 references an 'edit to the post' and 'intro rewrite' that never happened in this conversation, which is either a continuity error or implies a longer session context. The Hugo domain (likely a CMS) makes the undo request plausible. Overall feels mostly natural with minor tells.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_079": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand ('run a grammar pass') and chained editing workflow are realistic for someone iterating on a document. Turn 3 is a plausible follow-up that ignores the agent's clarifying question, which is very human. Minor tell: the tasks are suspiciously clean and sequential, like a demo script, but not enough to feel fully contrived.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_080": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, slightly skeptical follow-up that feels genuine \u2014 'Wait, explain how...' is realistic pushback shorthand. Turn 1 assumes shared context (no over-explanation of what 'this draft' is), which feels authentic. Minor tell: the scenario is suspiciously clean and pedagogically useful, and the agent's response in Turn 2 is very tidy. But overall the conversational rhythm and pronoun/shorthand usage feel close to real.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_082": {
+          "score": 2,
+          "reason": "The conversation feels contrived for a Hugo context \u2014 LinkedIn formatting and AI adoption chart requests don't naturally fit a static site generator workflow. Turn 3 is suspiciously convenient and topic-complete, reading like a scripted escalation rather than organic follow-up. The user language is clean but lacks personality, shorthand, or any friction you'd expect from a real user (no 'hmm' or 'actually can you also...' type messiness). The domain mismatch with Hugo is a strong synthetic tell.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_083": {
+          "score": 2,
+          "reason": "The conversation feels contrived. Turn 1 assumes prior context that doesn't exist in the conversation, which could be natural, but Turn 3 is a jarring non-sequitur \u2014 jumping from discussing edits to commanding a publish to Medium feels scripted to demonstrate a tool capability rather than reflect real user behavior. Also, the domain tag says 'hugo' but the conversation references Medium, adding to the sense this is a templated demo scenario. A real user would likely ask 'does it look good?' or give more transitional feedback before publishing.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_084": {
+          "score": 2,
+          "reason": "Turn 1 asks about 'a post of this length' with no post provided, which is unnatural \u2014 a real user would either paste content or specify length. Turn 3 then asks to 'analyze this draft' but no draft was ever shared, suggesting scripted placeholder behavior. The phrasing is also overly formal and task-complete, lacking personality or shorthand typical of real Hugo users.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_085": {
+          "score": 3,
+          "reason": "Turn 1 has a natural, directive tone ('Let's skip') suggesting familiarity, but Turn 3 is suspiciously terse and pivots abruptly to a diagram request without context about what tool/format they want. The scenario (keyword suggestions for Hugo content?) is plausible but the connection between keywords and CI/CD diagrams feels scripted. No real shorthand or personality beyond the opening line.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_086": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'go ahead and smooth out' and 'without changing what it's saying' are realistic shorthand phrases a real user would use. Turn 3 is a believable follow-up that doesn't over-explain. Minor tell: the request is unusually clean and well-scoped for a casual user, but nothing feels scripted or templated. The Hugo domain context (newsletter tool) fits the use case plausibly.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_087": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the shorthand 'sanity check' and casual phrasing are realistic, and the workflow (write then check metrics) is plausible for a Hugo blog author. Minor tell: Turn 3 is suspiciously clean and task-complete, like it was written to demonstrate a tool capability rather than organic follow-up curiosity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_088": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'way less formal' is casual shorthand, and the follow-up builds organically on the agent's options rather than introducing a scripted new request. Minor tell: Turn 1 is slightly polished ('frame the new project-based learning unit') but plausible for an educator or comms person. Overall reads like a real user iterating on content, though the domain label 'hugo' doesn't obviously connect to the newsletter/PBL context, which is a small oddity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_090": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 the shorthand 'drop in', the CDN reference, and the casual 'Good.' opener feel authentic. The request to pull neutral keywords in Turn 1 is a slightly unusual but plausible professional concern. Minor tell: the CDN URL is suspiciously clean and placeholder-like (cdn.example.com), which nudges it away from fully real, but the overall flow and domain-appropriate terminology (ADR, schema contracts) feel like a real technical writer or architect using the tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_091": {
+          "score": 3,
+          "reason": "Turn 1 and 3 feel somewhat natural with casual shorthand ('Cool', 'clunky lines'), but Turn 3 is a non-sequitur \u2014 asking an AI chat tool to 'show a preview on Substack' isn't something a real user would expect from a grammar assistant, suggesting a scripted scenario testing tool-switching or integration features. The domain tag 'hugo' also doesn't align with Substack, adding to the contrived feel. Mixed naturalness overall.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_092": {
+          "score": 5,
+          "reason": "Feels completely natural \u2014 vague reference to 'the escalation paths section' without over-explaining, a realistic back-and-forth where the user changes their mind after seeing the result, and 'Undo it' is exactly the kind of terse shorthand a real user would use rather than a scripted 'Please revert the changes you made.'",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_094": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('Good. Now let's...') and a plausible workflow. Turn 3 is a genuine-feeling pivot rather than a scripted follow-up. Minor tell: 'just a blank draft for now' is slightly over-explanatory, as a real user might just say 'start a new post on sustainable investing trends 2025.' Overall feels like an actual content creator using the tool, but slightly too tidy.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_095": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, casual 'Cool', urgency in Turn 3 all read like a real user in a hurry. Minor tell: 'what platforms are hooked up' is slightly polished phrasing, but the shorthand and impatience feel genuine. Realistic scenario for someone publishing Hugo content.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_096": {
+          "score": 4,
+          "reason": "Turn 3 feels genuinely natural \u2014 the pivot ('hold off on writing'), the practical concern about distribution channels, and the shorthand 'pin this' all read like a real user mid-workflow. The scenario (CAM reconciliation in property management) is specific and realistic. Minor tell: Turn 1 is slightly formal/complete for someone who'd later speak so casually, but the overall flow is believable.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_097": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'too pitchy' and 'founder advice vs sales page' are realistic editorial instincts, and Turn 3 is a plausible follow-up request. Minor tells: the context is suspiciously clean with no friction, typos, or ambiguity, and 'Show me other launch posts from last month' assumes a very specific capability without hesitation. Overall reads like a real user but slightly too smooth.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_098": {
+          "score": 3,
+          "reason": "Turn 1 and 3 have natural, casual phrasing ('way too wordy,' 'takes forever,' 'punchier') that feels genuine. However, the domain context says Hugo but the agent references WordPress, which is a mismatch. The scenario itself is plausible, but the conversation feels slightly constructed \u2014 the setup is very clean and the feedback in Turn 3, while colloquial, is almost textbook editorial critique. No real shorthand, typos, or personality quirks that would push it to fully natural.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_099": {
+          "score": 2,
+          "reason": "Turn 3 is a classic synthetic tell \u2014 it abruptly pivots to a completely unrelated request (outline options + SEO keywords) with no connection to the Substack preview task, reads like a template trying to pack in multiple capability demonstrations. Also, the domain context says 'hugo' but the conversation is about Substack, suggesting a mismatched or auto-generated scenario. Real users would follow up on the preview result, not suddenly ask for outlines.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_100": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual shorthand ('the Morning Rituals piece'), realistic editorial concern in Turn 3, and the 'too energetic' worry reads like genuine authorial anxiety. Minor tell: the concern is articulated a bit cleanly, but overall the voice is consistent and the scenario (content creator managing a Hugo blog calendar) is plausible.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_102": {
+          "score": 4,
+          "reason": "Turn 3 is a natural pivot that feels realistic \u2014 the user shifts context mid-conversation in a way real users do, revealing the post is already live rather than in planning. The shorthand ('push it') and assumption that the agent knows their setup feels authentic. Slight dock because Turn 1 reads a bit polished and the overall scenario is suspiciously tidy for a Hugo/publishing workflow demo.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_105": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('Find some stats') and a logical follow-up request. The user doesn't over-explain intent, which feels authentic. Minor tell: the requests are suspiciously clean and sequential, like a demo scenario, and 'Find some stats' is a bit vague in a way that feels slightly staged rather than a real user who might specify a source or context. Still, plausible for someone using an AI content assistant in Hugo.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_106": {
+          "score": 2,
+          "reason": "Turn 3 is a significant tell \u2014 asking to preview a Substack post inside what appears to be a Hugo-context tool is an odd mismatch, suggesting the scenario wasn't carefully constructed. The conversation also spells out intent very explicitly ('want to see how the tone and structure differ') with no natural shorthand or personality. The agent's response in Turn 2 is suspiciously well-structured and complete. Overall feels like a templated demo scenario rather than organic user behavior.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_107": {
+          "score": 5,
+          "reason": "Turn 3 is a classic natural pivot \u2014 user mid-task suddenly thinks of a related but tangential question, no explanation given, no formal transition. Shorthand throughout, no over-explanation of intent. The scenario (editing pet safety content, possibly for a Hugo-based site) is realistic. The abrupt topic shift in Turn 3 is exactly how real users behave.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_108": {
+          "score": 3,
+          "reason": "Turn 1 and 3 have some natural shorthand ('my last two', 'feels totally different') but the pivot in Turn 3 is suspiciously clean and on-topic \u2014 a real user might express more reaction to Turn 2's analysis before jumping to brainstorming. The scenario (Hugo blog with recipe posts) is plausible, but the conversation feels like it was designed to demonstrate a workflow rather than emerge organically.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_109": {
+          "score": 2,
+          "reason": "Turn 3 is a red flag \u2014 'remind me to keep the tone more conversational moving forward' reads like a meta-instruction planted to shape future outputs, not something a real user would naturally say mid-conversation. The opening question in Turn 1 also lacks grounding context (what is 'this'? what tool/page/content?) that a real user would typically provide or assume shared. The Hugo domain context doesn't clearly connect to the conversation content either, adding to the contrived feel.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_111": {
+          "score": 2,
+          "reason": "Turn 3 is a red flag \u2014 the user is asking the agent to 'show them' the draft, which makes no sense since the user would already have their own draft. A real user would paste their intro and ask for edits. The setup reads like a scripted exchange where someone forgot to include the actual content. Also, 'sequencing terms exact' in Turn 1 is oddly formal phrasing without any context about what those terms are. No shorthand, no personality, no actual content shared \u2014 feels like a template dialogue.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_112": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual phrasing ('Let's roll with'), but Turn 3 is oddly disconnected \u2014 asking about social accounts mid-content-creation feels like a scripted pivot to demonstrate a feature rather than organic user behavior. The context is also thin; no clear prior conversation establishing what 'this' refers to or why social sharing would suddenly come up. Hugo (meeting/notes tool) context makes partial sense, but the jump feels contrived.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_113": {
+          "score": 4,
+          "reason": "Turn 3 feels natural and realistic \u2014 a casual, terse style preference update with no over-explanation. Turn 1 is also natural shorthand ('Publish this'). Slight dock because the scenario feels a bit polished and the domain context (Hugo) doesn't obviously connect to Substack publishing, which is a minor inconsistency a real user might clarify but doesn't.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_115": {
+          "score": 2,
+          "reason": "The domain context is Hugo (static site generator), but the user is asking about WordPress connections \u2014 an odd mismatch that suggests a templated conversation not grounded in realistic usage. Turn 3 has natural shorthand ('tighten the results section') but the overall scenario feels contrived: the combination of checking WordPress sync health while simultaneously pulling an outline reads like a scripted multi-tool demo rather than organic workflow. The agent's response in Turn 2 is also suspiciously polished and complete.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_116": {
+          "score": 4,
+          "reason": "The pivot in Turn 3 feels natural \u2014 users often change their mind mid-task, and the casual 'actually' is a realistic shorthand. Turn 1 has personality ('I typed it out pretty fast'). Minor tell: the agent's response in Turn 2 is suspiciously specific and complete for a grammar scan with no actual document provided, which slightly undermines the realism, but the user side reads authentically.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_118": {
+          "score": 2,
+          "reason": "The domain context says Hugo (static site generator), but the agent references WordPress, which is a mismatch that suggests synthetic generation. The conversation is also suspiciously clean and linear \u2014 a real user would likely have more friction, questions, or specifics. Turn 3 is a natural follow-up in isolation, but the overall arc feels templated. The post title is oddly specific and complete, which reads more like a contrived example than organic context.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_119": {
+          "score": 3,
+          "reason": "Turn 1 feels natural enough for a writer/editor workflow, but Turn 3 is a pivot that feels slightly scripted \u2014 it introduces three distinct, neatly packaged tasks (missing sections, word count, empty headings) that read more like a checklist than organic follow-up. The user never shares actual content, which is unrealistic for a real editing session. 'Cool' adds a casual touch, but the overall pattern of tidy, multi-part requests without any friction or specificity suggests a templated scenario. Also, the Hugo domain context isn't evident in the conversation itself, which feels disconnected.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_120": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('Pull that up') and a plausible workflow for someone using Hugo to manage content drafts. Turn 3 is a genuine-feeling follow-up rather than a scripted prompt. Minor tell: the request is suspiciously clean and complete with no ambiguity, typos, or personality quirks you'd expect from a real user.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_121": {
+          "score": 2,
+          "reason": "The conversation feels like a template for content creation workflow. Turn 1 is a clean, directive prompt with no personality or context (no 'I'm writing a blog post' or 'my editor wants'). Turn 3 is a pivot that reads like a scripted next step \u2014 'what fresh angles are trending' is marketing-speak that feels constructed rather than organic. No shorthand, no typos, no real user voice. The Hugo domain context (static site generator, likely for a pet safety blog) adds plausibility but the dialogue itself is formulaic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_124": {
+          "score": 2,
+          "reason": "Turn 1 starts mid-conversation with no prior context, which could be natural, but Turn 3 is a non-sequitur \u2014 scheduling something 'on the calendar' is unrelated to Hugo static site content editing and feels like a scripted pivot to test a different capability. The transitions feel templated rather than organic, and the scenario doesn't hang together coherently for a real Hugo user workflow.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_125": {
+          "score": 3,
+          "reason": "Turn 1 feels natural and vague in a realistic way, but Turn 3 is oddly formal and complete \u2014 a real user might say 'can you pull those up?' or 'where do I find them?' rather than spelling out the full retrieval request so cleanly. The domain (Hugo static site, songwriting blog) is plausible, but the pivot from analysis advice to file retrieval feels slightly scripted, like it's demonstrating a tool capability rather than organic curiosity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_126": {
+          "score": 5,
+          "reason": "Reads like a real comms/content strategist using an internal tool. Natural shorthand ('pull up', 'talking points we've already used'), realistic workflow concern about repetition, casual acknowledgment in Turn 3 ('That's helpful, thanks') before pivoting to the actual goal. No over-explanation of intent, no robotic structure \u2014 feels like someone mid-project.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_127": {
+          "score": 5,
+          "reason": "Feels like a real content editor using Hugo. Turn 1 uses natural shorthand ('SMB explainer draft' without over-explaining). Turn 3 is a classic mid-workflow pivot \u2014 no re-explanation of context, just 'this paragraph' implying they're looking at something on screen. The instruction style ('less jargon, more concrete') is how writers actually talk, not how prompts are written. No robotic intent-spelling-out.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_128": {
+          "score": 4,
+          "reason": "Turn 3 feels genuinely natural \u2014 the 'actually' pivot, casual shorthand, and practical mid-task redirect are realistic user behavior. The title is specific and personality-driven. Minor tell: the scenario is slightly too clean and purposeful, but overall reads like a real content creator using a Hugo drafting tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_129": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 references to 'last year's post' and 'the old one' use realistic shorthand without over-explaining, and the follow-up request in Turn 3 is a plausible iterative editing ask. Minor tell: the requests are suspiciously clean and sequential, like a scripted demo, but the domain (content editing in Hugo) and casual phrasing ('tighten up') are consistent with a real user workflow.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_130": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic back-and-forth \u2014 the co-founder detail in Turn 3 adds authentic context and the pivot feels genuine. Minor tell: the request in Turn 3 is slightly polished ('weak or misleading phrasing' is precise for casual speech), but overall the scenario and shorthand feel like a real startup founder using a content/CMS tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_131": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual shorthand, but Turn 3 reads slightly scripted \u2014 'I wanna be sure it's complete' is a common template phrase. The agent's Turn 2 response asking about 'list + photo overlap' is oddly specific and goes unanswered, which a real user would likely address. The scenario is plausible for Hugo CMS work, but the conversation feels like it's hitting predefined task checkpoints rather than flowing organically.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_132": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('Let me see') and a logical follow-up request. The task is plausible for a Hugo user editing content. Minor tell: the URL and section name are suspiciously clean/complete, but overall the interaction feels like a real editing workflow.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_133": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand ('that post' instead of restating the full title), and the follow-up check on status is a plausible real-world action. Minor tell: the scenario is suspiciously clean and complete, with no ambiguity, typos, or friction that real users often introduce.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_134": {
+          "score": 4,
+          "reason": "Turn 1 uses natural shorthand ('my recent cloud security stuff') and Turn 3 feels like a realistic follow-up expansion after getting feedback. The request to check multiple posts simultaneously is a plausible next step. Minor tell: the context is suspiciously complete and the asks are well-scoped, but the casual phrasing and iterative refinement feel authentic to someone actually working on content consistency in Hugo.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_135": {
+          "score": 4,
+          "reason": "The pivot in Turn 3 feels natural \u2014 users often change their minds mid-task, and 'forget the schedule, just publish it now' has realistic shorthand. However, Turn 1 is suspiciously complete and formal for a real user (full platform name, exact time with timezone). Minor tells of a scripted scenario, but the interaction flow is plausible for someone managing a content calendar.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_136": {
+          "score": 4,
+          "reason": "Turn 3 is a natural pivot that feels realistic \u2014 users often change direction mid-session. The shorthand ('let's focus,' 'Pull up') and casual tone feel genuine. Minor tell: Turn 1 is a bit terse and command-like without context, and the overall flow is suspiciously clean, but nothing overtly scripted.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_137": {
+          "score": 3,
+          "reason": "The conversation has a natural flow and shorthand ('let's go with that'), but lacks any real personality, specificity, or messiness. Turn 1 drops in medias res which feels natural, but the exchange is suspiciously clean and template-like \u2014 a real user would likely add more context, opinions, or constraints. The 'cloud series' reference without any prior context and the perfectly structured agent response giving exactly three options feels formulaic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_138": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 jumps in mid-conversation referencing a prior suggestion, which is realistic shorthand. Turn 3 uses casual imperative ('drop in') and mentions a CDN without over-explaining, which feels authentic. Minor tell: the scenario is suspiciously well-structured (case study \u2192 diagram follows logically), and the context is unusually complete for a real user. But the terse, directive tone and lack of over-explanation lean natural.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_139": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Cool' and 'probably haven't covered yet' are casual and realistic shorthand. The progression from editing an intro to brainstorming coverage gaps is a logical workflow. Minor tell: the request in Turn 3 is slightly polished/complete for casual chat, but overall reads like a real content creator iterating on a Hugo blog series.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_140": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 'the syntax feels a bit clunky' is a genuine, personality-driven phrase, and the shorthand in Turn 1 ('I need the efficacy data draft') reads like someone who knows what they want. Turn 3 is a realistic follow-up. Minor tells: the agent's response is suspiciously clean and the overall arc is a bit too tidy, but nothing overtly scripted.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_141": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 Turn 1 uses shorthand ('last two versions'), Turn 3 has a dismissive, directive tone ('Never mind') that reads like a real user course-correcting. The context is plausible for someone working on a Hugo theme or documentation outline. Minor tell: the scenario is suspiciously tidy and the agent's response in Turn 2 is very specific and clean, suggesting possible construction, but the user turns themselves feel authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_142": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual tone, shorthand references ('the Ethiopian origin post'), and a realistic editorial workflow. Turn 3 is a plausible follow-up with natural phrasing. Minor tell: the context is suspiciously complete and the workflow is very clean/linear, but nothing overtly scripted.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_143": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'sound like me again' and 'not cheesy' are genuine user shorthand, and the flow between turns is organic. Turn 3 is a realistic follow-up request. Minor tell: the scenario is slightly too clean and the context (hugo domain) doesn't clearly connect to the content, suggesting possible synthetic construction, but the voice itself reads authentically.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_144": {
+          "score": 4,
+          "reason": "Turn 3 is natural and terse with casual phrasing ('way more active'), and the scenario is plausible for a content/marketing tool. However, Turn 1 is slightly too clean and directive without any surrounding context or friction, and the overall arc feels a bit too smooth \u2014 a real user might ask what was flagged or push back before jumping to a rewrite. Minor tells of a scripted flow, but the shorthand and casual language in Turn 3 add authenticity.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_145": {
+          "score": 3,
+          "reason": "Turn 1 has a natural, task-focused tone with a specific concern (tables breaking), which feels real. But the scenario is slightly off \u2014 Hugo users don't typically 'preview on Medium' as a workflow step, making the domain context feel mismatched or contrived. Turn 3 is natural shorthand, but the overall conversation is too brief and tidy to feel fully authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_146": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the tired parent framing and 'quick wins' language in Turn 1 has genuine voice, and Turn 3's pivot is a realistic follow-up. However, 'structured so skimmers can grab what they need fast' reads slightly polished/deliberate, and requesting estimated word counts per section is a fairly specific, tool-savvy ask that leans toward someone who knows how to prompt rather than a casual user. The Hugo context (content planning tool) makes this a plausible real workflow, which bumps it up from a 3.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_147": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 has a casual, delegating tone ('if it looks ready') and Turn 3 uses shorthand ('cross-post it', 'tweak formatting') without over-explaining. Minor tell: the scenario is suspiciously clean and sequential, like a demo workflow, but the phrasing itself is plausible for someone managing content publishing.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_148": {
+          "score": 2,
+          "reason": "Turn 3 is a jarring non-sequitur \u2014 jumping from passive voice/clich\u00e9 editing to 'show me the preview for WordPress' makes no logical sense in the conversation flow, suggesting this is a scripted demo stitching together unrelated capabilities. Also, the domain context says 'hugo' but the user asks about WordPress, which is suspicious. The initial request is natural enough, but the pivot feels like a template showcasing multiple features rather than a real editing session.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_149": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, no over-explanation, and a realistic workflow pivot from editing to retrieval. Turn 3 is a plausible follow-up for someone working on music/audio content in Hugo. Minor tell: the context shift is clean and convenient, but not implausibly so. Shorthand and implied shared context ('my last three soundtrack posts') feel authentic.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_150": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 3 is a realistic, unscripted response where the user decides to check the post before committing, which is what a real person would do. The shorthand 'Ok' and practical reasoning feel authentic. Minor tell: Turn 1 is slightly polished and complete for an opening message, but the scenario (content decision for a mentorship program) is plausible. No obvious template feel.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "anthropic"
+        },
+        "hugo_151": {
+          "score": 2,
+          "reason": "Turn 3 is a classic scripted pivot \u2014 it introduces a completely new task ('check my voice/draft') with no actual draft provided, which is unrealistic. A real user would paste the draft or at least reference it. The conversation also feels like it's demonstrating AI assistant capabilities across multiple domains (retrieval, then style analysis) rather than reflecting a genuine workflow. The 'Cool' opener in Turn 3 is a thin attempt at naturalness but the request itself is hollow without content. Also, Hugo is a static site generator \u2014 this conversation about poetry notes and voice-checking feels mismatched to that domain context.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openai"
+        },
+        "hugo_152": {
+          "score": 5,
+          "reason": "Feels completely natural \u2014 casual shorthand ('kill that schedule'), realistic change of mind with a practical reason ('shoot better photos first'), no over-explanation of intent. The back-and-forth mirrors how a real content creator would actually use a scheduling tool.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_153": {
+          "score": 5,
+          "reason": "Turn 3 is the clincher \u2014 'Nah it's fine' is casual, decisive, and realistic. The user doesn't over-explain, uses natural shorthand, and the scenario (checking tone before publishing a gala recap) is completely plausible for someone managing a nonprofit or event blog in Hugo. No robotic intent-spelling, no template feel.",
+          "source": "synth",
+          "category": "switch_flow",
+          "model": "openrouter"
+        },
+        "hugo_154": {
+          "score": 3,
+          "reason": "The request is plausible but has some contrived elements \u2014 'pull up my content marketing trends post' assumes the agent has file access without any setup context, and the scenario feels slightly staged. Turn 3 is natural and terse, which helps, but the overall framing reads like a demo script for a content management tool rather than an organic user interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_155": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'call out what feels off' and 'no rewrites yet' are casual, realistic phrasing. The back-and-forth is plausible for someone iterating on content. Minor tell: Turn 1 assumes shared context ('our usual voice') without any grounding, which could be natural or slightly staged. Overall reads like a real content editor using a writing tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_157": {
+          "score": 3,
+          "reason": "Turn 1 is plausible but vague in a way that feels slightly staged \u2014 a real user would likely reference the drafts more specifically (e.g., 'these two posts' or filenames). Turn 3 is natural and terse, which feels authentic. However, the overall exchange lacks personality, domain-specific shorthand (no mention of Hugo content types, front matter, sections), and the scenario feels generic rather than grounded in actual Hugo workflow. The agent's binary offer in Turn 2 also feels templated, and the user's clean acceptance of one option without elaboration is mildly suspicious.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_158": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user speaks in shorthand ('pull up anything we have'), has a clear real-world scenario (grant application), and Turn 3 is a crisp, realistic clarification that doesn't over-explain. Minor tell: the context is suspiciously complete and the phrasing is slightly polished, but overall reads like a real nonprofit/org staffer using a content tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_159": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user gives a casual initial request without over-explaining, and Turn 3 is a direct, shorthand follow-up that doesn't restate context unnecessarily. The post titles are specific and plausible. Minor tell: the titles are suspiciously polished and complete, and the scenario feels slightly curated, but overall the conversational rhythm is realistic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_160": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic editorial workflow. 'The intro flow is clunky' and 'Draft a new one' read like a real user giving quick feedback. Minor tell: the scenario is suspiciously clean and the domain context 'hugo' is ambiguous (static site generator? a document?), but the shorthand and impatient tone are authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_161": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, clipped redirect that feels genuine \u2014 real users often ignore the agent's framing and just say what they want. 'Just tighten the paragraphs' is casual and direct. Minor tell: Turn 1 is slightly too clean and purposeful for an opener, and the scenario assumes a content-management workflow with Hugo that's plausible but conveniently tidy. Overall reads mostly natural with minor polish.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_162": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the casual 'let's get it out there' and 'we can worry about the rest later' have realistic shorthand and mild impatience. Turn 3 is a believable brushoff response. Slight tell is that the context is suspiciously clean and the post title is very specific/polished, but overall reads like a real content manager or blogger using a publishing tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_163": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual phrasing like 'flesh this out' and 'before I post it' sounds genuine, and Turn 3 is a realistic, slightly impatient clarification. Minor tell: the agent's Turn 2 response is unusually well-structured for a draft-review scenario, which slightly elevates the polish level, but the user's side reads authentically.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_164": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Let's stick to' and the casual pivot to checking competitors reads like a real user mid-workflow. The request is plausible for someone using an AI writing assistant for nonprofit comms. Minor tell: Turn 1 is slightly polished and assumes a lot of shared context without any friction or clarification, which real users sometimes need. Overall though, the shorthand and incremental decision-making feel authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_165": {
+          "score": 5,
+          "reason": "Extremely natural exchange \u2014 vague opener ('all over the place'), no over-explanation of context, and Turn 3 is a clipped, realistic response to a clarifying question. No synthetic tells.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_166": {
+          "score": 2,
+          "reason": "Turn 1 is oddly formal and context-free \u2014 a real user would likely say something like 'can you check this post before I send it out?' rather than leading with a polished statement about standards. Turn 3 is slightly more natural but still reads like a scripted confirmation of the agent's offered options. The scenario also feels disconnected from Hugo (static site generator) \u2014 no mention of shortcodes, templates, or anything Hugo-specific, making the domain context feel tacked on. Overall the exchange feels like a template demonstrating a review workflow rather than an actual user interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_167": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'we need to share it in standup today' is a realistic, casual business justification, and Turn 1 has a breezy, non-technical tone. Minor tell: the scenario feels slightly too clean and cooperative, and the domain context (Hugo) doesn't quite align with publishing to Medium, which a real user might have clarified or stumbled over. But the shorthand and urgency read authentically.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_168": {
+          "score": 3,
+          "reason": "Turn 1 has natural shorthand and implied context, but the overall exchange feels thin and slightly staged. 'Get Medium ready for this' is plausible but vague in a way that feels constructed to test agent clarification behavior. Turn 3 is appropriately terse, but the scenario lacks grounding detail a real Hugo user would likely provide (which content, what format goal). The agent's clarifying question is unusually well-structured for the ambiguity level, suggesting a scripted demo flow.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_169": {
+          "score": 3,
+          "reason": "The conversation is brief and somewhat natural in tone, but it's oddly context-free \u2014 no mention of which post, no specifics, and the scenario of using a Hugo-related tool to format for Medium feels underspecified. Turn 3 is a natural follow-up, but the whole exchange reads like a minimal template demonstrating a workflow rather than a real user session. Lacks personality, shorthand, or any grounding detail a real user would likely include.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_170": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull up' and 'what's actually written' are casual shorthand, and the scenario (checking a draft post) is realistic for a Hugo user. Turn 3 is a believable impatient follow-up. Minor tell: the agent's response in Turn 2 is unusually well-structured and offers a clean binary choice, which slightly elevates the overall polish beyond typical tool interactions.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_171": {
+          "score": 3,
+          "reason": "Turn 1 has natural urgency and vagueness ('right version' is realistic shorthand), but Turn 3 reads like a checklist response \u2014 directly addressing each agent question in order with clean, complete answers. Real users often miss one point or add a casual aside. The scenario is plausible but the back-and-forth feels slightly scripted, especially with no personality or friction in Turn 3.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_172": {
+          "score": 4,
+          "reason": "The conversation is brief and uses natural shorthand ('What's the reasoning' rather than 'Can you please explain the reasoning behind'), and Turn 3 is a clipped, realistic follow-up that doesn't over-explain. Minor tell: the agent's clarifying question in Turn 2 feels slightly templated, but the user responses feel genuine. Context is thin but plausible for someone reviewing AI-generated copy or content in a Hugo-related workflow.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_173": {
+          "score": 5,
+          "reason": "Extremely natural \u2014 terse commands, no over-explanation, uses shorthand ('intro stats' instead of 'the introductory statistics section'), and Turn 3 is a minimal confirmation that real users give. The back-and-forth feels like someone actually working in a Hugo content workflow.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_174": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'Check the CRISPR post and tell me what's going on with it' is casual and realistic shorthand, and Turn 3's 'Inspection, yeah' is a natural confirmation pattern. Minor tell: the SEO keyword is suspiciously clean and complete ('CRISPR gene editing' in quotes), which real users sometimes do but feels slightly deliberate here. Overall reads like a plausible content editor or blogger using a Hugo-integrated tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_175": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'what's hot' is casual shorthand, and the follow-up clarification in Turn 3 is realistic. The 90-day timeframe is slightly precise but plausible for someone who works in content/advocacy. Minor tell: the domain pivot from 'climate advocacy' to adding 'environmental justice' in Turn 3 feels slightly expanded rather than organically narrowed, but overall reads like a real content manager or comms person using an internal tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_176": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic iterative workflow for someone building a Hugo blog post. Turn 3 is a clean direct response. Minor tell: Turn 2's agent response is unusually well-structured for a mid-session tool, and the overall exchange feels slightly too clean/complete without any hesitation or messiness typical of real editing sessions.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_177": {
+          "score": 3,
+          "reason": "Turn 1 has natural shorthand ('my last breakout update' without over-explaining), but Turn 3 is extremely terse in a way that feels like a scripted response option rather than how someone would naturally reply \u2014 most users would add some qualifier or context. The scenario is plausible for a writing/notes tool like Hugo, but the exchange feels like a demo script illustrating a feature rather than organic conversation.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_178": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user has a clear, casual voice, uses shorthand ('dial it back'), and doesn't over-explain their intent. Turn 3 is a realistic impatient follow-up that skips the audit option. Minor tell: the setup is suspiciously clean and complete for a first message, and 'training log' in a Hugo context is a slightly specific but plausible blogging scenario. Overall reads like a real user who knows what they want.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_179": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, directive response with shorthand structure ('then timeline, then budget last') that feels like a real user giving quick editorial instructions. The opening request in Turn 1 is casual and realistic. Minor tell: the conversation is suspiciously clean and complete, with no ambiguity, typos, or back-and-forth friction you'd expect in real editing workflows. But overall reads like a plausible nonprofit/grant writer using a writing tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_180": {
+          "score": 5,
+          "reason": "Highly natural \u2014 Turn 1 drops straight into a task with no over-explanation, assumes shared context (West Coast dates, existing photo), Turn 3 uses casual shorthand ('stick the van breakdown photo in the intro') that feels like a real person who knows what they want. No robotic spelling-out of intent, personality comes through in the specificity of the photo detail.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_181": {
+          "score": 4,
+          "reason": "Conversation feels mostly natural \u2014 terse opener, practical follow-up, decisive response. Minor tell: Turn 3 is slightly too clean and explanatory ('The old structure won't work with the new data') for someone in a real editing flow, who might just say 'yeah rewrite it, structure doesn't fit.' Still plausible for a professional user.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_182": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'while you're at it' is casual shorthand, the sponsor context is realistic for a content creator using Hugo, and Turn 3 is a plausible organic follow-up. Slight tell: the setup is a bit clean and the context is conveniently complete, but the phrasing and flow read like a real user under deadline pressure.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_183": {
+          "score": 3,
+          "reason": "Turn 1 is natural and shorthand-y, but Turn 3 reads slightly templated \u2014 it mirrors the agent's exact framing ('calm and simple') a bit too cleanly. Real users might just say 'yeah just do the intro' or 'go ahead, keep it chill.' The scenario is plausible but the phrasing in Turn 3 feels like it was written to confirm options rather than how someone would naturally respond. Also unclear how Hugo fits \u2014 no content was actually shared, which is a mild contrivance signal.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_184": {
+          "score": 3,
+          "reason": "Turn 1 is terse and natural, but 'optimize' is vague in a way that feels slightly templated. Turn 3 is a reasonable follow-up with casual shorthand ('Just...for now'), which feels authentic. However, asking to format for WordPress in a Hugo-domain conversation is a mismatch that suggests the scenario may be synthetic or poorly constructed. The overall exchange is plausible but the domain inconsistency and the clean clarification arc feel slightly scripted.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_185": {
+          "score": 5,
+          "reason": "Extremely terse, task-oriented exchange with no over-explanation. 'Let's get the failover doc ready' is natural workplace shorthand, and 'Just publish it' is exactly how a real user responds when they trust the tool. No artificial context-setting or spelled-out intent.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_186": {
+          "score": 3,
+          "reason": "Turn 1 has natural vagueness ('feels off') and implicit reference to prior work, which is realistic. Turn 3 sounds somewhat natural with 'Load up' and 'model the section flow,' but the phrasing is a bit too crisp and directive \u2014 reads like someone writing how they imagine a power user talks rather than how they actually type. The scenario itself is plausible but the consistency of polish across turns is a mild tell. No typos, shorthand, or personality quirks anywhere.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_187": {
+          "score": 4,
+          "reason": "Turn 1 feels natural with casual phrasing ('quick check', 'like links and voice consistency'). Turn 3 is a realistic narrowing response with specific focus areas ('recap timeline and the ending') that feels like genuine user behavior. Minor tell: the context is slightly too clean and the user's requests pair suspiciously well with the agent's offered options, suggesting possible scripting, but overall reads naturally.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_188": {
+          "score": 4,
+          "reason": "Turn 3 is natural and terse \u2014 'where I drifted' feels like genuine self-awareness rather than scripted phrasing. The setup in Turn 1 assumes shared context (no explanation of what 'my last three' are) which feels realistic. Minor tell: Turn 1 is slightly too clean and purposeful for an opener, lacking the usual messiness of real user requests. Overall reads like a plausible power user but slightly too composed.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_189": {
+          "score": 2,
+          "reason": "The conversation is extremely terse and context-free in a way that feels contrived rather than natural. 'Get this ready for Shopify' with no referent ('this' refers to nothing established) reads like a placeholder prompt. The domain is Hugo (static site generator) but the conversation references Shopify, which is a mismatch that suggests a templated scenario. Turn 3 is natural enough, but the overall exchange lacks any realistic grounding \u2014 a real user would have some prior context, file reference, or more specific detail. Feels like a minimal template to test agent clarification behavior.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_190": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'beef up' is casual shorthand, Turn 3 has realistic confirmation phrasing ('yeah') and a reasonable follow-up constraint ('past year or two'). Minor tell: the request is suspiciously well-scoped for a first interaction with no prior context about what 'the liability post' is or where it lives, which a real user would likely clarify or assume the agent already knows.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_191": {
+          "score": 3,
+          "reason": "The scenario is plausible but has mixed signals. Turn 1 is natural and terse with a realistic dual-question format. However, Turn 3 is overly explicit and complete ('Publish it now on WordPress, no scheduling') \u2014 a real user would likely just say 'publish it now' or 'just publish it' since WordPress was already established as the platform. The phrasing reads slightly like a confirmation template covering all bases rather than natural follow-through.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_192": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'verify the voice before publishing' is realistic editorial thinking, and 'the rehab guide' uses shorthand like a real user referencing a known document. Minor tell: Turn 1 is slightly formal and complete for an opener, but overall the flow is plausible for someone using a Hugo content tool pre-publish.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_193": {
+          "score": 3,
+          "reason": "The conversation is short and somewhat natural in tone, but the context is oddly mismatched \u2014 the domain is Hugo (static site generator) yet the agent mentions WordPress, which feels inconsistent and contrived. Turn 1 is plausibly casual, but the overall scenario doesn't hang together realistically for someone actually using a Hugo-based workflow. Turn 3 is natural enough, but the setup feels templated.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_194": {
+          "score": 2,
+          "reason": "The scenario feels contrived \u2014 the agent's Turn 2 response mentions WordPress but the domain is Hugo, which is a static site generator with no 'draft status' UI in the same sense. The user's turns are terse and natural-sounding on the surface, but the setup feels templated: vague initial request, agent over-explains with a clarifying question, user confirms with minimal words. The mismatch between Hugo and WordPress is a tell that this was assembled without domain consistency. Turn 3 is plausible shorthand but the overall scenario lacks coherence for a real Hugo user.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_195": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull up anything useful' is casual shorthand, and Turn 3 is a realistic tightening of the request with a specific focus ('error budget policy'). Slight tell is that the follow-up is suspiciously clean and well-scoped, but the phrasing and flow are consistent with someone who uses this tool regularly for content work.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_196": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse requests, no over-explanation, and Turn 3 is a realistic redirect rather than a scripted follow-up. Minor tell: the context (Hugo engineering blog) is implied but never stated, which is slightly too clean. Overall reads like a real user who knows what they want.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_197": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse phrasing, shorthand ('Full review'), and a specific follow-up about reading time and links suggest a real user workflow. Minor tell: the initial question assumes shared context ('the Kubernetes draft') in a way that feels slightly staged, but this is plausible for someone actively working in Hugo with a draft article. No robotic over-explanation of intent.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_198": {
+          "score": 5,
+          "reason": "Feels genuinely natural \u2014 Turn 1 uses casual 'we've written' and vague timeframe, Turn 3 has a realistic mid-thought correction ('Actually just...'), approximate title recall ('I think that's'), and a practical reason for the choice. No over-explanation of intent, natural shorthand throughout, realistic workflow for someone using a meeting notes/docs tool like Hugo.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_199": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'sanity check' and 'I wanna see' are casual shorthand, and the request flow is realistic for a content creator using a publishing tool. Minor tell: Turn 2's agent response is suspiciously complete (knowing the exact post title and ID), which makes the setup feel slightly scaffolded, but the user turns themselves read authentically.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_200": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'drawing a blank' is casual phrasing, and 'just discuss it' is a terse, realistic response. However, the context is thin (what is 'hugo' here? a project? the static site generator?), and the agent's Turn 2 response offering a binary choice feels slightly templated, which a real user might push back on more organically. Overall reads like a plausible real interaction with minor polish.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_201": {
+          "score": 5,
+          "reason": "Highly natural \u2014 terse, task-oriented phrasing ('Show me what I wrote'), no over-explanation of intent, and Turn 3 is a realistic clarifying narrowdown with a specific date rather than a scripted elaboration. Feels like someone actually using a notes/meeting tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_202": {
+          "score": 4,
+          "reason": "Turn 1 is naturally vague and casual, and Turn 3 has realistic shorthand ('Yeah restructure it') with a practical follow-up instruction. Minor tell: 'Load the full post so you can see how it fits with the rest' is slightly explicit about intent in a way that feels mildly coached, but overall the flow and tone feel like a real user working iteratively on a Hugo blog post.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_203": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 casual shorthand ('spin up something', 'get it into the draft'), implicit shared context about 'our onboarding posts', and a realistic content workflow scenario. Turn 3 is a clean, directive follow-up that fits the flow. Minor tell: it's slightly too tidy and purposeful, like a demo scenario, but the register and brevity are authentic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_204": {
+          "score": 5,
+          "reason": "Turn 3 is highly natural \u2014 'way too scrappy for a bank' is idiomatic, opinionated shorthand that a real user would say. They don't re-explain context, use casual phrasing, and push back on the agent's over-clarification with a focused correction. No robotic spelling-out of intent.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_205": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, no over-explanation of intent, and the follow-up in Turn 3 is a realistic short confirmation. Minor tell: the agent's response is unusually well-scoped ('self-attention section') without the user specifying it, suggesting possible scripting, but the user turns themselves read authentically.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_206": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, focused follow-up that uses shorthand ('stack up') and doesn't over-explain \u2014 feels like a real user refining their request. The initial ask in Turn 1 is slightly vague in a realistic way. Minor tell: the scenario is a bit polished and the user's intent is unusually clear across both turns without any ambiguity or messiness typical of real users.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_207": {
+          "score": 4,
+          "reason": "Turn 1 feels natural and casual with 'anything I wrote' phrasing. Turn 3 is a reasonable expansion of the request but reads slightly like a search query specification \u2014 a real user might say 'yeah search it, anything about mortgages or first-time buyer stuff' rather than listing three clean categories. Overall feels mostly natural for a content creator using an archive tool, minor polish tells.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_208": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the user is terse, uses shorthand ('the Superposition one'), and takes control of the task rather than deferring to the agent. Turn 3 is a realistic pushback that feels human. Minor tell: Turn 1 is slightly ambiguous about what 'this' refers to, which could be natural but also reads like a prompt designed to test agent clarification behavior. Overall the brevity and self-directed comparison approach rings true.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_209": {
+          "score": 5,
+          "reason": "Highly natural \u2014 starts mid-thought with a correction ('Wait, no, that's not right'), uses casual shorthand ('Just explain'), and references a specific prior action ('what you did with the scheduling') without over-explaining. Feels like a real user reacting in the moment, not scripted.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_210": {
+          "score": 4,
+          "reason": "Turn 3 is natural and direct with a real opinion ('not just word swaps'), and the shorthand feels genuine. Turn 1 lacks context about what document/site they're working on, which is slightly suspicious \u2014 a real user might reference the file or page. The agent's response naming specific sections ('How It Works', 'Architecture Overview') implies prior context not shown, which feels slightly staged. Overall reads mostly natural with minor tells of a constructed scenario.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_211": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'syndicate it' is realistic shorthand, the follow-up is direct and task-focused without over-explaining. Minor tell: the agent conveniently listed exactly the right platforms and the user's response flows a bit too cleanly into confirming both. But the casual tone, use of 'Yeah,' and implied context ('mission post') suggest a real working relationship with the tool.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_212": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, realistic back-and-forth, no over-explanation of intent. 'Sounds like my other posts' is a natural way a real user would phrase it. The agent's clarifying question and the user's short response feel authentic. Minor tell: the scenario is almost too clean and minimal, like a curated example, but nothing definitively synthetic.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_213": {
+          "score": 4,
+          "reason": "Turn 3 is natural and terse \u2014 a real user responding efficiently. Turn 1 feels authentic with the implicit 'recent posts' reference. Minor tell: no draft or posts are actually shared, which is slightly odd but could reflect a tool with file context already loaded. Overall reads like a real interaction with minor polish.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_214": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'doubling up' is casual shorthand, the request is practical and context-aware. Minor tell: the setup is suspiciously clean (agent offers a perfect binary choice, user responds ideally). Real users might be less tidy, but the language and logic feel genuine enough for someone using an AI writing/SEO assistant for Hugo content.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_215": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 the user pushes back on the agent's offer and expresses a genuine preference for process over output, which is realistic behavior. The shorthand 'Let's just talk it through' and the reasoning 'before we write anything' sounds like an actual person who's been burned by jumping ahead too fast. Minor tell: Turn 1 lacks any context about what the keynote is or who it's for, which could read as slightly stripped-down for a synthetic example, but could also just be mid-conversation context. Overall feels like a plausible real user interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_216": {
+          "score": 4,
+          "reason": "The casual dismissiveness in Turn 1 ('Whatever, just push') and the shorthand follow-up in Turn 3 feel natural and personality-driven. Minor tell: the agent's clarifying question is oddly specific about 'platforms to promote,' which feels slightly scaffolded, but the user's responses read like a real person in a hurry. Hugo context is plausible for a blogger managing content.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_217": {
+          "score": 2,
+          "reason": "The conversation is oddly mismatched with the domain context (Hugo, a static site generator) \u2014 the agent responds about WordPress draft status, which is incongruent. Turn 1 is vague in a way that could seem natural, but Turn 3 is a clean, scripted-feeling response to a binary choice the agent presented. The exchange feels like a template demonstrating a tool's capabilities rather than a real user workflow. No personality, shorthand, or realistic Hugo-specific context (e.g., mentioning hugo server, a specific content file, or deployment pipeline).",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_218": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'pull up,' 'look it over,' 'goes live' are casual shorthand, and Turn 3 is a realistic, slightly impatient redirect. Minor tell: the scenario is suspiciously clean and the agent's response in Turn 2 is unusually well-structured, suggesting a scripted demo flow rather than organic interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_219": {
+          "score": 5,
+          "reason": "Turn 3 is a natural, slightly informal response ('still like me') that directly mirrors the agent's framing without over-explaining. The user doesn't spell out their full intent robotically \u2014 they use shorthand and express a personality preference casually. The scenario (editing a lifestyle/fashion blog post) is realistic for this kind of tool use, and the back-and-forth feels like a genuine collaborative exchange rather than a scripted prompt sequence.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_220": {
+          "score": 3,
+          "reason": "The exchange is plausible but feels like a test case for a settings/preference feature. Turn 1 is oddly declarative without context (why mention it unprompted?), and Turn 3 is a clean rejection that conveniently exercises the 'don't save' branch. Real users would more likely say 'just for this one' or ask a question rather than a bare refusal. Not robotic, but reads like a scripted feature demo.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_221": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, no over-explanation, realistic back-and-forth for a dev workflow. 'Just verify the tags include Production' is a plausible real follow-up. Minor tell: the initial request is slightly vague in a way that feels like a setup for the agent's clarifying question, but overall the shorthand and tone fit a real user managing a Hugo changelog.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_222": {
+          "score": 5,
+          "reason": "Highly natural \u2014 user references a specific prior piece without over-explaining it, uses casual shorthand ('Just the audit first'), and shows realistic editorial caution ('before touching anything'). The workflow logic (audit before rewrite) feels like genuine professional instinct, not a scripted prompt. No robotic spelling-out of intent.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_223": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'angles first' is casual shorthand, the scenario (grant writing + volunteer scaling) is specific and plausible, and Turn 3 is a realistic follow-up rather than a scripted pivot. Minor tell: the request to 'pull a few examples from similar grant + volunteer growth posts' is slightly polished/complete for casual speech, but not implausibly so. Overall reads like a real nonprofit or program coordinator using the tool for actual work.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_225": {
+          "score": 5,
+          "reason": "Terse, task-oriented language with no over-explanation. 'Get it live before the campaign kicks off' is natural shorthand. Turn 3 echoes the agent's framing loosely ('tomorrow morning' vs 'tomorrow at 7 AM') without being robotic or overly precise. Realistic scenario for a content/marketing user managing Hugo posts.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_226": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 casual 'Yeah', shorthand phrasing, and a clear preference expressed without over-explaining. The scenario (blogger using a tool to mine their own notes) is realistic for a Hugo site owner. Minor tell: Turn 1 is slightly polished for someone just casually asking, but overall the voice is consistent and human-feeling.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "anthropic"
+        },
+        "hugo_227": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'Yeah, go ahead' is casual and realistic, and Turn 3 uses reasonable shorthand ('back it with one solid source'). However, the context is suspiciously clean and complete for a mid-conversation exchange, and Turn 3 is almost too well-structured in specifying exactly two clear tasks. Minor tells of a scripted scenario, but overall reads like a plausible real user interaction.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openai"
+        },
+        "hugo_228": {
+          "score": 3,
+          "reason": "The shorthand and terse replies feel natural ('Just explain the layout logic'), but the opening 'What's the thinking on the timeline?' is oddly vague with no prior context established \u2014 a real user would likely have more grounding. The exchange is minimal enough to seem real but lacks any domain-specific Hugo details (templates, archetypes, front matter) that would anchor it as genuine.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_229": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user is concise, uses 'please' casually, and the follow-up in Turn 3 directly addresses the agent's clarifying question without over-explaining. Minor tell: the request is suspiciously clean and complete, with no typos, hesitation, or domain-specific Hugo context (e.g., no mention of front matter, shortcodes, or specific post names), which a real Hugo user would likely reference.",
+          "source": "synth",
+          "category": "ambiguous_first",
+          "model": "openrouter"
+        },
+        "hugo_230": {
+          "score": 2,
+          "reason": "The conversation reads like a template for demonstrating document editing capabilities. Turn 1 is oddly formal ('Pull up the current draft') and Turn 3 is suspiciously complete and well-structured \u2014 a real user would likely be more fragmented, use shorthand, or reference specific content. The scenario also doesn't connect naturally to Hugo (static site generator), suggesting a generic document editing demo dressed up with domain context. No personality, typos, or natural hesitation anywhere.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_231": {
+          "score": 3,
+          "reason": "Turn 1 and 2 feel natural enough, but Turn 3 is a suspicious combo \u2014 drafting content AND deleting a section in one message feels like a constructed test case to evaluate multi-action handling rather than organic user behavior. Real users typically separate content creation from destructive actions, and 'delete my old Tooling Overview section' is oddly specific and consequential to bundle casually into a follow-up. The phrasing is clean but not overly robotic, landing in mixed territory.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_232": {
+          "score": 5,
+          "reason": "Turn 1 uses natural shorthand ('10k draft'), Turn 3 pivots organically with a compound request that feels like real mid-task thinking \u2014 'No, actually do this other thing' is classic user behavior. No over-explanation of intent, uses casual phrasing like 'brainstorm a few hooks.' The scenario (runner working on a training document) is realistic and specific without being suspiciously complete.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_233": {
+          "score": 2,
+          "reason": "The conversation feels contrived and template-like. Turn 1 is oddly formal and complete ('status and metadata on the password rotation policy draft') \u2014 real users rarely speak this precisely. The agent's response mentions WordPress, but the domain context is Hugo, which is a mismatch suggesting a generic script. Turn 3 is a clean, well-structured follow-up that reads like a scripted next step rather than a natural reaction. No shorthand, no personality, no hesitation or clarification \u2014 just perfectly sequenced task instructions. The scenario itself (managing a policy doc draft) is plausible, but the execution feels like a demo script.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_234": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with realistic pre-edit workflow concern. Turn 3 is where it gets suspicious \u2014 it's a compound request that conveniently bundles two distinct tasks ('add new section' + 'update existing sections') with a vague reference to 'reader feedback we got last week' that feels like injected context rather than organic recall. Real users tend to either be more specific about the feedback or ask these as separate follow-ups. The phrasing 'feel more practical' is slightly polished but not unnatural. Mixed signals overall.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_235": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 it bundles multiple related asks in a casual, shorthand way ('grab a few solid outline angles') without over-explaining intent. The scenario is realistic for a content creator using a Hugo-based blog management tool. Minor tell: the requests are suspiciously well-scoped and complete for a single follow-up, but the phrasing and tone feel like a real user who knows what they want.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_236": {
+          "score": 5,
+          "reason": "Terse, task-focused commands with no over-explanation. 'staging post' and 'seller tips tag' feel like real internal jargon. Turn 3 is a natural follow-up that assumes context from Turn 2 rather than restating it. The scheduling detail (next Tuesday 9am) is specific in a realistic way, not formulaic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_237": {
+          "score": 3,
+          "reason": "Turn 1 is casual and natural, but Turn 3 feels slightly scripted \u2014 a real user would likely just say 'publish the Playbook one' without asking the AI to justify its own selection, especially since the user is making the choice. The 'explain why you think it's the best choice' phrasing reads like a prompt designed to elicit reasoning, not something a typical user would ask when they've already decided. Context is plausible for Hugo (document publishing), but the combination of tasks in Turn 3 feels constructed.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_238": {
+          "score": 2,
+          "reason": "Turn 3 is a giveaway \u2014 it's a suspiciously complete, multi-part instruction that reads like a test prompt rather than a natural follow-up. A real user would likely ask for one thing at a time or use more casual shorthand. Also, the request to 'format for Confluence' contradicts Turn 1 which said it's going into the engineering blog (Hugo context), suggesting the scenario wasn't carefully constructed. No personality, contractions, or natural hesitation throughout.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_239": {
+          "score": 2,
+          "reason": "Turn 3 is a red flag \u2014 it's a double-barreled, suspiciously complete request that combines two distinct tasks (checking live status on WordPress and pulling recent edits) in a way that feels like a test case covering multiple features rather than natural user behavior. Also, the user is working in Hugo but asks about WordPress, which is an odd mismatch that feels scripted rather than a genuine slip. The phrasing is clean and explicit throughout with no shorthand, hesitation, or personality. The scenario itself (enterprise IT draft) is plausible, but the dialogue reads like a template designed to probe tool capabilities.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_240": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 uses shorthand ('the second one'), combines two requests casually, and doesn't over-explain. Minor tell is that the conversation is suspiciously clean and purposeful, but the phrasing and implicit reference to prior context reads like a real user mid-workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_241": {
+          "score": 2,
+          "reason": "Turn 1 asks about 'blog layout' but agent responds about WordPress with no prior context establishing that platform \u2014 feels scripted. Turn 3 is a classic 'while you're at it' multi-task pivot that reads like a template designed to test tool chaining rather than natural user behavior. No shorthand, typos, or personality; everything is cleanly spelled out. Also, the domain is tagged as Hugo but the agent mentions WordPress, adding to the contrived feel.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_242": {
+          "score": 3,
+          "reason": "Turn 1 feels natural \u2014 vague, task-oriented, realistic. But Turn 3 is a tell: 'Can you explain why you picked X and also do Y while you're at it' is a classic synthetic multi-task combo prompt. Real users tend to either ask for the explanation OR the formatting fix, not both in one polished compound request. Also, no shorthand, contractions are present but the phrasing is suspiciously complete and structured. The Hugo domain context doesn't really surface in the conversation either, which feels like an unused label.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_243": {
+          "score": 3,
+          "reason": "Turn 1 feels natural and casual ('pull a few past posts we have'), but Turn 3 is suspiciously complete and task-dense \u2014 it bundles three distinct requests (transform bullet notes, write funder-ready section, format for WordPress) in a way that reads more like a prompt template than a natural follow-up. A real user would likely reference the bullet notes more vaguely or ask about one thing at a time. The domain (nonprofit comms/Hugo) is plausible, but the pivot in Turn 3 feels scripted rather than conversational.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_244": {
+          "score": 5,
+          "reason": "Highly natural \u2014 terse, task-oriented shorthand ('Strip the internal IPs'), assumes shared context without over-explaining, realistic workflow for someone managing a Hugo blog with Dev.to publishing. Turn 3 is a genuine follow-up that builds logically on Turn 2 without restating unnecessary context. No formulaic phrasing or template-like structure.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_245": {
+          "score": 3,
+          "reason": "Turn 3 is reasonably natural with casual shorthand ('Yeah', 'find me'), but the overall scenario feels slightly contrived \u2014 asking an AI which part of a document 'needs the most work' without providing the document is an odd framing that suggests a synthetic setup. The follow-up is plausible but the initial prompt reads like a template testing agent capabilities rather than a real user workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_246": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 'yeah, let's talk about' and 'drop a new section' are casual shorthand consistent with a real user. The scenario is plausible for a content manager using a Hugo-integrated tool. Minor tell: the initial request in Turn 1 is slightly polished and purpose-complete, but not unusually so. Overall reads like a real professional with a genuine task.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_247": {
+          "score": 2,
+          "reason": "Turn 3 is overly packed with distinct actions (ignore suggestion + schedule + specific platform + specific time + timezone) in a way that reads like a test case covering multiple parameters rather than natural user behavior. Real users typically separate concerns or use shorthand. The scenario is plausible for Hugo/WordPress workflows but the phrasing is suspiciously complete and instruction-like, spelling out every detail without personality or hesitation.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_248": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, slightly chaotic follow-up that feels realistic \u2014 pivoting mid-task, checking a live platform, and giving vague editorial direction ('much vaguer') all feel human. The shorthand and lack of over-explanation are good signs. Minor tell: Turn 1 is slightly polished/imperative in a way that feels prompt-engineered, but overall the sequence reads like a real content/product person using an AI assistant.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_249": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, efficient follow-up that combines two tasks with shorthand ('rework' instead of 'please rewrite') and selectively picks from the agent's suggestions rather than accepting all \u2014 realistic behavior. Minor tell: the setup is suspiciously clean and the context (Hugo blog post) is implied but never awkwardly over-explained. Overall reads like a real user but slightly too tidy.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_250": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the urgency in Turn 3 ('press release goes out in an hour') adds realistic pressure and personality, and the shorthand 'push it live right now' sounds like a real user. Minor tells: the post title in Turn 2 is suspiciously polished/complete, and the scenario is almost too cinematically timed, but overall the flow and tone read like someone actually using a content management tool under deadline.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_251": {
+          "score": 3,
+          "reason": "Turn 1 is natural and terse, but Turn 3 packs in multiple distinct tasks (tone/structure comparison + formatting/tags check on a specific draft) in a way that feels slightly scripted \u2014 real users tend to either ask these separately or phrase them more casually. The draft ID 'post_482' is plausible but also feels like a placeholder. No real personality or shorthand beyond the brevity, and the requests are suspiciously complete and well-scoped for a single follow-up.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_252": {
+          "score": 4,
+          "reason": "Turn 3 is a natural pivot that feels like a real user changing their mind mid-task, and the shorthand ('this one') is realistic. However, the request is suspiciously well-formed and complete \u2014 a real user might be vaguer or messier. The scenario (using Hugo to draft book reviews, referencing past published content for style matching) is plausible but slightly too polished to be fully convincing.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_253": {
+          "score": 2,
+          "reason": "Turn 3 is a jarring pivot \u2014 asking about SEO keywords then suddenly requesting content cuts and WordPress formatting feels scripted and disconnected. No natural continuity or personality between turns. Also, the domain context says Hugo but the user asks for WordPress formatting, which adds to the contrived feel. Real users would show more conversational continuity and context.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_254": {
+          "score": 2,
+          "reason": "Turn 3 is a red flag \u2014 asking to 'check WordPress is connected and healthy' and 'show how the post will look' in the same breath is overly convenient and reads like a scripted demo of tool capabilities. Also, the domain context says Hugo (a static site generator), but the user mentions WordPress, which is an odd mismatch suggesting this was templated without careful domain alignment. Turn 1 is reasonably natural, but the overall flow feels like it's showcasing features rather than reflecting genuine user behavior.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_255": {
+          "score": 2,
+          "reason": "Turn 3 is a classic synthetic tell \u2014 it ignores the agent's direct question entirely and pivots to unrelated instructions (LinkedIn formatting + scheduling), packing in multiple distinct directives in one breath. Real users typically answer the question asked before adding new requests. The conversation also doesn't match the domain context (Hugo, a static site generator) \u2014 it references WordPress and LinkedIn syndication, suggesting a templated scenario dropped into the wrong domain. The phrasing is suspiciously complete and task-list-like rather than conversational.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_256": {
+          "score": 2,
+          "reason": "Turn 3 is a scripted pivot that combines two unrelated requests (content approval + UI preview) in a way that feels templated. The user spells everything out explicitly with no natural shorthand or personality. The scenario also doesn't fit Hugo (static site generator) \u2014 'mobile dashboard preview' isn't a Hugo workflow, suggesting this was written without domain knowledge. No realistic Hugo user would ask to preview content on a 'mobile dashboard.'",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_257": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user speaks in shorthand ('Let me see'), doesn't over-explain their role or intent, and Turn 3 is a realistic follow-up that builds on the agent's feedback rather than being pre-scripted. Minor tells: the request in Turn 3 is unusually well-structured and complete for a casual user, hitting two distinct asks cleanly. The CISO/executive framing is plausible for a Hugo-based content workflow but feels slightly polished.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_258": {
+          "score": 3,
+          "reason": "The urgency in Turn 1 feels somewhat natural, but Turn 3 is suspiciously convenient \u2014 it bundles two distinct actions (schedule + publish simultaneously) in a way that feels like it's designed to test multi-step tool use rather than reflect how a real user would think. A real user would likely ask about scheduling OR publishing, not both at once in such a clean compound request. Also, 'go ahead and publish it to WordPress now' while also scheduling for Monday is logically contradictory, which a real user might catch or clarify \u2014 the lack of confusion about this tension feels scripted.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_259": {
+          "score": 2,
+          "reason": "Turn 3 is a classic synthetic tell \u2014 it completely ignores the agent's clarifying question and pivots to unrelated tasks (scheduling, grammar pass), which reads like a scripted multi-task prompt rather than a natural response. A real user would likely answer the per-section question first. The requests are also oddly complete and cover distinct tool categories in one breath. The Hugo domain context is also undermined by mentioning WordPress scheduling, suggesting the scenario wasn't carefully constructed.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_260": {
+          "score": 3,
+          "reason": "Turn 1 and the pivot in Turn 3 feel somewhat natural, but Turn 3 is suspiciously multi-part \u2014 a real user might split these into separate messages or be less tidy about combining a scheduling change with a new content request. The scenario is plausible but the phrasing is a bit too complete and efficient, lacking the messiness of real user behavior.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_261": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'Love #4' is genuine shorthand, and the follow-up request flows organically. However, 'save that as my default cozy vibe' is a slightly contrived framing that sounds like it's demonstrating a memory/preference feature rather than how a real user would naturally phrase it. The overall flow is casual and the domain context (Hugo) doesn't obviously connect to book themes, which adds a mild synthetic feel.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_262": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with a casual, personal tone. But Turn 3 is suspiciously multi-part and polished \u2014 a real user would likely ask one thing at a time or phrase it more loosely. The phrase 'pull together a solid outline with word counts based on how other illustrators write about this' reads like a prompt template combining multiple distinct requests. Also, 'clean up any grammar issues in what I have so far' is odd since there's almost no content yet \u2014 a minor logical inconsistency that suggests scripted construction rather than genuine use.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_263": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with shorthand like 'my gentrification draft' and implicit context. Turn 3 is where it gets suspicious \u2014 combining scheduling and style audit in one tidy request feels like a scripted multi-task prompt rather than organic follow-up. A real user would more likely ask these separately or with more friction. The agent's Turn 2 response is also suspiciously polished and complete, suggesting a curated demo exchange rather than live interaction.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_264": {
+          "score": 2,
+          "reason": "Turn 3 is a jarring non-sequitur \u2014 it shifts from researching external nonprofits to editing an 'operations section' with no bridging context, suggesting these are stitched-together prompts rather than a continuous conversation. The domain tag 'hugo' (static site generator) also doesn't align naturally with nonprofit food security research. The phrasing is overly task-explicit and reads like a template demonstrating different tool capabilities rather than a real user workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_265": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 the callback to 'last year's zoo trip post' adds realistic context that a real content creator would mention, and 'flesh that out' is natural shorthand. The flow feels like someone actually working on content. Minor tell: the request is slightly too well-structured (two clear asks neatly combined), but overall reads like a real user managing a content calendar in Hugo.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_266": {
+          "score": 5,
+          "reason": "Turn 3 is the tell \u2014 'undo that last publish I just did' is reactive, mid-workflow thinking, not scripted. The pivot ('actually') and dual request feel like genuine multitasking. No over-explanation of intent, uses natural shorthand, and the scenario (migrating content between platforms while managing live state) is realistic for a Hugo blogger.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_267": {
+          "score": 2,
+          "reason": "Turn 3 is a scripted pivot that bundles two distinct requests (WordPress preview + tone analysis) in a way that feels like a test case covering multiple features. The scenario also doesn't fit Hugo's domain well \u2014 Hugo is a static site generator, not WordPress, making the WordPress reference feel like a generic/templated prompt not tailored to the actual tool. The user language is reasonably casual but the requests are suspiciously complete and convenient.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_268": {
+          "score": 4,
+          "reason": "The pivot in Turn 3 feels natural and somewhat impulsive, like a real user changing their mind mid-task. Shorthand like 'Pull up' and 'just check' adds authenticity. Minor tell: the scenario is a bit too clean and the agent's response in Turn 2 is suspiciously complete, but the user side reads mostly natural.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_269": {
+          "score": 3,
+          "reason": "The scenario is plausible but the conversation feels slightly scripted. Turn 1 is natural enough, but Turn 3 combines two distinct requests ('show preview' + 'suggest angle') in a way that feels like a test case covering multiple features rather than organic user behavior. Real users tend to ask one thing at a time or use more casual shorthand. No personality, typos, or hesitation markers present.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_270": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, realistic follow-up request that combines two related concerns in one message, which feels authentic. The user uses shorthand ('the whole thing') and doesn't over-explain. Minor tell: the scenario is suspiciously clean and progressive, like a demo flow, but the language itself is casual and believable for someone actually using a writing tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_271": {
+          "score": 3,
+          "reason": "Turn 1 and 2 are plausible but slightly formal. Turn 3 is more natural with 'drop that reordering suggestion' shorthand, but the combination of two distinct requests in one turn feels slightly scripted. The domain mismatch (Hugo vs WordPress) is also a tell \u2014 a real Hugo user likely wouldn't be scheduling WordPress publishes. Overall mixed signals.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_272": {
+          "score": 4,
+          "reason": "Turn 3 is a natural multi-part follow-up that combines an edit request with a redirect to another platform \u2014 realistic behavior for someone managing content across channels. The shorthand ('Add a disclaimer... and check') feels genuine. Minor tell: the context is suspiciously complete and tidy, and 'tax loss harvesting guide' is a very specific, polished topic name. Overall reads like a real user but slightly too clean.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_273": {
+          "score": 4,
+          "reason": "Feels mostly natural\u2014Turn 3 is a realistic last-minute change of mind that real users make, and the shorthand ('cancel the publish') reads authentically. Minor tell: Turn 1 is slightly too complete and directive for a casual user, reads a bit like a checklist prompt. Overall plausible workflow for someone managing Hugo content.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_274": {
+          "score": 2,
+          "reason": "Turn 3 is a jarring pivot that feels scripted \u2014 it introduces 'this post' and 'my previous architecture write-up' as if referencing documents that were never shared, which is a common synthetic tell where context is implied but not grounded. The domain tag 'hugo' (static site generator) doesn't connect naturally to the conversation flow either. The user language is reasonably casual but the scenario feels constructed to test multi-task or comparison capabilities rather than reflecting genuine usage.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_275": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 the user pivots to an editorial preference without over-explaining, uses casual shorthand ('less choppy'), and the request feels like something a real content creator would toss in as an afterthought. Minor tell: the domain context says 'hugo' but the conversation references WordPress, which is a slight inconsistency. Overall the tone and shorthand read as genuine, not templated.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_276": {
+          "score": 4,
+          "reason": "The conversation flows naturally with realistic shorthand and a plausible Hugo content workflow. Turn 3 is a genuine-feeling compound request that a real user might make. Minor tells: the context is suspiciously complete and tidy, and the phrasing is slightly too clean/polished for a typical user, but overall it reads like someone actually working on a historical content site.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_277": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic editorial workflow. Turn 3 is a plausible follow-up combining two related tasks. Minor tell: the two requests in Turn 3 are suspiciously clean and complete, but shorthand usage and lack of filler language keep it feeling authentic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_278": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual shorthand ('push something new'), but Turn 3 is a classic multi-task editing request that reads like a template prompt ('tighten up the structure,' 'clean up the grammar,' 'weak phrasing throughout'). The pivot from gap analysis to editing also feels slightly disconnected \u2014 a real user might reference the specific content being edited. The Hugo domain context is plausible but the conversation lacks any site-specific details or personality that would ground it further.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_279": {
+          "score": 4,
+          "reason": "Turn 3 is a natural compound request that feels like a real user multitasking \u2014 'punchy hooks' is casual shorthand and the structural note is practical. Minor tell: the initial request is slightly polished ('keep it practical' reads like a prompt-writer's flourish), but overall the shorthand and task-chaining feel authentic for someone using a content drafting tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_280": {
+          "score": 2,
+          "reason": "Turn 3 is a red flag \u2014 it's a two-part command that combines unrelated tasks (title brainstorming + Medium layout preview) in a single, suspiciously complete sentence. Real users typically issue one request at a time or use fragmented, conversational phrasing. The pivot from WordPress to Medium without explanation feels scripted. Also, 'broader audience' is an oddly polished qualifier. The scenario itself is plausible, but the phrasing reads like a template designed to test multi-tool agent capabilities rather than genuine user behavior.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_281": {
+          "score": 4,
+          "reason": "Reasonably natural \u2014 'our post' and terse Turn 3 feel like a real user, and the LinkedIn formatting request is plausible. Minor tells: the instruction to 'default to enterprise focus' is slightly meta/explicit in a way that feels like a prompted behavior test, and the overall arc is suspiciously clean and complete for a short exchange. Hugo domain context seems incidental/irrelevant to the conversation, which is a mild red flag.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_282": {
+          "score": 3,
+          "reason": "Turn 1 feels natural \u2014 specific, shorthand, realistic CMS status check. Turn 3 is where it gets contrived: it combines two distinct requests (create a draft + explain a past failure) in a single overly structured sentence, and references 'the rewrite' and 'aspirational tone' with no prior context established in the conversation. A real user would likely reference the rewrite more casually or in a separate message. The phrasing 'tell me exactly why' and 'so I don't run into this again' reads like a scripted instructional prompt rather than natural follow-up. Also, the domain context says 'hugo' but the conversation is about WordPress, a minor inconsistency suggesting synthetic construction.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_283": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural with casual phrasing like 'punch up' and 'feel more energetic,' but the request is suspiciously complete and well-structured for a follow-up \u2014 real users often fragment these into separate asks or are less precise. The scenario is plausible for a content tool like Hugo, and there's some personality, but it reads slightly too polished.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_284": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'K8s' shorthand, casual phrasing, and a realistic editorial workflow scenario. Turn 3 is a plausible follow-up that combines two tasks organically rather than scripting them separately. Minor tell: the request is suspiciously well-scoped and complete for a single turn, and the scenario feels slightly constructed to demonstrate multi-step agent capability. But overall reads like a real content/devrel person using a Hugo-integrated tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_285": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 uses shorthand ('voter reg posts'), references 'our' content implying organizational context, and builds logically on Turn 2 rather than restating everything. Minor tell: the request is suspiciously complete and actionable, combining two specific elements cleanly. No real personality or hesitation, but the domain-specific shorthand and workflow continuity feel plausible for a content strategist using a Hugo-based CMS tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_286": {
+          "score": 4,
+          "reason": "Turn 1 and 3 feel mostly natural \u2014 casual phrasing, shorthand ('flesh out', 'figure out where'), realistic workflow for a content creator using Hugo. Turn 3's dual goal (write + distribute) is slightly convenient but not unnatural. Minor tell: the scenario is suspiciously complete and tidy, but the language itself reads like a real user.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_287": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 terse commands, no over-explanation, realistic editorial workflow. Turn 3 is a plausible follow-up combining two tasks in one breath, which real users do. Minor tell: 'tell me what you changed in that intro' is slightly more explicit than a truly casual user might be, but overall the shorthand and domain specificity (fintech compliance, compliance-first framing) feel authentic rather than templated.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_288": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 'while you're at it' is a realistic casual phrase, and the follow-up logically builds on the agent's response. However, the scenario is slightly polished: the user's requests are unusually well-scoped and sequential, and 'tighten it up' paired with a grammar fix is a suspiciously complete editing instruction. Minor tells of a constructed demo, but not robotic.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_289": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'throw in some visuals' and 'give me a couple' are casual shorthand, and the follow-up builds logically on Turn 2. Minor tell: the request is suspiciously complete and well-structured (outlines + word counts + visuals in one shot), which feels slightly like a scripted prompt designed to test multiple features at once. But the tone and phrasing are plausible for a content creator using an AI writing tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_290": {
+          "score": 4,
+          "reason": "Turn 3 is a natural, efficient multi-task request that feels like a real user combining two things in one message \u2014 common behavior. The initial query uses 'we' suggesting an editorial/content team context, which is realistic. Minor tell: the scenario is suspiciously well-structured with a clear content gap identified, but the shorthand and task-combining in Turn 3 feel genuine. Overall reads like a content manager or medical editor using a CMS/content tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_291": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 the specific project name 'Kijiji Ridge' adds authenticity, Turn 3 uses casual shorthand ('Cool') and combines two tasks in a realistic way. Minor tell: the request is suspiciously complete and well-structured for a follow-up, and 'pull the post metadata so we can format it for WordPress' is slightly more explicit about intent than a real user might be, but overall reads like a plausible content creator or researcher workflow.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_292": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 terse commands, realistic back-and-forth, and Turn 3 is a plausible follow-up from someone who wants to verify before committing. Minor tell: Turn 3 is slightly too well-structured ('explain exactly... and give me a preview') for a casual user, who might just say 'what did you change?' or 'show me first.' Overall reads like a real user but slightly polished.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_293": {
+          "score": 4,
+          "reason": "Turn 3 feels mostly natural \u2014 'make sure this doesn't sound too corporate' is a realistic, personality-driven concern, and checking for similar past content is a plausible follow-up. Minor tell: the request is slightly too clean and complete for a real user who might say 'also check if i wrote smth like this before' rather than a well-structured compound instruction. Overall reads like a real startup founder using a writing tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_294": {
+          "score": 5,
+          "reason": "Turn 3 is the key tell \u2014 it's a natural multitasking request with casual shorthand ('herbs post'), assumes shared context, and combines two unrelated tasks in one breath exactly like a real user would. No over-explanation of intent, realistic content workflow scenario for a blogger using Hugo.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_295": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 Turn 1 uses casual shorthand and a realistic checklist request, and Turn 3 is a plausible follow-up that adds scope organically. Minor tell: the requests are suspiciously complete and well-structured for a chat message, and 'topic gaps' is a slightly polished/marketing-speak phrase. Overall reads like a real content creator but a touch too tidy.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_296": {
+          "score": 3,
+          "reason": "Turn 1 feels natural for someone doing a real content audit, but Turn 3 is overly explicit and instruction-complete \u2014 a real user would more likely say something like 'ok fix the transitions and let's make everything punchy going forward' rather than articulating two distinct directives so cleanly. No real shorthand or personality markers, reads slightly like a template demonstrating multi-instruction handling.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_297": {
+          "score": 4,
+          "reason": "Reads mostly natural \u2014 'kiln mishap post' implies real context, shorthand like 'customer version preview' feels organic, and the workflow (outline \u2192 preview \u2192 tone tweak) mirrors how someone actually iterates on content. Minor tell: the three-category request in Turn 1 is slightly structured, but not implausibly so for a content-savvy user. Overall feels like a real blogger or small ceramics business owner using an AI writing tool.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_298": {
+          "score": 4,
+          "reason": "Turn 3 feels natural \u2014 the user combines two requests casually ('sitting around' is colloquial, not robotic), uses shorthand ('this one' instead of restating the full title), and the follow-up is a realistic next step. Minor tell: the context is suspiciously clean and the requests are well-scoped, but overall reads like a real content creator using a writing assistant.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_299": {
+          "score": 2,
+          "reason": "Turn 3 is suspiciously compound and pre-planned \u2014 a real user would likely make the edit first, then decide whether to roll back rather than preemptively conditioning a rollback. The phrasing 'if that change gets too messy' reads like a scripted hedge. Also, the domain context says 'hugo' but the conversation references WordPress, which is an inconsistency suggesting a templated/contrived scenario. The user spells out intent very explicitly across both turns with no natural shorthand or personality.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_300": {
+          "score": 3,
+          "reason": "Turn 1 feels natural with casual shorthand ('last Tuesday'), but Turn 3 is suspiciously action-dense \u2014 combining a content creation request with an immediate publish command in one breath feels scripted to demonstrate tool capabilities rather than how a real user would cautiously handle publishing a draft. Real users typically confirm before publishing, especially for sensitive resettlement content.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_301": {
+          "score": 4,
+          "reason": "Feels mostly natural \u2014 'before I dive in' and 'Pull up' have casual shorthand energy, and the workflow (checking outline then full draft + CMS queue status) is realistic for a content editor. Minor tell: the two tasks in Turn 3 are cleanly combined in a way that's slightly convenient, but not implausible. Hugo as a content tool context fits.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_302": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user has a clear workflow, uses reasonable shorthand ('cut the outdated section'), and the follow-up in Turn 3 is a plausible multi-part request someone juggling content strategy would make. Minor tells: the context is suspiciously complete and tidy, and the phrasing is slightly too polished/professional without any hesitation or messiness you'd expect from a real user mid-task. But the scenario (grant awareness post, avoiding repetition) is realistic and the requests feel purposeful rather than templated.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "anthropic"
+        },
+        "hugo_303": {
+          "score": 3,
+          "reason": "Turn 1 and 2 feel reasonably natural, but Turn 3 is a bit of a stretch \u2014 asking to 'show how it'll look on Medium' in the same breath as tightening headings feels like two separate concerns awkwardly bundled together, which reads slightly scripted. Also, the domain context says Hugo but the user asks about Medium, which is an odd mismatch that suggests a contrived scenario rather than a real user with a consistent workflow. No strong personality or shorthand, but not robotic either.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openai"
+        },
+        "hugo_304": {
+          "score": 4,
+          "reason": "The conversation feels mostly natural \u2014 the user's casual 'fair enough' and 'keeping me honest' phrasing has personality, and Turn 3 blends two tasks naturally like a real user would. Minor tell: the context is suspiciously complete and self-contained, and it's unclear what 'schedule it' refers to without prior setup, which could indicate a constructed scenario. The Hugo domain context also doesn't clearly connect to the conversation (no Hugo-specific elements), suggesting possible template insertion.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        },
+        "hugo_305": {
+          "score": 2,
+          "reason": "The conversation reads like a scripted workflow demo. Turn 1 is a command with no context (what video? what post?), Turn 3 jumps to 'credits section' and 'LinkedIn' with no natural buildup or personality \u2014 it feels like a checklist of features being demonstrated rather than a real user working through an actual task. No shorthand, hesitation, or organic context-setting that a real user would exhibit.",
+          "source": "synth",
+          "category": "ambiguous_second",
+          "model": "openrouter"
+        }
+      },
+      "synth_summary": {
+        "mean": 3.6402640264026402,
+        "std": 0.8746310469242754,
+        "n": 303,
+        "by_category": {
+          "same_flow": {
+            "mean": 3.844155844155844,
+            "std": 0.8228069642315406,
+            "n": 77
+          },
+          "switch_flow": {
+            "mean": 3.473684210526316,
+            "std": 0.9244298984342262,
+            "n": 76
+          },
+          "ambiguous_first": {
+            "mean": 3.864864864864865,
+            "std": 0.7226887544389696,
+            "n": 74
+          },
+          "ambiguous_second": {
+            "mean": 3.3815789473684212,
+            "std": 0.9027313125812583,
+            "n": 76
+          }
+        },
+        "by_model": {
+          "anthropic": {
+            "mean": 3.6103896103896105,
+            "std": 0.8702267827403093,
+            "n": 77
+          },
+          "openai": {
+            "mean": 3.5657894736842106,
+            "std": 0.8635228689226213,
+            "n": 76
+          },
+          "openrouter": {
+            "mean": 3.6933333333333334,
+            "std": 0.8789893186053072,
+            "n": 150
+          }
+        }
+      },
+      "contrived_ids": [
+        "hugo_004",
+        "hugo_016",
+        "hugo_030",
+        "hugo_032",
+        "hugo_041",
+        "hugo_049",
+        "hugo_060",
+        "hugo_081",
+        "hugo_082",
+        "hugo_083",
+        "hugo_084",
+        "hugo_089",
+        "hugo_099",
+        "hugo_101",
+        "hugo_106",
+        "hugo_109",
+        "hugo_110",
+        "hugo_111",
+        "hugo_115",
+        "hugo_118",
+        "hugo_121",
+        "hugo_124",
+        "hugo_148",
+        "hugo_151",
+        "hugo_166",
+        "hugo_189",
+        "hugo_194",
+        "hugo_217",
+        "hugo_230",
+        "hugo_233",
+        "hugo_238",
+        "hugo_239",
+        "hugo_241",
+        "hugo_247",
+        "hugo_253",
+        "hugo_254",
+        "hugo_255",
+        "hugo_256",
+        "hugo_259",
+        "hugo_264",
+        "hugo_267",
+        "hugo_274",
+        "hugo_280",
+        "hugo_299",
+        "hugo_305"
+      ]
+    },
+    "diversity": {
+      "synth": {
+        "topic": 3.0625,
+        "task": 2.9375,
+        "complexity": 2.25
+      }
     }
   },
   "comparative": {
@@ -9845,30 +12068,30 @@
         "week's": 9,
         "urban": 8,
         "remote": 8,
-        "authentication": 6,
         "thailand": 6,
-        "thursday": 6,
-        "living": 6,
+        "authentication": 6,
         "oh": 6,
-        "transformer": 5,
+        "living": 6,
+        "thursday": 6,
+        "microservices": 5,
         "noise": 5,
         "vietnam": 5,
-        "microservices": 5,
+        "transformer": 5,
+        "bangkok": 4,
+        "self-attention": 4,
         "street": 4,
         "async": 4,
-        "self-attention": 4,
-        "bangkok": 4,
-        "asia": 3,
-        "mechanism": 3,
-        "jetbrains": 3,
-        "apart": 3,
-        "yesterday": 3,
-        "funds": 3,
-        "kinda": 3,
-        "communication": 3,
-        "squash": 3,
+        "index": 3,
+        "handling": 3,
+        "build": 3,
         "interest": 3,
-        "went": 3
+        "yesterday": 3,
+        "asia": 3,
+        "compound": 3,
+        "mechanism": 3,
+        "positional": 3,
+        "communication": 3,
+        "loneliness": 3
       }
     },
     "tools": {
@@ -19171,6 +21394,41 @@
           "cluster": 5
         }
       ]
+    },
+    "naturalness": {
+      "gap": 0.8954502593116453,
+      "t_stat": 7.464531207202895,
+      "t_pval": 4.528685148539084e-09,
+      "eval_summary": {
+        "mean": 4.535714285714286,
+        "std": 0.5658206970626737,
+        "n": 28
+      }
+    },
+    "ambiguity": {
+      "eval_mean": 2.4461538461538463,
+      "eval_std": 0.8949562813691685,
+      "synth_mean": 2.1333333333333333,
+      "synth_std": 0.9030811456096044,
+      "gap": 0.31282051282051304,
+      "t_stat": 1.9275503727508305,
+      "t_pval": 0.05623552441110308,
+      "n_eval": 65,
+      "n_synth": 60
+    },
+    "diversity": {
+      "eval": {
+        "topic": 2.857142857142857,
+        "task": 1.7142857142857142,
+        "complexity": 2.0
+      },
+      "synth": {
+        "topic": 3.0625,
+        "task": 2.9375,
+        "complexity": 2.25
+      },
+      "n_eval_batches": 7,
+      "n_synth_batches": 16
     }
   },
   "intrinsic_scorecard": [
@@ -19190,6 +21448,15 @@
       "rating": "green",
       "green_threshold": 0.85,
       "yellow_threshold": 0.7,
+      "higher_is_better": true
+    },
+    {
+      "signal": "Naturalness (synth)",
+      "metric": "mean = 3.64",
+      "value": 3.6402640264026402,
+      "rating": "green",
+      "green_threshold": 3.5,
+      "yellow_threshold": 2.5,
       "higher_is_better": true
     }
   ],
@@ -19273,6 +21540,24 @@
       "rating": "red",
       "green_threshold": 0.05,
       "yellow_threshold": 0.15,
+      "higher_is_better": false
+    },
+    {
+      "signal": "Naturalness gap",
+      "metric": "|\u0394| = 0.90",
+      "value": 0.8954502593116453,
+      "rating": "red",
+      "green_threshold": 0.3,
+      "yellow_threshold": 0.7,
+      "higher_is_better": false
+    },
+    {
+      "signal": "Ambiguity quality gap",
+      "metric": "|\u0394| = 0.31",
+      "value": 0.31282051282051304,
+      "rating": "green",
+      "green_threshold": 0.5,
+      "yellow_threshold": 1.0,
       "higher_is_better": false
     }
   ]

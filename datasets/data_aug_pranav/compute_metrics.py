@@ -25,8 +25,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from dotenv import load_dotenv
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import chisquare, ks_2samp
+
+load_dotenv()
 
 # ── Constants ────────────────────────────────────────────────────────
 
@@ -798,6 +801,13 @@ async def judge_naturalness_all(eval_convos, synth_convos, domain, seed=42, conc
     tasks += [_rate(c, "synth") for c in synth_convos]
     results = await asyncio.gather(*tasks)
     await client.close()
+
+    # Coerce scores to int (LLMs sometimes return strings)
+    for r in results:
+        try:
+            r["score"] = int(r["score"])
+        except (ValueError, TypeError):
+            r["score"] = -1
 
     # Per-conversation results
     per_conversation = {}
