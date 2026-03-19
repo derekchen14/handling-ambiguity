@@ -49,6 +49,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
+_DATA_DIR = _SCRIPT_DIR / "data"
 
 # ── Logging ──────────────────────────────────────────────────────────
 
@@ -627,10 +628,11 @@ def dedup_scenarios(
             raise ValueError(f'No models match filter: {models_filter}')
 
     # Input/output paths
-    enriched_jsonl = _SCRIPT_DIR / f'scenarios_{domain}_enriched.jsonl'
-    base_jsonl = _SCRIPT_DIR / f'scenarios_{domain}.jsonl'
-    deduped_jsonl = _SCRIPT_DIR / f'scenarios_{domain}_enriched_deduped.jsonl'
-    meta_path = _SCRIPT_DIR / f'scenarios_{domain}_dedup_meta.json'
+    _DATA_DIR.mkdir(parents=True, exist_ok=True)
+    enriched_jsonl = _DATA_DIR / f'scenarios_{domain}_enriched.jsonl'
+    base_jsonl = _DATA_DIR / f'scenarios_{domain}.jsonl'
+    deduped_jsonl = _DATA_DIR / f'scenarios_{domain}_enriched_deduped.jsonl'
+    meta_path = _DATA_DIR / f'scenarios_{domain}_dedup_meta.json'
 
     # Load enriched scenarios
     enriched = _load_jsonl(enriched_jsonl)

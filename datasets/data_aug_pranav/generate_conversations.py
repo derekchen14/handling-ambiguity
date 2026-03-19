@@ -37,6 +37,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
+_DATA_DIR = _SCRIPT_DIR / "data"
 
 # ── Logging ──────────────────────────────────────────────────────────
 
@@ -106,7 +107,7 @@ USER_FACING_INTENTS = {
 
 def _load_scenarios(domain: str) -> list[dict]:
     """Load enriched deduped scenarios."""
-    path = _SCRIPT_DIR / f'scenarios_{domain}_enriched_deduped.jsonl'
+    path = _DATA_DIR / f'scenarios_{domain}_enriched_deduped.jsonl'
     scenarios = []
     with open(path) as f:
         for line in f:
@@ -371,25 +372,69 @@ You MUST output ONLY a single valid JSON object (no markdown fencing, no explana
 The JSON must conform exactly to the schema described in the user prompt.
 
 ## Quality Rules
-- Utterances must sound like a real person typing on their phone to an AI assistant — casual, terse, direct.
-- NATURAL LENGTH DISTRIBUTION. Turn 1 and Turn 3: both average around 12-14 words (range 5-22). About 15% of turn-3 utterances should be very short (under 8 words) — terse follow-ups like "Same for the intro." The rest should be normal conversational length (10-20 words). Don't pad utterances or over-explain.
+
+### User utterances
+- IMAGINE THE USER IS TYPING ON THEIR SMARTPHONE. Mobile users are terse, rely on shared context, skip pleasantries, and don't repeat what's on screen.
+- USERS OBSERVE, THEY DON'T COMMAND. Describe what you see or what's wrong, not what the agent should do. "The ICD codes aren't matching" beats "Flag anything that doesn't match." "I think I see repeated employees?" beats "Check for duplicate employee IDs and clean those out."
+- DROP IMPERATIVES. State the problem without telling the agent what to do. "Signup dates are all over the place." Period. Don't append "Standardize them."
+- DON'T GIVE AWAY THE ANSWER. Even unambiguous turns shouldn't spell out the operation. Wrong: "Can you expand and develop my bullet points into fully written paragraphs?" Right: "Flesh them out into actual paragraphs."
+- MORE IMPLICIT, LESS EXPLICIT. Users assume shared context. "Too smooth now, try 3 days instead" beats "Can you also perform the same rolling average smoothing operation on the revenue column using a 3-day window?"
+- Turn 1: 8-20 words (avg ~14). Turn 3: 2-9 words (avg ~5). Turn 3 is EXTREMELY terse — context from turns 1-2 makes elaboration unnecessary.
+- Turn 3 MUST depend on turns 1-2. Use anaphora: "Same thing for...", "That one too", "What about X instead?"
+- Turn 3 can be a follow-up question: "What's the percent change?", "Which sites?"
+- Use domain abbreviations: "MoM" not "month-over-month", "CTR" not "click-through rate".
 - NEVER include the flow name, intent name, or tool name in the user utterance.
-- Turn 2 (agent) should be 1-2 sentences, directly responding to turn 1.
+- Vary register: mix observations ("dates look weird"), terse commands ("fix the intro"), casual questions ("what's the word count?"), and brief follow-ups ("same thing for the conclusion").
+- Avoid em dashes, fancy punctuation, and overly polished prose. Use plain commas and periods.
+
+### Agent utterances (Turn 2)
+- 1-2 sentences max. Directly responds to turn 1.
+- Agent explains WHY it's taking an action: "since that's the most common format" or "Biggest jump this quarter."
+- CRITICAL: Agent responds ONLY to what the user actually said. The agent does NOT know the user's downstream goal, the flow label, or what the user will ask next. Do NOT infer unstated goals.
+- No over-acknowledgment: NEVER start with "Absolutely!", "Great question!", "I'd be happy to!", "Sure thing!"
+- No filler: NEVER use "Just to confirm —", "To clarify,", "So what you're saying is..."
+
+### General
 - The context field must be realistic and specific to the scenario.
 - target_tools MUST ONLY include the required tools specified in the Tool Constraints section below. Do NOT add extra tools beyond those listed. Use realistic parameter values from the tool reference.
 - For parameters where the exact value depends on data the user hasn't provided, use null.
-- Vary register: mix terse commands ("fix the intro"), casual questions ("what's the word count?"), and brief follow-ups ("same thing for the conclusion").
-- Avoid em dashes, fancy punctuation, and overly polished prose. Use plain commas and periods.
 
-## Style Examples (for calibration — DO NOT copy verbatim)
-- Turn 1: "The self-attention section feels off. Reorder it from Q/K/V intuition into scaled dot-product."
-- Turn 3: "Same thing for multi-head attention."
-- Turn 1: "Pull up my last two API tutorials and show me how they compare."
-- Turn 3: "Throw in the authentication one too."
-- Turn 1: "The roundup needs to go out Friday at 8am EST."
-- Turn 3: "Actually push it to Thursday evening."
-- Turn 1: "The order_date is showing up as a generic string. That doesn't seem right."
-- Turn 3: "Great, while you're at it, outbound_target_region also looks weird."
+### Anti-patterns (NEVER do these)
+- Filler openers: "Before I...", "Just to confirm —", "I was wondering if..."
+- Hedging: "Can you maybe...", "Would it be possible to..."
+- Over-explaining intent: "so that I can then..." / "which will help me..."
+- Restating what's obvious: "Good call. Now, moving on to the next thing..."
+- Padding: "right now" / "at this point" / "at the moment"
+- Agent leaking label info: agent inferring user's goal that wasn't stated (e.g., user asks to "pull posts" and agent says "so we can compare wording")
+
+## Style Examples — BAD vs GOOD (for calibration — DO NOT copy verbatim)
+
+User turn 1:
+  BAD:  "Before I cross-post the Lisbon guide, can you check if it's already live on Medium and whether the sync looks okay?"
+  GOOD: "Is the Lisbon guide live on Medium yet?"
+  BAD:  "Can you pull my beginner baking posts from the last 6 months?"
+  GOOD: "beginner baking posts from the last 6 months"
+  BAD:  "The order_date column needs to be converted from string format to a proper datetime type."
+  GOOD: "The order_date is showing up as a generic string. That doesn't seem right."
+
+User turn 3:
+  BAD:  "Good. Can you pull up all my connected platforms and show me which ones have working integrations right now?"
+  GOOD: "Which platforms are working?"
+  BAD:  "Just publish it, we can worry about the rest later."
+  GOOD: "Publish now, worry about the rest later"
+  BAD:  "Just the ones tagged beginner or 101, and include anything that mentions laminated dough."
+  GOOD: "beginner tag is good, also anything that mentions laminated dough"
+  GOOD: "Same thing for multi-head attention."
+  GOOD: "That's a terrible title, please try again."
+  GOOD: "What about job satisfaction rather than department?"
+
+Agent turn 2:
+  BAD:  "Yep, I'll list your recent beginner-friendly baking drafts and published posts so we can compare wording."
+  GOOD: "Are beginner posts those that contain the word '101' or those that have the tag 'beginner'?"
+  BAD:  "Just to confirm — do you want to publish it live on the blog right now, or push it across your connected platforms?"
+  GOOD: "Publish it live on the blog, or push it across all platforms?"
+  BAD:  "Absolutely! I'll smooth out the transitions and tighten up the word choice in the intro for you."
+  GOOD: "I'll tighten the intro — the transitions between paragraphs are the main issue."
 """
 
 
@@ -418,8 +463,13 @@ def _build_user_prompt_same_flow(
 
 ## Rules for same_flow
 - Turn 1 and Turn 3 must BOTH use the flow "{af['turn1_flow']}" (intent: {af['turn1_intent']}).
-- Turn 3 should be a natural follow-up or continuation — NOT a repetition of turn 1. Sometimes very brief ("Same thing for the conclusion"), sometimes a fuller request.
+- Turn 3 should be a natural follow-up or continuation — NOT a repetition of turn 1. Turn 3 is EXTREMELY terse (2-9 words).
 - The agent (turn 2) responds to turn 1 helpfully, setting up the follow-up.
+- The conversation must follow ONE of these patterns:
+  (a) Slot-value missing — turn 1 omits a parameter, agent asks, turn 3 provides it
+  (b) User builds on previous — turn 1 acts on entity X, turn 3 does same flow on entity Y
+  (c) User adjusts agent proposal — turn 1 requests, agent proposes specifics, turn 3 corrects/adjusts
+- Anti-pattern: two independent same-flow requests. "Rename column A" then "Rename column B" are unrelated. Turns must have a narrative thread.
 
 ## Scenario
 {scenario['scenario']}
@@ -447,7 +497,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence agent response>"
+      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
     }},
     {{
       "turn_num": 3,
@@ -491,6 +541,10 @@ def _build_user_prompt_switch_flow(
 - Turn 3 SWITCHES to a different flow: "{af['turn3_flow']}" (intent: {af['turn3_intent']}).
 - The switch should feel natural — the user finishes one task and moves to another.
 - The agent (turn 2) responds to turn 1, then the user pivots.
+- The switch should emerge naturally from the conversation:
+  - brainstorm -> endorse: ask for ideas / agent suggests / "Let's go with that"
+  - tone -> preference: request style change / agent adjusts / "Remember that going forward"
+  - explain -> browse: "What'd you just do?" / agent explains / "What else have I got?"
 
 ## Scenario
 {scenario['scenario']}
@@ -518,7 +572,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence agent response>"
+      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
     }},
     {{
       "turn_num": 3,
@@ -621,7 +675,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<clarifying question or proposal with confirmation request>"
+      "utterance": "<clarifying question or proposal — respond ONLY to what the user said, do NOT infer unstated goals>"
     }},
     {{
       "turn_num": 3,
@@ -676,6 +730,14 @@ def _build_user_prompt_ambiguous_second(
   candidate_flows: {json.dumps(af['candidate_flows'])}
   This routes to the Plan orchestrator flow "{plan_flow}" (intent: Plan).
 - The multi-request should feel natural — the user combines two related actions in one sentence.
+- The multi-request MUST use a natural connector, NOT bare "and":
+  - Causal: "so I can", "so we can"
+  - Prerequisite: "before", "I need X before Y"
+  - Sequential: "and then" (ordered steps)
+  - Embedded qualifier: second operation as constraint on first
+  - Implicit: goal implied, never named ("send it off Friday")
+  - Two sentences with period between
+  - Question + request: "Also rename X. What do Y look like?"
 
 ## Scenario
 {scenario['scenario']}
@@ -703,7 +765,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
     {{
       "turn_num": 2,
       "speaker": "agent",
-      "utterance": "<1-2 sentence agent response>"
+      "utterance": "<1-2 sentence response to what the user ACTUALLY said — explain WHY you're taking this action, do NOT infer unstated goals>"
     }},
     {{
       "turn_num": 3,
@@ -949,9 +1011,10 @@ def generate_conversations(
     log.info('Loaded %d scenarios for %s', len(scenarios), domain)
 
     # Output paths
-    output_jsonl = _SCRIPT_DIR / f'conversations_{domain}_raw.jsonl'
-    output_json = _SCRIPT_DIR / f'conversations_{domain}.json'
-    output_meta = _SCRIPT_DIR / f'conversations_{domain}_meta.json'
+    _DATA_DIR.mkdir(parents=True, exist_ok=True)
+    output_jsonl = _DATA_DIR / f'conversations_{domain}_raw.jsonl'
+    output_json = _DATA_DIR / f'conversations_{domain}.json'
+    output_meta = _DATA_DIR / f'conversations_{domain}_meta.json'
 
     # Resume support: load existing conversations
     existing_ids: set[str] = set()

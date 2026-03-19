@@ -34,6 +34,7 @@ load_dotenv()
 # ── Constants ────────────────────────────────────────────────────────
 
 SCRIPT_DIR = Path(__file__).resolve().parent          # data_aug_pranav/
+SYNTH_DATA_DIR = SCRIPT_DIR / "data"                  # data_aug_pranav/data/
 DATA_DIR   = SCRIPT_DIR.parent                        # datasets/
 ANALYSIS_DIR = SCRIPT_DIR / "analysis"
 DOMAINS = ["dana", "hugo"]
@@ -57,6 +58,16 @@ INTRINSIC_THRESHOLDS = {
     "label_agreement_intent": (0.95, 0.85),  # higher is better
     "label_agreement_flow":   (0.85, 0.70),  # higher is better
     "label_agreement_tool":   (0.85, 0.70),  # higher is better
+    # Quality heuristics (Section I)
+    "heuristic_filler_rate":     (0.05, 0.15),   # lower is better
+    "heuristic_overack_rate":    (0.05, 0.15),   # lower is better
+    "heuristic_unicode_rate":    (0.02, 0.10),   # lower is better
+    "heuristic_leakage_rate":    (0.02, 0.10),   # lower is better
+    "heuristic_multireq_rate":   (0.90, 0.70),   # higher is better (has connector)
+    "heuristic_t3_terse_rate":   (0.70, 0.50),   # higher is better (turn3 ≤9 words)
+    # LLM judges (Section I)
+    "turn_dependency_mean":      (3.5,  2.5),    # higher is better
+    "agent_leak_rate":           (0.10, 0.25),   # lower is better
 }
 
 # ── Data Loading ─────────────────────────────────────────────────────
@@ -64,7 +75,7 @@ INTRINSIC_THRESHOLDS = {
 def load_datasets(domain: str):
     """Return (eval_convos, synth_convos) lists of dicts."""
     eval_path  = DATA_DIR / domain / "eval_set.json"
-    synth_path = SCRIPT_DIR / f"conversations_{domain}.json"
+    synth_path = SYNTH_DATA_DIR / f"conversations_{domain}.json"
     if not synth_path.exists():
         synth_path = SCRIPT_DIR / "old_data" / f"conversations_{domain}.json"
     with open(eval_path)  as f: eval_convos  = json.load(f)
@@ -517,6 +528,287 @@ def context_dependence(eval_recs, synth_recs, domain):
                 synth_terse=sn, synth_total=st)
 
 
+# ── 11b. Quality Heuristics (Section I Programmatic Checks) ─────────
+
+# Filler/hedging patterns in user utterances (I.2, I.7)
+_FILLER_PATTERNS = [
+    re.compile(r'\bbefore i\b', re.I),
+    re.compile(r'\bjust to confirm\b', re.I),
+    re.compile(r'\bi was wondering\b', re.I),
+    re.compile(r'\bwould it be possible\b', re.I),
+    re.compile(r'\bcan you maybe\b', re.I),
+    re.compile(r'\bso that i can then\b', re.I),
+    re.compile(r'\bwhich will help me\b', re.I),
+    re.compile(r'\bat this point\b', re.I),
+    re.compile(r'\bat the moment\b', re.I),
+    re.compile(r'\bnow,?\s*moving on\b', re.I),
+    re.compile(r'\bgood call\b', re.I),
+    re.compile(r'\bif you don\'t mind\b', re.I),
+    re.compile(r'\bwould you mind\b', re.I),
+    re.compile(r'\bif that\'s okay\b', re.I),
+]
+
+# Agent over-acknowledgment patterns (I.2)
+_OVERACK_PATTERNS = [
+    re.compile(r'^absolutely[!.]', re.I),
+    re.compile(r'^great question[!.]', re.I),
+    re.compile(r'^i\'?d be happy to\b', re.I),
+    re.compile(r'^sure thing[!.]', re.I),
+    re.compile(r'^of course[!.]', re.I),
+    re.compile(r'^certainly[!.]', re.I),
+    re.compile(r'^i\'?d love to\b', re.I),
+    re.compile(r'^wonderful[!.]', re.I),
+    re.compile(r'^fantastic[!.]', re.I),
+]
+
+# Unicode characters that are LLM tells (I.7) — ported from data_aug/validator.py
+_UNICODE_CHARS = {
+    '\u2014': 'em dash',
+    '\u2013': 'en dash',
+    '\u2026': 'ellipsis',
+    '\u00a0': 'non-breaking space',
+    '\u201c': 'left double quote',
+    '\u201d': 'right double quote',
+    '\u2018': 'left single quote',
+    '\u2019': 'right single quote',
+}
+
+# Common English words to skip in flow/intent name leakage check (I.8)
+# Ported from data_aug/validator.py COMMON_WORD_FLOWS
+_COMMON_ENGLISH = {
+    'add', 'check', 'compare', 'confirm', 'create', 'define', 'delete',
+    'describe', 'design', 'expand', 'explain', 'export', 'fill', 'find',
+    'format', 'insert', 'inspect', 'join', 'merge', 'outline', 'plot',
+    'preview', 'recall', 'recommend', 'refine', 'reject', 'release',
+    'replace', 'reshape', 'retrieve', 'schedule', 'search', 'split',
+    'store', 'study', 'style', 'suggest', 'survey', 'tone', 'trend',
+    'undo', 'update', 'validate', 'view', 'write',
+    'audit', 'browse', 'calculate', 'cancel', 'chat', 'approve',
+    'blank', 'dismiss', 'endorse', 'peek', 'pivot', 'query', 'reference',
+    'remember', 'segment', 'summarize',
+    # Intent names that are common English
+    'clean', 'transform', 'analyze', 'report', 'converse', 'plan',
+    'research', 'draft', 'revise', 'publish',
+    # Additional common words that are flow names
+    'dashboard', 'aggregate', 'profile', 'sort', 'filter', 'drop',
+    'rename', 'chart', 'rework', 'blueprint',
+}
+
+# Internal/system tools to exclude from leakage check
+_INTERNAL_TOOLS = {"handle_ambiguity"}
+
+# Multi-request connector patterns (I.6, I.8) — ported from data_aug/validator.py
+_MULTIREQ_CONNECTORS = [
+    re.compile(r'\bso i can\b', re.I),
+    re.compile(r'\bso we can\b', re.I),
+    re.compile(r'\bso\b', re.I),
+    re.compile(r'\bbefore\b', re.I),
+    re.compile(r'\band then\b', re.I),
+    re.compile(r'\balso\b', re.I),
+    re.compile(r'\bplus\b', re.I),
+    re.compile(r'\btoo\b', re.I),
+    re.compile(r'\bmeaning\b', re.I),
+    re.compile(r'\bthen\b', re.I),
+    re.compile(r'\band\b', re.I),
+    re.compile(r'\bwhile you\'re at it\b', re.I),
+    re.compile(r'\bafter that\b', re.I),
+    re.compile(r'\bon top of that\b', re.I),
+    re.compile(r';'),
+    re.compile(r'[.?!]\s+[A-Z]'),  # two sentences
+]
+
+
+def quality_heuristics(synth_convos: list[dict], domain: str) -> dict:
+    """Programmatic quality checks from README Section I guidelines.
+
+    Checks: filler phrases (I.2), agent over-acknowledgment (I.2),
+    unicode/em-dashes (I.7), flow/tool name leakage (I.8),
+    length violations (I.8), multi-request connectors (I.6/I.8),
+    converse same-flow anti-pattern (I.3), turn 3 terseness (I.2),
+    double-converse yellow flag (I.4).
+    """
+    # Collect all flow names, intent names, tool names from the data
+    all_flows: set[str] = set()
+    all_intents: set[str] = set()
+    all_tools: set[str] = set()
+    for c in synth_convos:
+        for t in c["turns"]:
+            if t.get("flow") and t["flow"] != "ambiguous":
+                all_flows.add(t["flow"])
+            if t.get("intent"):
+                all_intents.add(t["intent"])
+            for tool_name in (t.get("target_tools") or {}):
+                all_tools.add(tool_name)
+
+    # Exclude internal tools and common English words
+    check_tools = all_tools - _INTERNAL_TOOLS
+    flaggable_flows = {f for f in all_flows if f.lower() not in _COMMON_ENGLISH}
+    flaggable_intents = {i for i in all_intents if i.lower() not in _COMMON_ENGLISH}
+
+    # Accumulators
+    filler_flagged: list[dict] = []
+    overack_flagged: list[dict] = []
+    unicode_flagged: list[dict] = []
+    leakage_flagged: list[dict] = []
+    length_user_over: list[dict] = []
+    length_agent_over: list[dict] = []
+    multireq_missing: list[dict] = []
+    multireq_total = 0
+    multireq_has = 0
+    converse_sameflow: list[str] = []
+    double_converse: list[str] = []
+    t3_over_9 = 0
+    t3_total = 0
+    t3_word_counts: list[int] = []
+    total_user_turns = 0
+    total_agent_turns = 0
+
+    for c in synth_convos:
+        cid = c["convo_id"]
+        cat = c["category"]
+        converse_count = 0
+
+        for t in c["turns"]:
+            utt = t["utterance"]
+
+            if t["speaker"] == "user":
+                total_user_turns += 1
+                if t.get("intent") == "Converse":
+                    converse_count += 1
+
+                # Filler check (I.2, I.7)
+                for pat in _FILLER_PATTERNS:
+                    if pat.search(utt):
+                        filler_flagged.append({"convo_id": cid, "turn": t["turn_num"],
+                                               "match": pat.pattern, "utterance": utt})
+                        break
+
+                # Flow/intent/tool name leakage (I.8)
+                utt_lower = utt.lower()
+                leaked = []
+                for tool_name in check_tools:
+                    if re.search(r'\b' + re.escape(tool_name) + r'\b', utt_lower):
+                        leaked.append(("tool", tool_name))
+                for fn in flaggable_flows:
+                    if re.search(r'\b' + re.escape(fn.lower()) + r'\b', utt_lower):
+                        leaked.append(("flow", fn))
+                for intent_name in flaggable_intents:
+                    if re.search(r'\b' + re.escape(intent_name.lower()) + r'\b', utt_lower):
+                        leaked.append(("intent", intent_name))
+                if leaked:
+                    leakage_flagged.append({"convo_id": cid, "turn": t["turn_num"],
+                                            "leaked": leaked, "utterance": utt})
+
+                # Length check (I.8): user max 100 words
+                wc = word_count(utt)
+                if wc > 100:
+                    length_user_over.append({"convo_id": cid, "turn": t["turn_num"],
+                                             "words": wc})
+
+                # Turn 3 terse check (I.2)
+                if t["turn_num"] == 3:
+                    t3_total += 1
+                    t3_word_counts.append(wc)
+                    if wc > 9:
+                        t3_over_9 += 1
+
+            elif t["speaker"] == "agent":
+                total_agent_turns += 1
+
+                # Over-acknowledgment (I.2)
+                for pat in _OVERACK_PATTERNS:
+                    if pat.search(utt):
+                        overack_flagged.append({"convo_id": cid, "turn": t["turn_num"],
+                                                "match": pat.pattern, "utterance": utt})
+                        break
+
+                # Length check (I.8): agent max 80 words
+                wc = word_count(utt)
+                if wc > 80:
+                    length_agent_over.append({"convo_id": cid, "turn": t["turn_num"],
+                                              "words": wc})
+
+            # Unicode check (I.7) — all turns
+            for char, name in _UNICODE_CHARS.items():
+                if char in utt:
+                    unicode_flagged.append({"convo_id": cid, "turn": t["turn_num"],
+                                            "char": name, "utterance": utt[:80]})
+                    break
+
+        # Converse same-flow anti-pattern (I.3)
+        if cat == "same_flow":
+            user_turns = [t for t in c["turns"] if t["speaker"] == "user"]
+            if any(t.get("intent") == "Converse" for t in user_turns):
+                converse_sameflow.append(cid)
+
+        # Double converse yellow flag (I.4)
+        if converse_count >= 2:
+            double_converse.append(cid)
+
+        # Multi-request connector (I.6, I.8)
+        if cat == "ambiguous_second":
+            t3_turns = [t for t in c["turns"]
+                        if t["turn_num"] == 3 and t["speaker"] == "user"]
+            if t3_turns:
+                multireq_total += 1
+                utt3 = t3_turns[0]["utterance"]
+                if any(pat.search(utt3) for pat in _MULTIREQ_CONNECTORS):
+                    multireq_has += 1
+                else:
+                    multireq_missing.append({"convo_id": cid, "utterance": utt3})
+
+    # Compute rates
+    n_same = sum(1 for c in synth_convos if c["category"] == "same_flow")
+
+    return {
+        "filler": {
+            "rate": len(filler_flagged) / total_user_turns if total_user_turns else 0,
+            "count": len(filler_flagged), "total": total_user_turns,
+            "flagged": filler_flagged[:20],
+        },
+        "agent_overack": {
+            "rate": len(overack_flagged) / total_agent_turns if total_agent_turns else 0,
+            "count": len(overack_flagged), "total": total_agent_turns,
+            "flagged": overack_flagged[:20],
+        },
+        "unicode": {
+            "rate": len(unicode_flagged) / len(synth_convos) if synth_convos else 0,
+            "count": len(unicode_flagged), "total": len(synth_convos),
+            "flagged": unicode_flagged[:20],
+        },
+        "leakage": {
+            "rate": len(leakage_flagged) / total_user_turns if total_user_turns else 0,
+            "count": len(leakage_flagged), "total": total_user_turns,
+            "flagged": leakage_flagged[:20],
+        },
+        "length_violations": {
+            "user_over_100": len(length_user_over),
+            "agent_over_80": len(length_agent_over),
+            "flagged_user": length_user_over[:10],
+            "flagged_agent": length_agent_over[:10],
+        },
+        "multireq_connector": {
+            "rate": multireq_has / multireq_total if multireq_total else 1.0,
+            "has_connector": multireq_has, "total": multireq_total,
+            "missing": multireq_missing[:10],
+        },
+        "converse_sameflow": {
+            "rate": len(converse_sameflow) / n_same if n_same else 0,
+            "count": len(converse_sameflow),
+            "flagged": converse_sameflow,
+        },
+        "double_converse": {
+            "count": len(double_converse),
+            "flagged": double_converse,
+        },
+        "turn3_length": {
+            "terse_rate": (t3_total - t3_over_9) / t3_total if t3_total else 0,
+            "over_9_words": t3_over_9, "total": t3_total,
+            "mean_words": float(np.mean(t3_word_counts)) if t3_word_counts else 0,
+        },
+    }
+
+
 # ── 12. Per-Category Metrics ────────────────────────────────────────
 
 def per_category_metrics(eval_recs, synth_recs, domain):
@@ -744,17 +1036,29 @@ async def _call_llm(prompt: str, client, semaphore: asyncio.Semaphore) -> dict:
 
 # ── Full-Corpus Naturalness Judge ────────────────────────────────────
 
-NATURALNESS_PROMPT_FULL = """Rate whether this conversation sounds like a real user or synthetic/contrived (1-5):
-1 = Completely contrived — robotic, formulaic, no personality
-2 = Mostly contrived — overly explicit about intent, reads like a template
+NATURALNESS_PROMPT_FULL = """Rate whether this conversation sounds like a real user talking to an AI assistant on their phone (1-5):
+1 = Completely contrived — robotic, formulaic, reads like a template
+2 = Mostly contrived — filler phrases, over-explains, agent leaks unstated goals
 3 = Mixed — some natural, some forced
-4 = Mostly natural — minor tells (too polished, suspiciously complete context)
-5 = Indistinguishable from real user — natural shorthand, personality, context-appropriate
+4 = Mostly natural — minor tells (one filler phrase, slightly too polished)
+5 = Indistinguishable from real — terse, personality, implicit context, no filler
 
-Attention pointers:
-- Turn 3: natural follow-up vs scripted?
-- User uses pronouns/shorthand or spells everything out?
-- Realistic scenario for someone actually using this tool?
+Red flags (drop toward 1-2):
+- Subordinate clause openers: "Before I do X, can you Y"
+- Filler/hedging: "Just to confirm", "I was wondering", "Would it be possible"
+- User spells out the operation explicitly instead of stating the problem
+- Agent over-acknowledges: "Absolutely!", "Great question!", "I'd be happy to"
+- Agent infers unstated goals (e.g., user asks to "pull posts" and agent says "so we can compare")
+- Turn 3 restates context from turns 1-2 instead of using anaphora
+- Both user turns sound like the same wordy template with different nouns
+
+Green flags (push toward 4-5):
+- Terse turn 3: "Same for the intro", "That too", "What about X instead?"
+- User observes a problem, doesn't command: "dates look weird" vs "standardize the dates"
+- Direct, no hedging: "Fix the intro", "That's a terrible title"
+- Personality/opinion shows through
+- Domain abbreviations and shorthand
+- Agent explains WHY without over-acknowledging
 
 Domain context: {domain}
 
@@ -864,6 +1168,187 @@ async def judge_naturalness_all(eval_convos, synth_convos, domain, seed=42, conc
         t_stat=float(t_stat), t_pval=float(t_pval),
         contrived_ids=contrived_ids,
     )
+
+
+# ── Turn Dependency Judge (Section I.1) ──────────────────────────────
+
+TURN_DEPENDENCY_PROMPT = """Evaluate whether the two user turns in this conversation are contextually dependent on each other (1-5):
+
+1 = Completely independent — two unrelated requests stapled together, swapping them changes nothing
+2 = Weakly connected — same topic area but turns don't reference each other
+3 = Somewhat dependent — shared context, light reference to previous turn
+4 = Clearly dependent — turn 3 directly builds on or references turns 1-2
+5 = Fully dependent — turn 3 is unintelligible without turns 1-2
+
+Key test: if user turns 1 and 3 were swapped, would the conversation still make sense? If yes, score 1-2.
+
+Signs of dependency (push toward 4-5):
+- Turn 3 uses anaphora: "Same for...", "That one too", "What about X instead?"
+- Turn 3 adjusts or corrects something the agent proposed in turn 2
+- Turn 3 provides a missing parameter the agent asked about
+- Turn 3 only makes sense given the entity/topic established in turn 1
+
+Signs of independence (push toward 1-2):
+- Turn 3 introduces a completely new entity or topic not mentioned in turns 1-2
+- Both turns could standalone as separate requests
+- Turn 3 repeats the same template as turn 1 with different nouns
+
+Category: {category}
+
+Turn 1 (user): {turn1}
+Turn 2 (agent): {turn2}
+Turn 3 (user): {turn3}
+
+Respond in JSON only: {{"score": <1-5>, "reason": "<brief explanation>"}}"""
+
+
+async def judge_turn_dependency(synth_convos, domain, seed=42, concurrency=10):
+    """Score turn dependency (I.1) for all synth conversations."""
+    from anthropic import AsyncAnthropic
+    client = AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _rate(c):
+        ts = c["turns"]
+        p = TURN_DEPENDENCY_PROMPT.format(
+            category=c["category"],
+            turn1=ts[0]["utterance"],
+            turn2=ts[1]["utterance"],
+            turn3=ts[2]["utterance"],
+        )
+        r = await _call_llm(p, client, sem)
+        r["convo_id"] = c["convo_id"]
+        r["category"] = c["category"]
+        if "_provider" in c:
+            r["model"] = c["_provider"]
+        return r
+
+    tasks = [_rate(c) for c in synth_convos]
+    results = await asyncio.gather(*tasks)
+    await client.close()
+
+    for r in results:
+        try:
+            r["score"] = int(r["score"])
+        except (ValueError, TypeError):
+            r["score"] = -1
+
+    valid = [r["score"] for r in results if r["score"] > 0]
+
+    per_conversation = {}
+    for r in results:
+        cid = r.get("convo_id")
+        if cid:
+            per_conversation[cid] = {
+                "score": r.get("score", -1),
+                "reason": r.get("reason", ""),
+                "category": r["category"],
+            }
+
+    by_cat = defaultdict(list)
+    for r in results:
+        if r["score"] > 0:
+            by_cat[r["category"]].append(r["score"])
+    by_category = {c: {"mean": float(np.mean(s)), "n": len(s)}
+                   for c, s in by_cat.items()}
+
+    independent_ids = sorted(
+        cid for cid, info in per_conversation.items()
+        if info["score"] <= 2
+    )
+
+    return {
+        "per_conversation": per_conversation,
+        "mean": float(np.mean(valid)) if valid else 0,
+        "std": float(np.std(valid)) if valid else 0,
+        "n": len(valid),
+        "by_category": by_category,
+        "independent_ids": independent_ids,
+        "independent_count": len(independent_ids),
+    }
+
+
+# ── Agent Label Leak Judge (Section I.2) ──────────────────────────────
+
+AGENT_LEAK_PROMPT = """Does the agent (Turn 2) reveal knowledge about the user's goals or intentions that were NOT expressed in Turn 1?
+
+The agent should respond ONLY to what the user explicitly said. The agent should NOT:
+- State the user's downstream goal: "so we can compare wording", "for your report"
+- Anticipate what the user will ask next
+- Name the specific operation when the user only described a problem
+
+Examples of leaks:
+- User: "Pull my beginner baking posts" -> Agent: "so we can compare wording" (goal never stated)
+- User: "The dates look weird" -> Agent: "I'll standardize them to ISO 8601" (user didn't say standardize)
+- User: "Show me the revenue data" -> Agent: "I'll generate the quarterly report" (user didn't ask for report)
+
+Turn 1 (user): {turn1}
+Turn 2 (agent): {turn2}
+
+Score 1 if the agent leaks unstated information, 0 if clean.
+Respond in JSON only: {{"leak": <0 or 1>, "reason": "<brief explanation>"}}"""
+
+
+async def judge_agent_leak(synth_convos, domain, seed=42, concurrency=10):
+    """Check if agent responses leak unstated user goals (I.2)."""
+    from anthropic import AsyncAnthropic
+    client = AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _rate(c):
+        ts = c["turns"]
+        p = AGENT_LEAK_PROMPT.format(
+            turn1=ts[0]["utterance"],
+            turn2=ts[1]["utterance"],
+        )
+        r = await _call_llm(p, client, sem)
+        r["convo_id"] = c["convo_id"]
+        r["category"] = c["category"]
+        return r
+
+    tasks = [_rate(c) for c in synth_convos]
+    results = await asyncio.gather(*tasks)
+    await client.close()
+
+    for r in results:
+        try:
+            r["leak"] = int(r.get("leak", -1))
+        except (ValueError, TypeError):
+            r["leak"] = -1
+
+    valid = [r for r in results if r["leak"] >= 0]
+    leak_count = sum(1 for r in valid if r["leak"] == 1)
+    leak_rate = leak_count / len(valid) if valid else 0
+
+    leak_ids = sorted(r["convo_id"] for r in valid if r["leak"] == 1)
+
+    per_conversation = {}
+    for r in results:
+        cid = r.get("convo_id")
+        if cid:
+            per_conversation[cid] = {
+                "leak": r.get("leak", -1),
+                "reason": r.get("reason", ""),
+                "category": r.get("category", ""),
+            }
+
+    # By category
+    by_cat = defaultdict(lambda: {"total": 0, "leaks": 0})
+    for r in valid:
+        by_cat[r["category"]]["total"] += 1
+        if r["leak"] == 1:
+            by_cat[r["category"]]["leaks"] += 1
+    by_category = {c: {"rate": d["leaks"] / d["total"] if d["total"] else 0, **d}
+                   for c, d in by_cat.items()}
+
+    return {
+        "per_conversation": per_conversation,
+        "leak_rate": leak_rate,
+        "leak_count": leak_count,
+        "total": len(valid),
+        "leak_ids": leak_ids,
+        "by_category": by_category,
+    }
 
 
 # ── Existing LLM Judges (sample-based) ──────────────────────────────
@@ -1239,6 +1724,42 @@ def compute_intrinsic_scorecard(intrinsic: dict) -> list[dict]:
                  f"agreement = {a:.2f}", a,
                  f"label_agreement_{stage}", True)
 
+    # Quality heuristics (Section I)
+    h = intrinsic.get("heuristics", {})
+    if h:
+        fr = h.get("filler", {}).get("rate", 0)
+        _add("Filler phrases (I.2)", f"rate = {fr:.2%}", fr, "heuristic_filler_rate")
+
+        oar = h.get("agent_overack", {}).get("rate", 0)
+        _add("Agent over-ack (I.2)", f"rate = {oar:.2%}", oar, "heuristic_overack_rate")
+
+        ur = h.get("unicode", {}).get("rate", 0)
+        _add("Unicode/em-dash (I.7)", f"rate = {ur:.2%}", ur, "heuristic_unicode_rate")
+
+        lr = h.get("leakage", {}).get("rate", 0)
+        _add("Label leakage (I.8)", f"rate = {lr:.2%}", lr, "heuristic_leakage_rate")
+
+        mr = h.get("multireq_connector", {}).get("rate", 0)
+        _add("Multi-req connectors (I.6)", f"rate = {mr:.2%}", mr,
+             "heuristic_multireq_rate", True)
+
+        tr = h.get("turn3_length", {}).get("terse_rate", 0)
+        _add("Turn 3 terse ≤9w (I.2)", f"rate = {tr:.2%}", tr,
+             "heuristic_t3_terse_rate", True)
+
+    # Turn dependency (Section I.1)
+    td = intrinsic.get("turn_dependency", {})
+    if td.get("mean"):
+        tdm = td["mean"]
+        _add("Turn dependency (I.1)", f"mean = {tdm:.2f}", tdm,
+             "turn_dependency_mean", True)
+
+    # Agent label leak (Section I.2)
+    al = intrinsic.get("agent_leak", {})
+    if "leak_rate" in al:
+        alr = al["leak_rate"]
+        _add("Agent label leak (I.2)", f"rate = {alr:.2%}", alr, "agent_leak_rate")
+
     return rows
 
 
@@ -1425,6 +1946,15 @@ def main():
             "synth_total": cd_result["synth_total"],
         }
 
+        print("  [10b]  Quality heuristics (Section I)...")
+        intrinsic["heuristics"] = quality_heuristics(synth_c, dm)
+        h = intrinsic["heuristics"]
+        print(f"         Filler: {h['filler']['count']}/{h['filler']['total']} | "
+              f"Overack: {h['agent_overack']['count']}/{h['agent_overack']['total']} | "
+              f"Unicode: {h['unicode']['count']} | "
+              f"Leakage: {h['leakage']['count']} | "
+              f"Turn3 terse: {h['turn3_length']['terse_rate']:.0%}")
+
         print("  [11/16] Per-category metrics...")
         comparative["per_category"] = per_category_metrics(eval_r, synth_r, dm)
 
@@ -1485,6 +2015,22 @@ def main():
                 scenario_diversity_analysis(eval_c, synth_c, dm, concurrency=args.concurrency))
             comparative["diversity"] = div_result
             intrinsic["diversity"] = {"synth": div_result["synth"]}
+
+            print("  [16d] Turn dependency (LLM, Section I.1)...")
+            td_result = asyncio.run(
+                judge_turn_dependency(synth_c, dm,
+                                      seed=args.seed, concurrency=args.concurrency))
+            intrinsic["turn_dependency"] = td_result
+            print(f"         mean={td_result['mean']:.2f}, "
+                  f"independent (score<=2): {td_result['independent_count']}")
+
+            print("  [16e] Agent label leak (LLM, Section I.2)...")
+            al_result = asyncio.run(
+                judge_agent_leak(synth_c, dm,
+                                 seed=args.seed, concurrency=args.concurrency))
+            intrinsic["agent_leak"] = al_result
+            print(f"         leak_rate={al_result['leak_rate']:.2%} "
+                  f"({al_result['leak_count']}/{al_result['total']})")
         else:
             print("  [16/16] Skipping LLM judges (--skip-llm)")
 

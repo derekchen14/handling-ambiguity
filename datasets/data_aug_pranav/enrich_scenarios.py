@@ -40,6 +40,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
+_DATA_DIR = _SCRIPT_DIR / "data"
 
 # ── Logging ──────────────────────────────────────────────────────────
 
@@ -724,9 +725,10 @@ def enrich_scenarios(
             raise ValueError(f'No models match filter: {models_filter}')
 
     # Input/output paths
-    input_jsonl = _SCRIPT_DIR / f'scenarios_{domain}.jsonl'
-    output_jsonl = _SCRIPT_DIR / f'scenarios_{domain}_enriched.jsonl'
-    output_meta = _SCRIPT_DIR / f'scenarios_{domain}_enriched_meta.json'
+    _DATA_DIR.mkdir(parents=True, exist_ok=True)
+    input_jsonl = _DATA_DIR / f'scenarios_{domain}.jsonl'
+    output_jsonl = _DATA_DIR / f'scenarios_{domain}_enriched.jsonl'
+    output_meta = _DATA_DIR / f'scenarios_{domain}_enriched_meta.json'
 
     # Load all input scenarios
     all_scenarios: list[dict] = []
@@ -1093,7 +1095,7 @@ def _backfill_tools(domain: str, seed: int) -> None:
     flow_tool_cursor: dict[str, int] = {}
 
     for suffix in ('_enriched', '_enriched_deduped'):
-        path = _SCRIPT_DIR / f'scenarios_{domain}{suffix}.jsonl'
+        path = _DATA_DIR / f'scenarios_{domain}{suffix}.jsonl'
         if not path.exists():
             continue
         scenarios = []

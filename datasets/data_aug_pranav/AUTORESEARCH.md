@@ -25,7 +25,7 @@ Produce diverse scenario objects (description + example utterances) grounded in 
     --domain {domain} --target {N} --batch-size 12 --seed 42
 ```
 
-- Output: `datasets/data_aug_pranav/scenarios_{domain}.jsonl`
+- Output: `datasets/data_aug_pranav/data/scenarios_{domain}.jsonl`
 - Uses 4 LLM providers round-robin: anthropic (claude-sonnet-4-6), openai (gpt-5.2), gemini (google/gemini-3-pro-preview via openrouter), deepseek (deepseek/deepseek-chat via openrouter)
 - Supports resume: if output file exists, only generates the delta to reach `--target`
 - Add `--dry-run` to print prompts without API calls
@@ -38,8 +38,8 @@ Add natural flow sequences (5-7 flows), edge flow pairs, and tool assignments to
     --domain {domain} --batch-size 8 --seed 42 --max-threads 20
 ```
 
-- Input: `scenarios_{domain}.jsonl`
-- Output: `scenarios_{domain}_enriched.jsonl`
+- Input: `data/scenarios_{domain}.jsonl`
+- Output: `data/scenarios_{domain}_enriched.jsonl`
 - Uses anchor flow round-robin for uniform coverage
 - Tool assignment via round-robin cursor across flows
 
@@ -57,8 +57,8 @@ Semantic deduplication using LLM-based analysis (catches near-duplicates Jaccard
     --domain {domain} --batch-size 60 --seed 43
 ```
 
-- Input: `scenarios_{domain}_enriched.jsonl`
-- Output: `scenarios_{domain}_enriched_deduped.jsonl`
+- Input: `data/scenarios_{domain}_enriched.jsonl`
+- Output: `data/scenarios_{domain}_enriched_deduped.jsonl`
 - Two-phase: within-batch dedup, then cross-batch consolidation
 - Add `--skip-backfill` to dedup without regenerating removed scenarios
 
@@ -70,8 +70,8 @@ Generate 3-turn conversations (user -> agent -> user) from enriched scenarios, o
     --domain {domain} --seed 42 --max-threads 8
 ```
 
-- Input: `scenarios_{domain}_enriched_deduped.jsonl`
-- Output: `conversations_{domain}_raw.jsonl` (intermediate) + `conversations_{domain}.json` (final, sorted)
+- Input: `data/scenarios_{domain}_enriched_deduped.jsonl`
+- Output: `data/conversations_{domain}_raw.jsonl` (intermediate) + `data/conversations_{domain}.json` (final, sorted)
 - Categories: `same_flow`, `switch_flow`, `ambiguous_first`, `ambiguous_second` (equal split)
 - Each scenario gets assigned to exactly one category with pre-assigned flow and tool constraints
 

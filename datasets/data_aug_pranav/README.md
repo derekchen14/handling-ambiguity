@@ -22,7 +22,7 @@ uv run datasets/data_aug_pranav/generate_scenarios.py \
     --domain hugo --target 400 --batch-size 10 --seed 42
 ```
 
-**Output:** `scenarios_<domain>.jsonl` — one JSON object per line with scenario description, example utterances, grounding flows/intents, diversity axis, and source model.
+**Output:** `data/scenarios_<domain>.jsonl` — one JSON object per line with scenario description, example utterances, grounding flows/intents, diversity axis, and source model.
 
 ### Step 2: Enrich Scenarios with Flow Sequences
 
@@ -42,9 +42,9 @@ uv run datasets/data_aug_pranav/enrich_scenarios.py \
     --domain hugo --batch-size 8 --seed 42 --max-threads 20
 ```
 
-**Input:** `scenarios_<domain>.jsonl` (from Step 1)
+**Input:** `data/scenarios_<domain>.jsonl` (from Step 1)
 
-**Output:** `scenarios_<domain>_enriched.jsonl` — preserves all original fields and adds `flow_sequence`, `edge_flow_pairs`, `enrichment_model`, `enrichment_provider`.
+**Output:** `data/scenarios_<domain>_enriched.jsonl` — preserves all original fields and adds `flow_sequence`, `edge_flow_pairs`, `enrichment_model`, `enrichment_provider`.
 
 Resumable — rerun the same command to pick up where it left off.
 
@@ -70,11 +70,11 @@ python datasets/data_aug_pranav/dedup_scenarios.py \
     --domain hugo --batch-size 60 --seed 43 --max-threads 6
 ```
 
-**Input:** `scenarios_<domain>_enriched.jsonl` (from Step 2)
+**Input:** `data/scenarios_<domain>_enriched.jsonl` (from Step 2)
 
 **Output:**
-- `scenarios_<domain>_enriched_deduped.jsonl` — final deduped enriched scenarios (new file, originals untouched until backfill)
-- `scenarios_<domain>_dedup_meta.json` — duplicate clusters, counts, and model distribution
+- `data/scenarios_<domain>_enriched_deduped.jsonl` — final deduped enriched scenarios (new file, originals untouched until backfill)
+- `data/scenarios_<domain>_dedup_meta.json` — duplicate clusters, counts, and model distribution
 
 During backfill, deduped IDs are removed from the base and enriched JSONL files, then `generate_scenarios` and `enrich_scenarios` are called to fill the gap.
 
@@ -98,12 +98,12 @@ python datasets/data_aug_pranav/generate_conversations.py \
 
 **CLI:** `--domain`, `--seed`, `--models` (comma-separated), `--max-threads`, `--dry-run`
 
-**Input:** `scenarios_<domain>_enriched_deduped.jsonl` (from Step 3)
+**Input:** `data/scenarios_<domain>_enriched_deduped.jsonl` (from Step 3)
 
 **Output:**
-- `conversations_<domain>_raw.jsonl` — one JSON object per line, appended incrementally
-- `conversations_<domain>.json` — sorted JSON array (final format matching eval_set.json)
-- `conversations_<domain>_meta.json` — generation counts, category splits, and model distribution
+- `data/conversations_<domain>_raw.jsonl` — one JSON object per line, appended incrementally
+- `data/conversations_<domain>.json` — sorted JSON array (final format matching eval_set.json)
+- `data/conversations_<domain>_meta.json` — generation counts, category splits, and model distribution
 
 Resumable — rerun the same command to pick up where it left off.
 

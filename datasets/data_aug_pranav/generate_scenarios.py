@@ -39,6 +39,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
+_DATA_DIR = _SCRIPT_DIR / "data"
 
 # ── Logging ──────────────────────────────────────────────────────────
 
@@ -529,8 +530,9 @@ def generate_scenarios(
             raise ValueError(f'No models match filter: {models_filter}')
 
     # Output paths
-    output_jsonl = _SCRIPT_DIR / f'scenarios_{domain}.jsonl'
-    output_meta = _SCRIPT_DIR / f'scenarios_{domain}_meta.json'
+    _DATA_DIR.mkdir(parents=True, exist_ok=True)
+    output_jsonl = _DATA_DIR / f'scenarios_{domain}.jsonl'
+    output_meta = _DATA_DIR / f'scenarios_{domain}_meta.json'
 
     # Resume support: load existing scenarios
     existing_scenarios: list[str] = []
