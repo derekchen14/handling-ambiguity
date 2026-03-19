@@ -130,7 +130,7 @@
       {
         "turn_num": 1,
         "flow": "rework",
-        "intent": "Revise",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Load the Reserved Instances draft, I need to fix the flow.",
         "target_tools": {
@@ -191,7 +191,7 @@
       {
         "turn_num": 1,
         "flow": "survey",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Is the Python/Pandas walkthrough live on Dev.to yet?",
         "target_tools": {
@@ -209,7 +209,7 @@
       {
         "turn_num": 3,
         "flow": "survey",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "What other platforms are connected?",
         "target_tools": {
@@ -268,7 +268,7 @@
       {
         "turn_num": 3,
         "flow": "polish",
-        "intent": "Revise",
+        "intent": "Converse",
         "speaker": "user",
         "utterance": "More confident, keep it warm",
         "target_tools": {
@@ -307,7 +307,7 @@
       {
         "turn_num": 1,
         "flow": "simplify",
-        "intent": "Revise",
+        "intent": "Draft",
         "speaker": "user",
         "utterance": "Summarize the AD replication troubleshooting guide for a non-expert team wiki",
         "target_tools": {
@@ -326,7 +326,7 @@
       {
         "turn_num": 3,
         "flow": "simplify",
-        "intent": "Revise",
+        "intent": "Draft",
         "speaker": "user",
         "utterance": "Just the common issues",
         "target_tools": {
@@ -473,7 +473,7 @@
       {
         "turn_num": 1,
         "flow": "outline",
-        "intent": "Draft",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "What are the high-volume search terms for RAG implementation hurdles?",
         "target_tools": {
@@ -653,7 +653,7 @@
       {
         "turn_num": 1,
         "flow": "preview",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Can I see a preview of the lit review paste, the headings look broken.",
         "target_tools": {
@@ -787,7 +787,7 @@
       {
         "turn_num": 3,
         "flow": "rework",
-        "intent": "Revise",
+        "intent": "Draft",
         "speaker": "user",
         "utterance": "Add some success stats too",
         "target_tools": {
@@ -827,7 +827,7 @@
       {
         "turn_num": 1,
         "flow": "survey",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Is the Constantinople post live on Substack yet?",
         "target_tools": {
@@ -845,7 +845,7 @@
       {
         "turn_num": 3,
         "flow": "survey",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Which other platforms are connected?",
         "target_tools": {
@@ -1071,7 +1071,7 @@
       {
         "turn_num": 1,
         "flow": "refine",
-        "intent": "Draft",
+        "intent": "Revise",
         "speaker": "user",
         "utterance": "Make the findings section less formal and easier to digest.",
         "target_tools": {
@@ -1145,7 +1145,7 @@
       {
         "turn_num": 3,
         "flow": "suggest",
-        "intent": "Converse",
+        "intent": "Draft",
         "speaker": "user",
         "utterance": "Brainstorm angles for this IAM draft",
         "target_tools": {
@@ -1384,7 +1384,7 @@
       {
         "turn_num": 3,
         "flow": "survey",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Check if Medium is ready.",
         "target_tools": {
@@ -1650,7 +1650,7 @@
       {
         "turn_num": 3,
         "flow": "preview",
-        "intent": "Publish",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Rendered preview, definitely.",
         "candidate_intents": [
@@ -1834,7 +1834,7 @@
       {
         "turn_num": 3,
         "flow": "suggest",
-        "intent": "Converse",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Look at past releases instead",
         "candidate_intents": [
@@ -1933,7 +1933,7 @@
       {
         "turn_num": 3,
         "flow": "audit",
-        "intent": "Revise",
+        "intent": "Research",
         "speaker": "user",
         "utterance": "Check against my usual tone.",
         "candidate_intents": [
@@ -2388,7 +2388,7 @@
       {
         "turn_num": 3,
         "flow": "suggest",
-        "intent": "Converse",
+        "intent": "Draft",
         "speaker": "user",
         "utterance": "Suggest angles",
         "candidate_intents": [

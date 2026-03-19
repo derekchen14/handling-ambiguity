@@ -19,11 +19,11 @@
           2
         ],
         [
-          "recommend",
+          "plot",
           2
         ],
         [
-          "trend",
+          "describe",
           2
         ]
       ]
@@ -35,23 +35,23 @@
       "ttr": 0.6200607902735562,
       "top_flows": [
         [
-          "describe",
+          "insert",
           3
         ],
         [
-          "undo",
-          3
+          "segment",
+          2
         ],
         [
           "join",
           2
         ],
         [
-          "insert",
+          "replace",
           2
         ],
         [
-          "outline",
+          "undo",
           2
         ]
       ]
@@ -63,11 +63,11 @@
       "ttr": 0.5967741935483871,
       "top_flows": [
         [
-          "outline",
-          7
+          "preference",
+          5
         ],
         [
-          "preference",
+          "exist",
           5
         ],
         [
@@ -75,12 +75,12 @@
           5
         ],
         [
-          "validate",
+          "describe",
           4
         ],
         [
-          "design",
-          3
+          "compare",
+          4
         ]
       ]
     }

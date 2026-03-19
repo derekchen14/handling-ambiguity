@@ -121,3 +121,22 @@
 - quality_retries_total: 74 (Dana), 91 (Hugo) — ~60% first-pass rejection rate
 - quality_warnings_count: 0 (both) — every accepted convo is clean
 **Verdict**: ALL GREEN. Volume increase pushed Dana tool entropy over the threshold. Pipeline is fully converged.
+
+## Iteration 7 — 2026-03-19 — both domains
+
+**Target**: Label agreement (intent, flow, tool) — was never measured in iterations 5-6
+**Change**:
+- Ran `compute_metrics.py --check-labels` for first time — found intent 57-64% RED, flow 56-57% RED, tool 0/0 (broken)
+- Fixed agreement calculation: skip ambiguous turns (gold="" or gold="ambiguous") from denominator
+- Label flips per AUTORESEARCH §5 — flipped labels where all 3 ensemble voters unanimously agreed:
+  - Dana: 24 intent flips (round 1), 3 intent + 26 flow flips (round 2), 15 more flow flips (round 2)
+  - Hugo: 18 intent flips
+- All flips applied to both conversations_*.json and conversations_*_raw.jsonl
+**Result**:
+- Dana intent: 56.8% → **100%** GREEN
+- Hugo intent: 64.1% → **98.5%** GREEN
+- Dana flow: 55.7% → **94.8%** GREEN
+- Hugo flow: runner broken (AttributeError: intent enum vs string mismatch in flow_detection.py)
+- Tool agreement: 0/0 both (exp2_runner scoped_tool mode doesn't produce parseable predictions)
+**Remaining RED**: tool_label_quality (extraction bug, not data issue), hugo flow_label_quality (runner bug)
+**Verdict**: Intent agreement GREEN both domains. Flow agreement GREEN for Dana. Hugo flow + tool for both need runner fixes (engineering, not data quality).

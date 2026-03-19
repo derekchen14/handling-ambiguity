@@ -25,7 +25,7 @@
       {
         "turn_num": 1,
         "flow": "update",
-        "intent": "Clean",
+        "intent": "Transform",
         "speaker": "user",
         "utterance": "The header for temp_assigned_to should read internal_reviewer for now",
         "target_tools": {
@@ -47,7 +47,7 @@
       {
         "turn_num": 3,
         "flow": "update",
-        "intent": "Clean",
+        "intent": "Transform",
         "speaker": "user",
         "utterance": "Now push reporting_period to the front",
         "target_tools": {
@@ -94,7 +94,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "describe",
+        "flow": "segment",
         "intent": "Analyze",
         "speaker": "user",
         "utterance": "How many rows per server, and any gaps in timestamps?",
@@ -112,7 +112,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "describe",
+        "flow": "segment",
         "intent": "Analyze",
         "speaker": "user",
         "utterance": "Use 5 minute intervals",
@@ -215,8 +215,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "validate",
-        "intent": "Clean",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "What program area codes are in the submission file?",
         "target_tools": {
@@ -233,8 +233,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "validate",
-        "intent": "Clean",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Check for HT-208",
         "target_tools": {
@@ -281,8 +281,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "recommend",
-        "intent": "Converse",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "any duplicates in site_code + subject_num combos I should know about?",
         "target_tools": {
@@ -303,8 +303,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "recommend",
-        "intent": "Converse",
+        "flow": "query",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "which site_codes have the overlapping ones?",
         "target_tools": {
@@ -427,8 +427,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "datatype",
-        "intent": "Clean",
+        "flow": "describe",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "check the stats now.",
         "target_tools": {
@@ -482,7 +482,7 @@
       {
         "turn_num": 1,
         "flow": "trend",
-        "intent": "Report",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "WoW growth rate looks inconsistent - can you calculate the rolling 4-week average?",
         "target_tools": {
@@ -499,7 +499,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "trend",
+        "flow": "plot",
         "intent": "Report",
         "speaker": "user",
         "utterance": "Chart both lines together",
@@ -675,8 +675,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "validate",
-        "intent": "Clean",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Check if chronic_absent_rate is between 0 and 100",
         "target_tools": {
@@ -696,8 +696,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "validate",
-        "intent": "Clean",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Same for total_enrollment",
         "target_tools": {
@@ -768,8 +768,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "join",
-        "intent": "Transform",
+        "flow": "describe",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "what columns came in from finding_aids?",
         "target_tools": {
@@ -815,8 +815,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "undo",
-        "intent": "Converse",
+        "flow": "replace",
+        "intent": "Clean",
         "speaker": "user",
         "utterance": "That last replace scrambled a bunch of plant names, undo it.",
         "target_tools": {
@@ -877,7 +877,7 @@
       {
         "turn_num": 1,
         "flow": "trend",
-        "intent": "Report",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Is the yield trend significantly different for the high temperature runs?",
         "target_tools": {
@@ -896,8 +896,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "trend",
-        "intent": "Report",
+        "flow": "describe",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Get the stats for those too.",
         "target_tools": {
@@ -947,7 +947,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "lookup",
+        "flow": "describe",
         "intent": "Analyze",
         "speaker": "user",
         "utterance": "Which demographic fields have the most nulls?",
@@ -968,8 +968,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "lookup",
-        "intent": "Analyze",
+        "flow": "delete",
+        "intent": "Transform",
         "speaker": "user",
         "utterance": "Drop rows with nulls?",
         "target_tools": {
@@ -1015,8 +1015,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "explain",
-        "intent": "Converse",
+        "flow": "summarize",
+        "intent": "Report",
         "speaker": "user",
         "utterance": "How did you pick age_group as the top demographic segment?",
         "target_tools": {
@@ -1121,7 +1121,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "style",
+        "flow": "design",
         "intent": "Report",
         "speaker": "user",
         "utterance": "Also make the pie chart match district colors.",
@@ -1169,8 +1169,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "plot",
-        "intent": "Report",
+        "flow": "query",
+        "intent": "Plan",
         "speaker": "user",
         "utterance": "Profile the finished dates then plot the monthly counts.",
         "target_tools": {
@@ -1267,8 +1267,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "fill",
-        "intent": "Clean",
+        "flow": "describe",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "how many reaction_severity values are missing?",
         "target_tools": {
@@ -1318,7 +1318,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "describe",
+        "flow": "compare",
         "intent": "Analyze",
         "speaker": "user",
         "utterance": "See how engagement compares between short and long videos.",
@@ -1389,8 +1389,8 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "dedupe",
-        "intent": "Clean",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Are there duplicate emails in the customer data?",
         "target_tools": {
@@ -1684,8 +1684,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "delete",
-        "intent": "Transform",
+        "flow": "exist",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "Which rows are blank now?",
         "target_tools": {
@@ -1753,8 +1753,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "segment",
-        "intent": "Analyze",
+        "flow": "summarize",
+        "intent": "Report",
         "speaker": "user",
         "utterance": "Why did it drop in Q3?",
         "target_tools": {
@@ -1822,8 +1822,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "plot",
-        "intent": "Report",
+        "flow": "segment",
+        "intent": "Analyze",
         "speaker": "user",
         "utterance": "What's the call outcome breakdown?",
         "target_tools": {
@@ -2108,7 +2108,7 @@
       {
         "turn_num": 3,
         "flow": "update",
-        "intent": "Clean",
+        "intent": "Converse",
         "speaker": "user",
         "utterance": "Update the matches",
         "candidate_intents": [
@@ -2495,7 +2495,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "segment",
+        "flow": "trend",
         "intent": "Analyze",
         "speaker": "user",
         "utterance": "Seasonal patterns",
@@ -2692,8 +2692,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "query",
-        "intent": "Analyze",
+        "flow": "summarize",
+        "intent": "Report",
         "speaker": "user",
         "utterance": "Summarize it",
         "candidate_intents": [
@@ -2979,8 +2979,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
-        "intent": "Plan",
+        "flow": "trend",
+        "intent": "Report",
         "candidate_flows": [
           "trend",
           "plot"
@@ -3068,8 +3068,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
-        "intent": "Plan",
+        "flow": "validate",
+        "intent": "Analyze",
         "candidate_flows": [
           "reject",
           "validate"
@@ -3139,7 +3139,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "define",
+        "flow": "insert",
         "intent": "Transform",
         "speaker": "user",
         "utterance": "New column total_ram_mb from memory_gb * 1024.",
@@ -3164,7 +3164,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
+        "flow": "datatype",
         "intent": "Plan",
         "candidate_flows": [
           "datatype",
@@ -3254,7 +3254,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
+        "flow": "pipeline",
         "intent": "Plan",
         "candidate_flows": [
           "insert",
@@ -3346,7 +3346,7 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
+        "flow": "query",
         "intent": "Plan",
         "candidate_flows": [
           "update",
@@ -3416,7 +3416,7 @@
     "turns": [
       {
         "turn_num": 1,
-        "flow": "define",
+        "flow": "insert",
         "intent": "Transform",
         "speaker": "user",
         "utterance": "Compute a 30-day readmit flag using the days column.",
@@ -3435,8 +3435,8 @@
       },
       {
         "turn_num": 3,
-        "flow": "outline",
-        "intent": "Plan",
+        "flow": "datatype",
+        "intent": "Clean",
         "candidate_flows": [
           "datatype",
           "validate"

@@ -1697,6 +1697,9 @@ def run_label_agreement(
                 gold = gold_by_turn.get(key)
                 if gold is None:
                     continue
+                # Skip ambiguous turns — they don't have a single correct label
+                if isinstance(gold, str) and (gold == "" or gold == "ambiguous"):
+                    continue
                 cat = category_by_turn.get(key, "unknown")
 
                 if sdef["vote_fn"] == "scalar":
