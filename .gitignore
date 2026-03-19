@@ -36,3 +36,6 @@ results/**/*.jsonl
 
 # Logs
 *.log
+
+# Plots
+.png
