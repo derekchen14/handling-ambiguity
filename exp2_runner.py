@@ -81,8 +81,8 @@ def load_configs() -> dict[str, dict]:
     return {c['config_id']: c for c in configs}
 
 
-def load_eval_set(domain: str) -> list[dict]:
-    eval_path = BASE_DIR / 'datasets' / domain / 'eval_set.json'
+def load_eval_set(domain: str, override_path: Path | None = None) -> list[dict]:
+    eval_path = override_path or (BASE_DIR / 'datasets' / domain / 'eval_set.json')
     if not eval_path.exists():
         log.error('Eval set not found: %s', eval_path)
         sys.exit(1)
@@ -120,6 +120,12 @@ def main():
     parser.add_argument('--param-strategy', choices=['per_tool', 'batch'], default='per_tool',
                         help='Param extraction strategy for --mode parameters')
     parser.add_argument('--workers', type=int, default=4)
+    parser.add_argument('--temperature', type=float, default=None,
+                        help='Override sampling temperature')
+    parser.add_argument('--output-dir', default=None,
+                        help='Override results subdirectory')
+    parser.add_argument('--eval-path', type=Path, default=None,
+                        help='Override eval set path (default: datasets/{domain}/eval_set.json)')
     parser.add_argument('--verbose', '-v', action='store_true')
     args = parser.parse_args()
 
@@ -133,7 +139,7 @@ def main():
 
     configs = load_configs()
     seeds = parse_seeds(args.seeds)
-    eval_set = load_eval_set(args.domain)
+    eval_set = load_eval_set(args.domain, args.eval_path)
 
     # Config selection
     if args.all:
@@ -163,6 +169,10 @@ def main():
         config = dict(configs[config_id])
         model_id = config.get('model_id', '')
 
+        # Apply temperature override
+        if args.temperature is not None:
+            config['temperature'] = args.temperature
+
         for seed in seeds:
             run_start = time.time()
             log.info('Starting %s [%s] domain=%s seed=%d mode=%s',
@@ -182,10 +192,12 @@ def main():
                 tools = load_tools(args.domain)
                 result = runner.run_exp2_scoped_tool(
                     args.domain, config, eval_set, tools, seed,
+                    output_dir=args.output_dir,
                 )
             elif args.mode == 'intent':
                 result = runner.run_exp2_intent(
                     args.domain, config, eval_set, seed,
+                    output_dir=args.output_dir,
                 )
             elif args.mode == 'parameters':
                 tools = load_tools(args.domain)
@@ -205,14 +217,17 @@ def main():
             run_count += 1
 
             # Save summary
-            output_subdir = {
-                'tool': Path('exp2b'),
-                'hint': Path('exp2c'),
-                'scoped_tool': Path('exp2a') / 'tools',
-                'intent': Path('exp2a') / 'intents',
-                'parameters': Path('exp2a') / 'parameters',
-                'slot': Path('exp2a') / 'slots',
-            }[args.mode]
+            if args.output_dir:
+                output_subdir = Path(args.output_dir)
+            else:
+                output_subdir = {
+                    'tool': Path('exp2b'),
+                    'hint': Path('exp2c'),
+                    'scoped_tool': Path('exp2a') / 'tools',
+                    'intent': Path('exp2a') / 'intents',
+                    'parameters': Path('exp2a') / 'parameters',
+                    'slot': Path('exp2a') / 'slots',
+                }[args.mode]
             summary_path = (
                 RESULTS_DIR / output_subdir
                 / f'{args.domain}_{config_id}_seed{seed}_summary.json'

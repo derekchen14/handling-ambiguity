@@ -240,12 +240,16 @@ class ExperimentRunner:
         config: dict,
         eval_set: list[dict],
         seed: int,
+        output_dir: str | None = None,
     ) -> RunResult:
         """Run intent classification on all eval conversations."""
         config_id = config['config_id']
         run_id = f'exp2a_intent_{domain}_{config_id}_seed{seed}'
 
-        output_path = self.results_dir / 'exp2a' / 'intents' / f'{domain}_{config_id}_seed{seed}.jsonl'
+        if output_dir:
+            output_path = self.results_dir / output_dir / f'{domain}_{config_id}_seed{seed}.jsonl'
+        else:
+            output_path = self.results_dir / 'exp2a' / 'intents' / f'{domain}_{config_id}_seed{seed}.jsonl'
         completed = self._load_completed(output_path)
 
         system_prompt = build_intent_classification_prompt(domain)
@@ -345,6 +349,7 @@ class ExperimentRunner:
         eval_set: list[dict],
         tools: list[dict],
         seed: int,
+        output_dir: str | None = None,
     ) -> RunResult:
         """Run scoped tool-calling: per-turn tools filtered by gold flow.
 
@@ -354,7 +359,10 @@ class ExperimentRunner:
         config_id = config['config_id']
         run_id = f'exp2a_tool_{domain}_{config_id}_seed{seed}'
 
-        output_path = self.results_dir / 'exp2a' / 'tools' / f'{domain}_{config_id}_seed{seed}.jsonl'
+        if output_dir:
+            output_path = self.results_dir / output_dir / f'{domain}_{config_id}_seed{seed}.jsonl'
+        else:
+            output_path = self.results_dir / 'exp2a' / 'tools' / f'{domain}_{config_id}_seed{seed}.jsonl'
         completed = self._load_completed(output_path)
 
         remaining = [c for c in eval_set if c['convo_id'] not in completed]

@@ -74,9 +74,9 @@ def load_configs() -> dict[str, dict]:
     return {c['config_id']: c for c in configs}
 
 
-def load_eval_set(domain: str) -> list[dict]:
+def load_eval_set(domain: str, override_path: Path | None = None) -> list[dict]:
     """Load the eval set for a domain."""
-    eval_path = BASE_DIR / 'datasets' / domain / 'eval_set.json'
+    eval_path = override_path or (BASE_DIR / 'datasets' / domain / 'eval_set.json')
     if not eval_path.exists():
         log.error('Eval set not found: %s', eval_path)
         sys.exit(1)
@@ -107,6 +107,8 @@ def main():
                         help='Results subdirectory (default: exp1a)')
     parser.add_argument('--label',
                         help='Override config_id in output filenames (e.g., 3v-1)')
+    parser.add_argument('--eval-path', type=Path, default=None,
+                        help='Override eval set path (default: datasets/{domain}/eval_set.json)')
     parser.add_argument('--verbose', '-v', action='store_true')
     args = parser.parse_args()
 
@@ -121,7 +123,7 @@ def main():
 
     configs = load_configs()
     seeds = parse_seeds(args.seeds)
-    eval_set = load_eval_set(args.domain)
+    eval_set = load_eval_set(args.domain, args.eval_path)
 
     if args.all:
         config_ids = list(configs.keys())
