@@ -1,0 +1,602 @@
+# hugo/schemas/tools.yaml
+# Domain config for the blogging assistant (Hugo).
+# Sections defined here fully replace the shared default for that section.
+
+environment: dev
+
+models:
+  default:
+    provider: anthropic
+    model_id: claude-sonnet-4-5-20250929
+    temperature: 0.0
+    max_output_tokens: 4096
+  overrides:
+    skill:
+      model_id: claude-opus-4-6
+    naturalize:
+      temperature: 0.5
+    nlu:
+      model_id: claude-sonnet-4-5-20250929
+    nlu_vote_haiku:
+      provider: anthropic
+      model_id: claude-haiku-4-5-20251001
+    nlu_vote_sonnet:
+      provider: anthropic
+      model_id: claude-sonnet-4-5-20250929
+    nlu_vote_gemini:
+      provider: google
+      model_id: gemini-3-flash-preview
+
+persona:
+  tone: conversational
+  expertise_boundaries: [blog writing, content strategy, social media posting, copy editing]
+  name: "Hugo"
+  response_style: detailed
+  design_colors:
+    primary: ["#2D3748", "#4A5568"]
+    accent: "#ED8936"
+
+guardrails:
+  input_max_tokens: 8192
+  content_filter:
+    enabled: true
+    categories: [violence, sexual, hate_speech, self_harm, dangerous]
+    severity: medium
+  pii_detection:
+    enabled: false
+    action: redact
+    types: [ssn, credit_card, email, phone, address]
+  topic_control:
+    allowed_topics: []
+    forbidden_topics: []
+  forbidden_patterns: []
+  prompt_injection_detection:
+    enabled: true
+    sensitivity: medium
+
+key_entities: [post, section, note, platform]
+
+display:
+  types: [Default, Dynamic]
+  chart_types: []
+  page_size: 256
+
+tools:
+  # -- PostService ----------------------------------------------------------
+  find_posts:
+    tool_id: find_posts
+    name: "Find posts"
+    description: "Search posts and drafts by keyword, tags, or status"
+    input_schema:
+      type: object
+      properties:
+        query: {type: string, description: "Search term to match against post titles and content"}
+        tags: {type: array, items: {type: string}, description: "Filter by tags"}
+        status: {type: string, enum: [draft, published, archived, all], default: all, description: "Filter by post status"}
+        limit: {type: integer, default: 4, description: "Maximum number of results"}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  search_notes:
+    tool_id: search_notes
+    name: "Search notes"
+    description: "Search notes and short snippets by keyword"
+    input_schema:
+      type: object
+      properties:
+        query: {type: string, description: "Search term to match against note titles and content"}
+        limit: {type: integer, default: 8, description: "Maximum number of results"}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  read_metadata:
+    tool_id: read_metadata
+    name: "Read metadata"
+    description: "Read a post's metadata including title, status, tags, and optionally outline or preview"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to read"}
+        include_outline: {type: boolean, default: false, description: "Include the outline content"}
+        include_preview: {type: boolean, default: false, description: "Include a content preview"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  read_section:
+    tool_id: read_section
+    name: "Read section"
+    description: "Read a specific section of a post by section ID"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "The section ID to read"}
+        include_lines: {type: boolean, default: true, description: "Include line numbers in the output"}
+      required: [post_id, sec_id]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  create_post:
+    tool_id: create_post
+    name: "Create post"
+    description: "Create a new draft post with title and optional initial content"
+    input_schema:
+      type: object
+      properties:
+        title: {type: string, description: "Title of the new post"}
+        type: {type: string, enum: [draft, note], default: draft, description: "Type of content: draft for a full blog post, note for a shorter snippet"}
+        topic: {type: string, description: "Topic or theme for the post"}
+        sections: {type: array, items: {type: string}, description: "Initial section headings"}
+      required: [title]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: true, communicates_externally: false}
+
+  update_post:
+    tool_id: update_post
+    name: "Update post"
+    description: "Update a post's metadata (title, category, tags, color, status)"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to update"}
+        updates: {type: object, description: "Key-value pairs to update (title, category, tags, color, status)"}
+      required: [post_id, updates]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  delete_post:
+    tool_id: delete_post
+    name: "Delete post"
+    description: "Delete a post and its snapshots from the database"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to delete"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  summarize_text:
+    tool_id: summarize_text
+    name: "Summarize text"
+    description: "Produce a summary of content given a post_id, section, note, or raw text"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "Post ID to summarize"}
+        sec_id: {type: string, description: "Section ID to summarize"}
+        note: {type: string, description: "Note content to summarize"}
+        raw_text: {type: string, description: "Raw text to summarize (highest precedence)"}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  rollback_post:
+    tool_id: rollback_post
+    name: "Rollback post"
+    description: "Restore a post to a previous snapshot version"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to rollback"}
+        version: {type: integer, default: 1, description: "Snapshot version to restore (1-4, where 1 is the most recent)"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  # -- ContentService -------------------------------------------------------
+  generate_outline:
+    tool_id: generate_outline
+    name: "Generate outline"
+    description: "Save an outline to a post using markdown with ## headings and bullet points"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to save the outline to"}
+        content: {type: string, description: "Outline content as markdown (## Section headings with bullet points)"}
+        sec_id: {type: string, description: "Optional section ID to scope the outline to"}
+      required: [post_id, content]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  convert_to_prose:
+    tool_id: convert_to_prose
+    name: "Convert to prose"
+    description: "Convert outline bullets into prose paragraphs for a post or section"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "Optional section ID to convert (if omitted, converts all sections)"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  revise_content:
+    tool_id: revise_content
+    name: "Revise content"
+    description: "Replace the content of a specific section with revised text"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "The section ID to revise"}
+        content: {type: string, description: "The new content for the section"}
+        lines: {type: array, items: {type: integer}, description: "Optional line range [start, end] to replace instead of entire section"}
+      required: [post_id, sec_id, content]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  write_text:
+    tool_id: write_text
+    name: "Write text"
+    description: "Generate new text from instructions and optional seed content"
+    input_schema:
+      type: object
+      properties:
+        instructions: {type: string, description: "Instructions for what to write"}
+        seed_content: {type: string, description: "Existing content to build upon or transform"}
+        location: {type: string, enum: [append, prepend, replace], default: append, description: "Where to place the new text relative to seed content"}
+      required: [instructions, seed_content]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: true, communicates_externally: false}
+
+  find_and_replace:
+    tool_id: find_and_replace
+    name: "Find and replace"
+    description: "Find and replace text within a post or specific section"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        find: {type: string, description: "Text to find"}
+        replace: {type: string, description: "Replacement text"}
+        sec_id: {type: string, description: "Optional section ID to scope the replacement"}
+        lines: {type: array, items: {type: integer}, description: "Optional line range [start, end] to scope the replacement"}
+      required: [post_id, find, replace]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  remove_content:
+    tool_id: remove_content
+    name: "Remove content"
+    description: "Remove a section or specific lines from a post"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "The section ID to remove"}
+        lines: {type: array, items: {type: integer}, description: "Optional line range [start, end] to remove instead of entire section"}
+      required: [post_id, sec_id]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  insert_section:
+    tool_id: insert_section
+    name: "Insert section"
+    description: "Insert a new section after a specified section"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "The section to insert after"}
+        section_title: {type: string, description: "Title of the new section"}
+        content: {type: string, description: "Initial content for the new section"}
+      required: [post_id, sec_id, section_title]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  insert_content:
+    tool_id: insert_content
+    name: "Insert content"
+    description: "Insert content at a specific line within a section"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        sec_id: {type: string, description: "The section ID to insert into"}
+        content: {type: string, description: "The content to insert"}
+        line_number: {type: integer, description: "Line number to insert at (omit to append)"}
+      required: [post_id, sec_id, content]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: true, communicates_externally: false}
+
+  cut_and_paste:
+    tool_id: cut_and_paste
+    name: "Cut and paste"
+    description: "Move content between sections within a post"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        source_section: {type: string, description: "Section ID to move content from"}
+        target_section: {type: string, description: "Section ID to move content to"}
+        source_lines: {type: array, items: {type: integer}, description: "Line range [start, end] to move (omit for entire section)"}
+        target_line: {type: integer, description: "Line number in target section to insert at"}
+      required: [post_id, source_section, target_section]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  diff_section:
+    tool_id: diff_section
+    name: "Diff section"
+    description: "Compare two versions of a section side by side"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID"}
+        source_section: {type: string, description: "Section ID to compare"}
+        target_section: {type: string, description: "Section ID to compare against (omit to compare against snapshot)"}
+        version: {type: integer, default: 0, description: "Snapshot version to compare against (0-4)"}
+      required: [post_id, source_section]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  insert_media:
+    tool_id: insert_media
+    name: "Insert media"
+    description: "Generate an image via Nano Banana and store it locally"
+    input_schema:
+      type: object
+      properties:
+        prompt: {type: string, description: "Image generation prompt"}
+        style: {type: string, description: "Optional style modifier for the image"}
+      required: [prompt]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 30000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: true, communicates_externally: true}
+
+  web_search:
+    tool_id: web_search
+    name: "Web search"
+    description: "Search the web via Tavily API"
+    input_schema:
+      type: object
+      properties:
+        query: {type: string, description: "Search query"}
+        limit: {type: integer, default: 5, description: "Maximum number of results"}
+      required: [query]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 15000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: true, communicates_externally: true}
+
+  # -- AnalysisService ------------------------------------------------------
+  brainstorm_ideas:
+    tool_id: brainstorm_ideas
+    name: "Brainstorm ideas"
+    description: "Generate topic ideas, angles, or phrasing alternatives"
+    input_schema:
+      type: object
+      properties:
+        topic: {type: string, description: "Topic or theme to brainstorm about"}
+        source_text: {type: string, description: "Existing text to generate alternatives for"}
+        existing_ideas: {type: array, items: {type: string}, description: "Ideas already considered, to avoid repetition"}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: false, communicates_externally: false}
+
+  inspect_post:
+    tool_id: inspect_post
+    name: "Inspect post"
+    description: "Compute metrics for a post: word count, read time, section count, readability"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to inspect"}
+        metrics: {type: array, items: {type: string}, description: "Specific metrics to compute (omit for all)"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  check_readability:
+    tool_id: check_readability
+    name: "Check readability"
+    description: "Compute readability metrics for text content"
+    input_schema:
+      type: object
+      properties:
+        content: {type: string, description: "Text content to analyze"}
+      required: [content]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: false, communicates_externally: false}
+
+  check_links:
+    tool_id: check_links
+    name: "Check links"
+    description: "Find and validate links and images in content"
+    input_schema:
+      type: object
+      properties:
+        content: {type: string, description: "Text content to scan for links"}
+      required: [content]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: false, communicates_externally: false}
+
+  compare_style:
+    tool_id: compare_style
+    name: "Compare style"
+    description: "Compare a post's style metrics against reference posts"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to compare"}
+        reference_ids: {type: array, items: {type: string}, description: "Post IDs to compare against (omit for automatic selection)"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  editor_review:
+    tool_id: editor_review
+    name: "Editor review"
+    description: "Review content against an editorial style guide"
+    input_schema:
+      type: object
+      properties:
+        content: {type: string, description: "Text content to review"}
+        guide_path: {type: string, description: "Path to a custom style guide (optional, uses default if omitted)"}
+      required: [content]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: false, communicates_externally: false}
+
+  explain_action:
+    tool_id: explain_action
+    name: "Explain action"
+    description: "Explain what Hugo did or plans to do for a given turn or flow"
+    input_schema:
+      type: object
+      properties:
+        turn_id: {type: string, description: "Turn ID to explain"}
+        flow_name: {type: string, description: "Flow name to explain"}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  analyze_seo:
+    tool_id: analyze_seo
+    name: "Analyze SEO"
+    description: "Compute SEO-relevant metrics for a post including keyword density and heading structure"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to analyze"}
+        target_keyword: {type: string, description: "Primary keyword to check density for"}
+      required: [post_id]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: false}
+
+  # -- PlatformService ------------------------------------------------------
+  release_post:
+    tool_id: release_post
+    name: "Release post"
+    description: "Publish a post to a specific platform channel"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to publish"}
+        platform: {type: string, description: "Target platform (e.g., blog, medium, substack)"}
+        scheduled_at: {type: string, description: "ISO datetime to schedule publication (omit for immediate)"}
+      required: [post_id, platform]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 15000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: true}
+
+  channel_status:
+    tool_id: channel_status
+    name: "Channel status"
+    description: "Check the publication status of a post on a specific platform"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to check"}
+        platform: {type: string, description: "The platform to check status on"}
+      required: [post_id, platform]
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: true}
+
+  promote_post:
+    tool_id: promote_post
+    name: "Promote post"
+    description: "Make a published post more prominent by pinning, featuring, or announcing"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to promote"}
+        platform: {type: string, description: "Target platform (e.g., facebook, twitter, linkedin)"}
+        action: {type: string, enum: [promote, feature, pin], default: promote, description: "Promotion action to take"}
+      required: [post_id, platform]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 15000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: true}
+
+  cancel_release:
+    tool_id: cancel_release
+    name: "Cancel release"
+    description: "Cancel a scheduled publication or unpublish a live post"
+    input_schema:
+      type: object
+      properties:
+        post_id: {type: string, description: "The post ID to cancel"}
+        platform: {type: string, description: "The platform to cancel on"}
+      required: [post_id, platform]
+      additionalProperties: false
+    idempotent: false
+    timeout_ms: 10000
+    capabilities: {accesses_private_data: true, receives_untrusted_input: false, communicates_externally: true}
+
+  list_channels:
+    tool_id: list_channels
+    name: "List channels"
+    description: "List configured publishing channels and their connection status"
+    input_schema:
+      type: object
+      properties: {}
+      required: []
+      additionalProperties: false
+    idempotent: true
+    timeout_ms: 5000
+    capabilities: {accesses_private_data: false, receives_untrusted_input: false, communicates_externally: false}
+
+# Template registry populated in Phase 7 (Prompt Writing)
