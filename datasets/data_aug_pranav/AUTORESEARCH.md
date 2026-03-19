@@ -117,7 +117,7 @@ These measure the synthetic data's absolute quality and diversity. **These are t
 | `label_agreement_flow` | Multi-model flow label agreement | >= 0.85 | < 0.70 | Higher = better |
 | `label_agreement_tool` | Multi-model tool label agreement | >= 0.85 | < 0.70 | Higher = better |
 
-Note: `naturalness_mean` and `label_agreement_*` require full metrics (no `--skip-llm`). Use `--skip-llm` for fast iteration on entropy/diversity metrics, then run full metrics at checkpoints.
+**ALL of these metrics must be actively measured and optimized — not just entropy.** Run label agreement checks (`--check-labels`) and naturalness scoring (no `--skip-llm`) as part of the core iteration loop, not just at checkpoints. If label agreement is low, run the disagreement handling protocol (section 5). If naturalness is low, use naturalness-gated filtering. If embedding diversity shows tight clusters, reject and regenerate.
 
 ### Secondary Compass: Comparative Scorecard
 
@@ -148,6 +148,8 @@ These compare synth vs eval distributions. Use as directional guidance, but reme
 for each iteration:
     1. Run pipeline steps 1-4 for {domain}
     2. Run metrics (--skip-llm for fast, full every 3rd iteration)
+    2b. Run label agreement check (--check-labels) — identify disagreements, flip or quarantine per section 5
+    2c. Compute embedding diversity — flag and remove tight clusters (pairwise cosine > 0.85)
     3. Read the scorecard JSON
     4. Read a sample of the actual generated conversations — don't just trust aggregate numbers.
        Look at real examples to spot issues metrics miss (awkward phrasing, repetitive patterns,
@@ -177,6 +179,9 @@ Focus on:
 - Any intrinsic metric moving from red -> yellow or yellow -> green
 - Multiple metrics improving without any regressing
 - Consistency across both domains (hugo AND dana)
+- Label agreement improving (intent toward 0.95, flow/tool toward 0.85)
+- Contrived conversation count decreasing
+- Embedding diversity: no tight clusters remaining after filtering
 
 ---
 
@@ -215,9 +220,9 @@ When flipping labels, modify the conversation JSON file directly. When quarantin
 
 ---
 
-## 6. Advanced Optimization Ideas
+## 6. Required Optimization Techniques
 
-Incorporate these into the process as soon as they're useful — don't wait for prompt tuning to plateau. These are expected tools in your toolkit, not last resorts:
+These are core techniques you MUST use in the optimization loop, not optional ideas. Apply them every iteration:
 
 - **Embedding diversity filtering**: After Step 4, compute pairwise cosine similarities of generated utterances. Reject conversations whose utterances are all within a tight cluster (e.g., mean pairwise similarity > 0.85). This directly boosts `flow_entropy_ratio` and `tool_entropy_ratio`.
 
