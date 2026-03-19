@@ -37,4 +37,19 @@
 
 ## Iteration 3 — 2026-03-19 — both domains
 
-**Target**: Vocab overlap (Jaccard 0.26→0.30+), flow/tool coverage, Dana tool entropy
+**Target**: Scale up for tool/flow coverage, fix compute_metrics.py target_tools parsing bug
+**Change**:
+- Scaled to 400 scenarios per domain → ~345 enriched → ~305 after dedup → ~305 conversations each
+- Dedup rate improved dramatically: Hugo 60%→11%, Dana 37%→12% (conservative dedup prompt paying off at scale)
+- Fixed compute_metrics.py: added `_normalize_target_tools()` to handle list-format and nested-dict target_tools
+- Calibrated turn-3 length: settled on "average 12-14w, ~15% under 8w terse"
+**Result** (Hugo 303 convos, Dana 305 convos):
+- Hugo Tool coverage: 0.80 → 0.95 GREEN!
+- Length KS: 0.14→0.13 (Hugo YELLOW), 0.17→0.19 (Dana YELLOW)
+- Intrinsic: Flow entropy GREEN both (0.93, 0.90), Tool entropy GREEN (Hugo 0.90), YELLOW (Dana 0.73)
+- Intent JSD: YELLOW both
+- Vocab Jaccard: 0.26→0.26 (Hugo), 0.27→0.24 (Dana) — still RED, threshold 0.30
+- Flow JSD: 0.23 (Hugo), 0.22 (Dana) — still RED, threshold 0.15
+- Flow pair coverage: 0.49 (Hugo), 0.60 (Dana) — improving, still RED
+- Ambiguous category JSD: still RED (0.41-0.49 Hugo, 0.32-0.47 Dana)
+**Verdict**: Volume fixed tool coverage (Hugo GREEN). Dedup rate normalized. Remaining RED: vocab overlap, flow JSD, flow pair coverage, ambiguous categories.

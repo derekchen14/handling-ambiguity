@@ -69,6 +69,19 @@ def load_datasets(domain: str):
     return eval_convos, synth_convos
 
 
+def _normalize_target_tools(tt) -> dict:
+    """Normalize target_tools to a dict of {tool_name: params}."""
+    if isinstance(tt, dict):
+        return {k: v for k, v in tt.items() if isinstance(k, str)}
+    if isinstance(tt, list):
+        result = {}
+        for item in tt:
+            if isinstance(item, dict) and "name" in item:
+                result[item["name"]] = item.get("args", item.get("params", {}))
+        return result
+    return {}
+
+
 def flatten_turns(convos: list[dict], source: str) -> list[dict]:
     """Flatten conversations into one record per user turn."""
     records = []
@@ -82,7 +95,7 @@ def flatten_turns(convos: list[dict], source: str) -> list[dict]:
                 "flow":         t.get("flow"),
                 "intent":       t.get("intent"),
                 "utterance":    t["utterance"],
-                "target_tools": t.get("target_tools", {}),
+                "target_tools": _normalize_target_tools(t.get("target_tools", {})),
                 "turn_num":     t["turn_num"],
                 "source":       source,
                 "_model":       c.get("_model",    "human"),
