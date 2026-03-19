@@ -782,8 +782,8 @@ def main():
         help='Domain to generate scenarios for',
     )
     parser.add_argument(
-        '--target', type=int, default=200,
-        help='Target number of scenarios (default: 200)',
+        '--target', type=int, default=40,
+        help='Target number of scenarios (default: 40)',
     )
     parser.add_argument(
         '--batch-size', type=int, default=12,

@@ -62,7 +62,6 @@ INTRINSIC_THRESHOLDS = {
     "heuristic_filler_rate":     (0.05, 0.15),   # lower is better
     "heuristic_overack_rate":    (0.05, 0.15),   # lower is better
     "heuristic_unicode_rate":    (0.02, 0.10),   # lower is better
-    "heuristic_leakage_rate":    (0.02, 0.10),   # lower is better
     "heuristic_multireq_rate":   (0.90, 0.70),   # higher is better (has connector)
     "heuristic_t3_terse_rate":   (0.70, 0.50),   # higher is better (turn3 ≤9 words)
     # LLM judges (Section I)
@@ -561,7 +560,7 @@ _OVERACK_PATTERNS = [
     re.compile(r'^fantastic[!.]', re.I),
 ]
 
-# Unicode characters that are LLM tells (I.7) — ported from data_aug/validator.py
+# Unicode characters that are LLM tells (I.7)
 _UNICODE_CHARS = {
     '\u2014': 'em dash',
     '\u2013': 'en dash',
@@ -573,31 +572,7 @@ _UNICODE_CHARS = {
     '\u2019': 'right single quote',
 }
 
-# Common English words to skip in flow/intent name leakage check (I.8)
-# Ported from data_aug/validator.py COMMON_WORD_FLOWS
-_COMMON_ENGLISH = {
-    'add', 'check', 'compare', 'confirm', 'create', 'define', 'delete',
-    'describe', 'design', 'expand', 'explain', 'export', 'fill', 'find',
-    'format', 'insert', 'inspect', 'join', 'merge', 'outline', 'plot',
-    'preview', 'recall', 'recommend', 'refine', 'reject', 'release',
-    'replace', 'reshape', 'retrieve', 'schedule', 'search', 'split',
-    'store', 'study', 'style', 'suggest', 'survey', 'tone', 'trend',
-    'undo', 'update', 'validate', 'view', 'write',
-    'audit', 'browse', 'calculate', 'cancel', 'chat', 'approve',
-    'blank', 'dismiss', 'endorse', 'peek', 'pivot', 'query', 'reference',
-    'remember', 'segment', 'summarize',
-    # Intent names that are common English
-    'clean', 'transform', 'analyze', 'report', 'converse', 'plan',
-    'research', 'draft', 'revise', 'publish',
-    # Additional common words that are flow names
-    'dashboard', 'aggregate', 'profile', 'sort', 'filter', 'drop',
-    'rename', 'chart', 'rework', 'blueprint',
-}
-
-# Internal/system tools to exclude from leakage check
-_INTERNAL_TOOLS = {"handle_ambiguity"}
-
-# Multi-request connector patterns (I.6, I.8) — ported from data_aug/validator.py
+# Multi-request connector patterns (I.6, I.8)
 _MULTIREQ_CONNECTORS = [
     re.compile(r'\bso i can\b', re.I),
     re.compile(r'\bso we can\b', re.I),
@@ -618,38 +593,164 @@ _MULTIREQ_CONNECTORS = [
 ]
 
 
+# ── Inline quality gate (used by generate_conversations.py) ──────────
+
+from dataclasses import dataclass, field
+
+
+@dataclass
+class QualityResult:
+    passed: bool
+    reasons: list[str] = field(default_factory=list)
+
+
+def check_conversation(convo: dict, category: str) -> QualityResult:
+    """Run regex-based heuristics on a single conversation.
+
+    Does NOT check for label leakage — use check_leakage_llm() for that.
+    """
+    reasons: list[str] = []
+
+    for turn in convo.get('turns', []):
+        utt = turn.get('utterance', '')
+        turn_num = turn.get('turn_num', 0)
+        speaker = turn.get('speaker', '')
+
+        if speaker == 'user':
+            for pat in _FILLER_PATTERNS:
+                if pat.search(utt):
+                    reasons.append(f'filler in user turn {turn_num}: {pat.pattern}')
+                    break
+            if turn_num == 3 and word_count(utt) > 9:
+                reasons.append(f'turn 3 too long: {word_count(utt)} words (max 9)')
+
+        elif speaker == 'agent':
+            for pat in _OVERACK_PATTERNS:
+                if pat.search(utt):
+                    reasons.append(f'overack in agent turn {turn_num}: {pat.pattern}')
+                    break
+
+        for char, name in _UNICODE_CHARS.items():
+            if char in utt:
+                reasons.append(f'banned unicode ({name}) in turn {turn_num}')
+                break
+
+    if category == 'ambiguous_second':
+        t3_turns = [t for t in convo.get('turns', [])
+                    if t.get('turn_num') == 3 and t.get('speaker') == 'user']
+        if t3_turns:
+            utt3 = t3_turns[0]['utterance']
+            if not any(pat.search(utt3) for pat in _MULTIREQ_CONNECTORS):
+                reasons.append('ambiguous_second turn 3 missing multi-request connector')
+
+    return QualityResult(passed=len(reasons) == 0, reasons=reasons)
+
+
+# ── LLM leakage judge ───────────────────────────────────────────────
+
+_LEAKAGE_JUDGE_SYSTEM = """\
+You are a quality auditor for synthetic training conversations between a user and a copilot agent.
+
+Your job is to detect **label leakage**: places where the agent (or user) reveals knowledge that could only come from the system prompt, scenario description, or flow/tool metadata — NOT from what was actually said in the conversation.
+
+Common leakage patterns:
+- Agent infers the user's unstated downstream goal ("so we can compare wording" when user only asked to "pull posts")
+- Agent references a flow name, tool name, or intent label that was never mentioned by the user
+- Agent anticipates what the user will ask next
+- User utterance contains exact tool names (e.g. "run_search"), flow names that aren't common English, or internal jargon from the ontology
+- Agent over-explains by synthesizing information the user never provided
+
+A conversation is CLEAN if:
+- The agent responds ONLY to what the user actually said
+- No turn reveals knowledge from the scenario/system prompt metadata
+- Tool/flow/intent names don't appear verbatim in user speech (common English words like "search", "filter", "draft" are fine)
+
+You will be given the conversation turns AND the scenario metadata that was used to generate them. \
+Compare what the agent says against what the user actually said — flag any gap where the agent "knows too much"."""
+
+_LEAKAGE_JUDGE_USER = """\
+## Scenario metadata (given to the generator, NOT visible to the user)
+{scenario_context}
+
+## Conversation
+{conversation_text}
+
+## Task
+Does this conversation contain label leakage? Respond with EXACTLY one of:
+- CLEAN — no leakage detected
+- LEAKED: <one-sentence explanation of what leaked and where>"""
+
+
+async def check_leakage_llm(
+    convo: dict,
+    scenario: dict,
+    assigned_flows: dict,
+) -> QualityResult:
+    """Use an LLM judge to detect label leakage in a conversation."""
+    from anthropic import AsyncAnthropic
+
+    scenario_parts = [
+        f"Scenario: {scenario.get('scenario', 'N/A')}",
+        f"Category: {convo.get('category', 'N/A')}",
+    ]
+    if assigned_flows:
+        scenario_parts.append(f"Turn 1 flow: {assigned_flows.get('turn1_flow', 'N/A')} (intent: {assigned_flows.get('turn1_intent', 'N/A')})")
+        if assigned_flows.get('turn3_flow'):
+            scenario_parts.append(f"Turn 3 flow: {assigned_flows.get('turn3_flow', 'N/A')} (intent: {assigned_flows.get('turn3_intent', 'N/A')})")
+        if assigned_flows.get('turn1_tools'):
+            scenario_parts.append(f"Turn 1 tools: {assigned_flows['turn1_tools']}")
+        if assigned_flows.get('turn3_tools'):
+            scenario_parts.append(f"Turn 3 tools: {assigned_flows['turn3_tools']}")
+    scenario_context = '\n'.join(scenario_parts)
+
+    conv_lines = []
+    for t in convo.get('turns', []):
+        speaker = t.get('speaker', '?').upper()
+        conv_lines.append(f"Turn {t.get('turn_num', '?')} ({speaker}): {t.get('utterance', '')}")
+    conversation_text = '\n'.join(conv_lines)
+
+    user_prompt = _LEAKAGE_JUDGE_USER.format(
+        scenario_context=scenario_context,
+        conversation_text=conversation_text,
+    )
+
+    client = AsyncAnthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', ''))
+    try:
+        resp = await client.messages.create(
+            model='claude-sonnet-4-20250514',
+            max_tokens=256,
+            temperature=0.0,
+            system=_LEAKAGE_JUDGE_SYSTEM,
+            messages=[{'role': 'user', 'content': user_prompt}],
+        )
+        answer = next(b.text for b in resp.content if hasattr(b, 'text')).strip()
+    finally:
+        await client.close()
+
+    if answer.startswith('CLEAN'):
+        return QualityResult(passed=True, reasons=[])
+    elif answer.startswith('LEAKED:'):
+        reason = answer[len('LEAKED:'):].strip()
+        return QualityResult(passed=False, reasons=[f'leakage: {reason}'])
+    else:
+        return QualityResult(passed=True, reasons=[])
+
+
 def quality_heuristics(synth_convos: list[dict], domain: str) -> dict:
     """Programmatic quality checks from README Section I guidelines.
 
     Checks: filler phrases (I.2), agent over-acknowledgment (I.2),
-    unicode/em-dashes (I.7), flow/tool name leakage (I.8),
-    length violations (I.8), multi-request connectors (I.6/I.8),
-    converse same-flow anti-pattern (I.3), turn 3 terseness (I.2),
+    unicode/em-dashes (I.7), length violations (I.8),
+    multi-request connectors (I.6/I.8), converse same-flow
+    anti-pattern (I.3), turn 3 terseness (I.2),
     double-converse yellow flag (I.4).
+
+    Note: label leakage is now handled exclusively by the LLM judge
+    (check_leakage_llm / judge_agent_leak), not regex heuristics.
     """
-    # Collect all flow names, intent names, tool names from the data
-    all_flows: set[str] = set()
-    all_intents: set[str] = set()
-    all_tools: set[str] = set()
-    for c in synth_convos:
-        for t in c["turns"]:
-            if t.get("flow") and t["flow"] != "ambiguous":
-                all_flows.add(t["flow"])
-            if t.get("intent"):
-                all_intents.add(t["intent"])
-            for tool_name in (t.get("target_tools") or {}):
-                all_tools.add(tool_name)
-
-    # Exclude internal tools and common English words
-    check_tools = all_tools - _INTERNAL_TOOLS
-    flaggable_flows = {f for f in all_flows if f.lower() not in _COMMON_ENGLISH}
-    flaggable_intents = {i for i in all_intents if i.lower() not in _COMMON_ENGLISH}
-
-    # Accumulators
     filler_flagged: list[dict] = []
     overack_flagged: list[dict] = []
     unicode_flagged: list[dict] = []
-    leakage_flagged: list[dict] = []
     length_user_over: list[dict] = []
     length_agent_over: list[dict] = []
     multireq_missing: list[dict] = []
@@ -682,22 +783,6 @@ def quality_heuristics(synth_convos: list[dict], domain: str) -> dict:
                         filler_flagged.append({"convo_id": cid, "turn": t["turn_num"],
                                                "match": pat.pattern, "utterance": utt})
                         break
-
-                # Flow/intent/tool name leakage (I.8)
-                utt_lower = utt.lower()
-                leaked = []
-                for tool_name in check_tools:
-                    if re.search(r'\b' + re.escape(tool_name) + r'\b', utt_lower):
-                        leaked.append(("tool", tool_name))
-                for fn in flaggable_flows:
-                    if re.search(r'\b' + re.escape(fn.lower()) + r'\b', utt_lower):
-                        leaked.append(("flow", fn))
-                for intent_name in flaggable_intents:
-                    if re.search(r'\b' + re.escape(intent_name.lower()) + r'\b', utt_lower):
-                        leaked.append(("intent", intent_name))
-                if leaked:
-                    leakage_flagged.append({"convo_id": cid, "turn": t["turn_num"],
-                                            "leaked": leaked, "utterance": utt})
 
                 # Length check (I.8): user max 100 words
                 wc = word_count(utt)
@@ -775,11 +860,6 @@ def quality_heuristics(synth_convos: list[dict], domain: str) -> dict:
             "rate": len(unicode_flagged) / len(synth_convos) if synth_convos else 0,
             "count": len(unicode_flagged), "total": len(synth_convos),
             "flagged": unicode_flagged[:20],
-        },
-        "leakage": {
-            "rate": len(leakage_flagged) / total_user_turns if total_user_turns else 0,
-            "count": len(leakage_flagged), "total": total_user_turns,
-            "flagged": leakage_flagged[:20],
         },
         "length_violations": {
             "user_over_100": len(length_user_over),
@@ -1270,60 +1350,46 @@ async def judge_turn_dependency(synth_convos, domain, seed=42, concurrency=10):
 
 # ── Agent Label Leak Judge (Section I.2) ──────────────────────────────
 
-AGENT_LEAK_PROMPT = """Does the agent (Turn 2) reveal knowledge about the user's goals or intentions that were NOT expressed in Turn 1?
-
-The agent should respond ONLY to what the user explicitly said. The agent should NOT:
-- State the user's downstream goal: "so we can compare wording", "for your report"
-- Anticipate what the user will ask next
-- Name the specific operation when the user only described a problem
-
-Examples of leaks:
-- User: "Pull my beginner baking posts" -> Agent: "so we can compare wording" (goal never stated)
-- User: "The dates look weird" -> Agent: "I'll standardize them to ISO 8601" (user didn't say standardize)
-- User: "Show me the revenue data" -> Agent: "I'll generate the quarterly report" (user didn't ask for report)
-
-Turn 1 (user): {turn1}
-Turn 2 (agent): {turn2}
-
-Score 1 if the agent leaks unstated information, 0 if clean.
-Respond in JSON only: {{"leak": <0 or 1>, "reason": "<brief explanation>"}}"""
-
-
 async def judge_agent_leak(synth_convos, domain, seed=42, concurrency=10):
-    """Check if agent responses leak unstated user goals (I.2)."""
-    from anthropic import AsyncAnthropic
-    client = AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+    """Check if agent responses leak unstated user goals (I.2).
+
+    Uses the LLM leakage judge (check_leakage_llm) which compares
+    conversation content against scenario metadata to detect semantic
+    leakage — not just lexical matches.
+    """
     sem = asyncio.Semaphore(concurrency)
 
     async def _rate(c):
-        ts = c["turns"]
-        p = AGENT_LEAK_PROMPT.format(
-            turn1=ts[0]["utterance"],
-            turn2=ts[1]["utterance"],
-        )
-        r = await _call_llm(p, client, sem)
-        r["convo_id"] = c["convo_id"]
-        r["category"] = c["category"]
-        return r
+        async with sem:
+            scenario = {"scenario": c.get("scenario", "")}
+            assigned_flows = c.get("_assigned_tools", {})
+            qr = await check_leakage_llm(c, scenario, assigned_flows)
+            return {
+                "convo_id": c["convo_id"],
+                "category": c["category"],
+                "leak": 0 if qr.passed else 1,
+                "reason": qr.reasons[0] if qr.reasons else "",
+            }
 
     tasks = [_rate(c) for c in synth_convos]
-    results = await asyncio.gather(*tasks)
-    await client.close()
+    results = await asyncio.gather(*tasks, return_exceptions=True)
 
+    # Filter out exceptions
+    valid_results = []
     for r in results:
-        try:
-            r["leak"] = int(r.get("leak", -1))
-        except (ValueError, TypeError):
-            r["leak"] = -1
+        if isinstance(r, BaseException):
+            valid_results.append({"leak": -1, "reason": str(r)})
+        else:
+            valid_results.append(r)
 
-    valid = [r for r in results if r["leak"] >= 0]
+    valid = [r for r in valid_results if r["leak"] >= 0]
     leak_count = sum(1 for r in valid if r["leak"] == 1)
     leak_rate = leak_count / len(valid) if valid else 0
 
     leak_ids = sorted(r["convo_id"] for r in valid if r["leak"] == 1)
 
     per_conversation = {}
-    for r in results:
+    for r in valid_results:
         cid = r.get("convo_id")
         if cid:
             per_conversation[cid] = {
@@ -1736,9 +1802,6 @@ def compute_intrinsic_scorecard(intrinsic: dict) -> list[dict]:
         ur = h.get("unicode", {}).get("rate", 0)
         _add("Unicode/em-dash (I.7)", f"rate = {ur:.2%}", ur, "heuristic_unicode_rate")
 
-        lr = h.get("leakage", {}).get("rate", 0)
-        _add("Label leakage (I.8)", f"rate = {lr:.2%}", lr, "heuristic_leakage_rate")
-
         mr = h.get("multireq_connector", {}).get("rate", 0)
         _add("Multi-req connectors (I.6)", f"rate = {mr:.2%}", mr,
              "heuristic_multireq_rate", True)
@@ -1952,7 +2015,6 @@ def main():
         print(f"         Filler: {h['filler']['count']}/{h['filler']['total']} | "
               f"Overack: {h['agent_overack']['count']}/{h['agent_overack']['total']} | "
               f"Unicode: {h['unicode']['count']} | "
-              f"Leakage: {h['leakage']['count']} | "
               f"Turn3 terse: {h['turn3_length']['terse_rate']:.0%}")
 
         print("  [11/16] Per-category metrics...")

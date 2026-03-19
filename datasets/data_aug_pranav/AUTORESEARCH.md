@@ -74,6 +74,11 @@ Generate 3-turn conversations (user -> agent -> user) from enriched scenarios, o
 - Output: `data/conversations_{domain}_raw.jsonl` (intermediate) + `data/conversations_{domain}.json` (final, sorted)
 - Categories: `same_flow`, `switch_flow`, `ambiguous_first`, `ambiguous_second` (equal split)
 - Each scenario gets assigned to exactly one category with pre-assigned flow and tool constraints
+- **Inline quality gate** (two-phase, up to 3 retries per conversation):
+  1. **Regex checks** (fast): filler phrases, agent over-acknowledgment, banned unicode, turn-3 terseness, multi-request connectors
+  2. **LLM leakage judge** (async, batched): detects semantic label leakage — agent inferring unstated goals, revealing scenario metadata, or anticipating user's next turn. Uses `quality_checks.check_leakage_llm()` with Sonnet as judge.
+- Conversations that fail either check are regenerated (up to `MAX_QUALITY_RETRIES=3`). If retries exhausted, accepted with `_quality_warnings` field.
+- Meta output includes `quality_retries_total` and `quality_warnings_count`
 
 ### Metrics — Compute Scorecard
 ```bash

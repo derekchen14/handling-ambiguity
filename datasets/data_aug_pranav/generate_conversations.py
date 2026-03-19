@@ -30,6 +30,11 @@ from pathlib import Path
 
 from tqdm import tqdm
 
+from datasets.data_aug_pranav.compute_metrics import (
+    check_conversation,
+    check_leakage_llm,
+)
+
 # ── Path setup ───────────────────────────────────────────────────────
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -94,6 +99,7 @@ CONTEXT_SCHEMA = {
 }
 
 MAX_RETRIES = 3
+MAX_QUALITY_RETRIES = 3
 BACKOFF_BASE_S = 1.0
 
 # Intents that are user-facing (exclude Plan, Internal)
@@ -959,6 +965,20 @@ async def _run_wave(
     return await asyncio.gather(*tasks, return_exceptions=True)
 
 
+async def _run_leakage_checks(
+    candidates: list[tuple[dict, dict]],
+) -> list:
+    """Run LLM leakage judge in parallel for a batch of (spec, convo) pairs."""
+    async def _check_one(spec, convo):
+        return await check_leakage_llm(
+            convo,
+            scenario=spec.get('scenario', {}),
+            assigned_flows=spec.get('scenario', {}).get('assigned_flows', {}),
+        )
+    tasks = [_check_one(spec, convo) for spec, convo in candidates]
+    return await asyncio.gather(*tasks, return_exceptions=True)
+
+
 # ── Output finalization ──────────────────────────────────────────────
 
 def _finalize_output(domain: str, raw_jsonl_path: Path, output_json_path: Path) -> None:
@@ -1090,6 +1110,8 @@ def generate_conversations(
     cursor = 0
     failed = 0
     generated = 0
+    quality_retries_total = 0
+    quality_warnings_count = 0
     failed_items: list[dict] = []
 
     while cursor < len(work_items):
@@ -1100,6 +1122,9 @@ def generate_conversations(
         results = asyncio.run(_run_wave(wave_specs, system_prompt, semaphore))
 
         wave_new: list[dict] = []
+        # Candidates that passed regex checks, pending leakage LLM judge
+        leakage_candidates: list[tuple[dict, dict]] = []  # (spec, convo)
+
         for spec, result in zip(wave_specs, results):
             if isinstance(result, BaseException):
                 pbar.write(f'ERROR: {spec["convo_id"]} ({spec["model_config"]["name"]}): {result}')
@@ -1114,6 +1139,21 @@ def generate_conversations(
                 failed_items.append(spec)
                 continue
 
+            # Regex quality gate (fast)
+            qr = check_conversation(convo, spec['category'])
+            if not qr.passed:
+                retries_so_far = spec.get('_quality_retries', 0)
+                if retries_so_far < MAX_QUALITY_RETRIES:
+                    spec['_quality_retries'] = retries_so_far + 1
+                    quality_retries_total += 1
+                    pbar.write(f'QUALITY: {spec["convo_id"]} retry {retries_so_far + 1}/{MAX_QUALITY_RETRIES}: {qr.reasons}')
+                    failed_items.append(spec)
+                    continue
+                else:
+                    pbar.write(f'QUALITY: {spec["convo_id"]} accepted with warnings: {qr.reasons}')
+                    convo['_quality_warnings'] = qr.reasons
+                    quality_warnings_count += 1
+
             # Ensure correct metadata
             convo['convo_id'] = spec['convo_id']
             convo['category'] = spec['category']
@@ -1121,7 +1161,29 @@ def generate_conversations(
             convo['_provider'] = spec['model_config']['provider']
             convo['_assigned_tools'] = spec['scenario'].get('assigned_flows', {})
 
-            wave_new.append(convo)
+            leakage_candidates.append((spec, convo))
+
+        # LLM leakage judge (async, batched)
+        if leakage_candidates:
+            leakage_results = asyncio.run(_run_leakage_checks(leakage_candidates))
+            for (spec, convo), lr in zip(leakage_candidates, leakage_results):
+                if isinstance(lr, BaseException):
+                    pbar.write(f'LEAKAGE CHECK ERROR: {spec["convo_id"]}: {lr}')
+                    wave_new.append(convo)  # accept on judge error
+                elif not lr.passed:
+                    retries_so_far = spec.get('_quality_retries', 0)
+                    if retries_so_far < MAX_QUALITY_RETRIES:
+                        spec['_quality_retries'] = retries_so_far + 1
+                        quality_retries_total += 1
+                        pbar.write(f'LEAKAGE: {spec["convo_id"]} retry {retries_so_far + 1}/{MAX_QUALITY_RETRIES}: {lr.reasons}')
+                        failed_items.append(spec)
+                    else:
+                        pbar.write(f'LEAKAGE: {spec["convo_id"]} accepted with warnings: {lr.reasons}')
+                        convo.setdefault('_quality_warnings', []).extend(lr.reasons)
+                        quality_warnings_count += 1
+                        wave_new.append(convo)
+                else:
+                    wave_new.append(convo)
 
         # Flush to disk
         if wave_new:
@@ -1155,6 +1217,8 @@ def generate_conversations(
             results = asyncio.run(_run_wave(wave_specs, system_prompt, semaphore))
 
             wave_new = []
+            leakage_candidates = []
+
             for spec, result in zip(wave_specs, results):
                 if isinstance(result, BaseException):
                     pbar.write(f'RETRY ERROR: {spec["convo_id"]} ({spec["model_config"]["name"]}): {result}')
@@ -1167,13 +1231,50 @@ def generate_conversations(
                     retry_failed.append(spec)
                     continue
 
+                # Regex quality gate (fast)
+                qr = check_conversation(convo, spec['category'])
+                if not qr.passed:
+                    retries_so_far = spec.get('_quality_retries', 0)
+                    if retries_so_far < MAX_QUALITY_RETRIES:
+                        spec['_quality_retries'] = retries_so_far + 1
+                        quality_retries_total += 1
+                        pbar.write(f'QUALITY: {spec["convo_id"]} retry {retries_so_far + 1}/{MAX_QUALITY_RETRIES}: {qr.reasons}')
+                        retry_failed.append(spec)
+                        continue
+                    else:
+                        pbar.write(f'QUALITY: {spec["convo_id"]} accepted with warnings: {qr.reasons}')
+                        convo['_quality_warnings'] = qr.reasons
+                        quality_warnings_count += 1
+
                 convo['convo_id'] = spec['convo_id']
                 convo['category'] = spec['category']
                 convo['_model'] = spec['model_config']['model_id']
                 convo['_provider'] = spec['model_config']['provider']
                 convo['_assigned_tools'] = spec['scenario'].get('assigned_flows', {})
 
-                wave_new.append(convo)
+                leakage_candidates.append((spec, convo))
+
+            # LLM leakage judge (async, batched)
+            if leakage_candidates:
+                leakage_results = asyncio.run(_run_leakage_checks(leakage_candidates))
+                for (spec, convo), lr in zip(leakage_candidates, leakage_results):
+                    if isinstance(lr, BaseException):
+                        pbar.write(f'LEAKAGE CHECK ERROR: {spec["convo_id"]}: {lr}')
+                        wave_new.append(convo)
+                    elif not lr.passed:
+                        retries_so_far = spec.get('_quality_retries', 0)
+                        if retries_so_far < MAX_QUALITY_RETRIES:
+                            spec['_quality_retries'] = retries_so_far + 1
+                            quality_retries_total += 1
+                            pbar.write(f'LEAKAGE: {spec["convo_id"]} retry {retries_so_far + 1}/{MAX_QUALITY_RETRIES}: {lr.reasons}')
+                            retry_failed.append(spec)
+                        else:
+                            pbar.write(f'LEAKAGE: {spec["convo_id"]} accepted with warnings: {lr.reasons}')
+                            convo.setdefault('_quality_warnings', []).extend(lr.reasons)
+                            quality_warnings_count += 1
+                            wave_new.append(convo)
+                    else:
+                        wave_new.append(convo)
 
             if wave_new:
                 with open(output_jsonl, 'a') as f:
@@ -1198,6 +1299,8 @@ def generate_conversations(
         'total_scenarios': len(scenarios),
         'total_generated': generated,
         'total_failed': failed,
+        'quality_retries_total': quality_retries_total,
+        'quality_warnings_count': quality_warnings_count,
         'categories': {cat: len(buckets[cat]) for cat in CATEGORIES},
         'models': [m['name'] for m in active_models],
     }
