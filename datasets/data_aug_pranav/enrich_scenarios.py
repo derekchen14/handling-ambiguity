@@ -128,6 +128,52 @@ def _load_tool_manifest(domain: str) -> str:
     return path.read_text()
 
 
+def _load_tool_manifest_json(domain: str) -> list[dict]:
+    """Load tool manifest as parsed JSON list."""
+    path = _PROJECT_ROOT / 'tools' / f'tool_manifest_{domain}.json'
+    with open(path) as f:
+        return json.load(f)
+
+
+def _build_flow_tool_index(manifest: list[dict]) -> dict[str, list[str]]:
+    """Build {flow_name: [sorted tool names]} from manifest, excluding internal tools."""
+    index: dict[str, list[str]] = {}
+    for tool in manifest:
+        if tool.get('internal_component'):
+            continue
+        for flow in tool.get('_flows', []):
+            index.setdefault(flow, []).append(tool['name'])
+    for flow in index:
+        index[flow].sort()  # deterministic ordering
+    return index
+
+
+def _assign_tools_to_sequence(
+    flow_seq: list[dict],
+    flow_tool_index: dict[str, list[str]],
+    flow_tool_cursor: dict[str, int],
+) -> list[dict]:
+    """Add assigned_tools to each flow in a sequence using round-robin."""
+    result = []
+    for step in flow_seq:
+        step = dict(step)
+        flow = step['flow']
+        tools = flow_tool_index.get(flow, [])
+        if not tools:
+            step['assigned_tools'] = []
+        elif len(tools) == 1:
+            step['assigned_tools'] = [tools[0]]
+            flow_tool_cursor[flow] = flow_tool_cursor.get(flow, 0) + 1
+        else:
+            cursor = flow_tool_cursor.get(flow, 0)
+            t1 = tools[cursor % len(tools)]
+            t2 = tools[(cursor + 1) % len(tools)]
+            step['assigned_tools'] = [t1, t2]
+            flow_tool_cursor[flow] = cursor + 2
+        result.append(step)
+    return result
+
+
 def _assign_anchor_flows(scenarios: list[dict], user_facing: dict, rng: random.Random) -> list[dict]:
     """Round-robin assign 2 anchor flows per scenario for uniform distribution."""
     flow_names = sorted(user_facing.keys())
@@ -665,6 +711,11 @@ def enrich_scenarios(
     user_facing = _user_facing_flows(flow_catalog, Intent)
     by_intent = _flows_by_intent(user_facing)
 
+    # Build tool index for deterministic tool assignment
+    tool_manifest_json = _load_tool_manifest_json(domain)
+    flow_tool_index = _build_flow_tool_index(tool_manifest_json)
+    flow_tool_cursor: dict[str, int] = {}
+
     # Filter models if requested
     active_models = MODEL_CONFIGS[:]
     if models_filter:
@@ -860,6 +911,9 @@ def enrich_scenarios(
                 # Compute edge_flow_pairs
                 edge_pairs = _extract_edge_pairs(flow_seq, user_facing)
 
+                # Assign tools deterministically
+                flow_seq = _assign_tools_to_sequence(flow_seq, flow_tool_index, flow_tool_cursor)
+
                 # Merge into original scenario
                 mc = scenario_model_map[sid]
                 output_obj = dict(scenario)
@@ -970,6 +1024,10 @@ def enrich_scenarios(
                         continue
 
                     edge_pairs = _extract_edge_pairs(flow_seq, user_facing)
+
+                    # Assign tools deterministically
+                    flow_seq = _assign_tools_to_sequence(flow_seq, flow_tool_index, flow_tool_cursor)
+
                     mc = scenario_model_map[sid]
                     output_obj = dict(scenario)
                     output_obj['flow_sequence'] = flow_seq
@@ -1026,6 +1084,37 @@ def enrich_scenarios(
     return output_jsonl
 
 
+# ── Backfill ─────────────────────────────────────────────────────────
+
+def _backfill_tools(domain: str, seed: int) -> None:
+    """Add assigned_tools to existing enriched scenarios (no LLM calls)."""
+    tool_manifest_json = _load_tool_manifest_json(domain)
+    flow_tool_index = _build_flow_tool_index(tool_manifest_json)
+    flow_tool_cursor: dict[str, int] = {}
+
+    for suffix in ('_enriched', '_enriched_deduped'):
+        path = _SCRIPT_DIR / f'scenarios_{domain}{suffix}.jsonl'
+        if not path.exists():
+            continue
+        scenarios = []
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    scenarios.append(json.loads(line))
+        # Sort by scenario_id for deterministic assignment
+        scenarios.sort(key=lambda s: s['scenario_id'])
+        for sc in scenarios:
+            if 'flow_sequence' in sc:
+                sc['flow_sequence'] = _assign_tools_to_sequence(
+                    sc['flow_sequence'], flow_tool_index, flow_tool_cursor,
+                )
+        with open(path, 'w') as f:
+            for sc in scenarios:
+                f.write(json.dumps(sc, ensure_ascii=False) + '\n')
+        log.info('Backfilled tools for %d scenarios in %s', len(scenarios), path.name)
+
+
 # ── CLI ──────────────────────────────────────────────────────────────
 
 def main():
@@ -1066,6 +1155,10 @@ def main():
         '--max-threads', type=int, default=None,
         help='Max concurrent API calls (default: number of active models)',
     )
+    parser.add_argument(
+        '--backfill-tools', action='store_true',
+        help='Add assigned_tools to existing enriched scenarios (no LLM calls)',
+    )
 
     args = parser.parse_args()
 
@@ -1076,6 +1169,10 @@ def main():
     )
     # Only our logger gets DEBUG/INFO — keep httpcore/httpx silent
     log.setLevel(logging.DEBUG if args.verbose else logging.INFO)
+
+    if args.backfill_tools:
+        _backfill_tools(args.domain, args.seed)
+        return
 
     models_filter = None
     if args.models:

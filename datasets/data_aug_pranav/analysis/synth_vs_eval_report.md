@@ -4,10 +4,16 @@
 
 **Dana**: Flow JSD=0.167, Intent JSD=0.088, Tool coverage=93.5%. Vocab Jaccard=0.200. 3 eval tools missing from synth.
 
-**Hugo**: Flow JSD=0.225, Intent JSD=0.068, Tool coverage=92.7%. Vocab Jaccard=0.176. 3 eval tools missing from synth.
 
+## Intrinsic Quality Scorecard
 
-## Transfer Risk Scorecard
+| Signal | Metric | Rating | Green / Yellow | Red |
+|--------|--------|--------|----------------|-----|
+| **Dana** | | | | |
+| Flow uniformity | ratio = 0.93 | 🟢 | > 0.85 / > 0.7 | <= 0.7 |
+| Tool uniformity | ratio = 0.85 | 🟡 | > 0.85 / > 0.7 | <= 0.7 |
+
+## Comparative Scorecard
 
 | Signal | Metric | Rating | Green / Yellow | Red |
 |--------|--------|--------|----------------|-----|
@@ -16,17 +22,39 @@
 | Intent match | JSD = 0.088 | 🟡 | < 0.05 / < 0.15 | >= 0.15 |
 | Length match | KS = 0.518 | 🔴 | < 0.1 / < 0.3 | >= 0.3 |
 | Vocab overlap | Jaccard = 0.200 | 🔴 | > 0.6 / > 0.3 | <= 0.3 |
-| Tool coverage | 93.5% | 🟡 | > 95% / > 80% | <= 80% |
-| Flow pair coverage | 61.5% | 🟡 | > 80% / > 60% | <= 60% |
-| **Hugo** | | | | |
-| Flow match | JSD = 0.225 | 🔴 | < 0.05 / < 0.15 | >= 0.15 |
-| Intent match | JSD = 0.068 | 🟡 | < 0.05 / < 0.15 | >= 0.15 |
-| Length match | KS = 0.510 | 🔴 | < 0.1 / < 0.3 | >= 0.3 |
-| Vocab overlap | Jaccard = 0.176 | 🔴 | > 0.6 / > 0.3 | <= 0.3 |
-| Tool coverage | 92.7% | 🟡 | > 95% / > 80% | <= 80% |
-| Flow pair coverage | 60.4% | 🟡 | > 80% / > 60% | <= 60% |
+| Tool coverage | 93.5% | 🟡 | > 0.95 / > 0.8 | <= 0.8 |
+| Flow pair coverage | 61.5% | 🟡 | > 0.8 / > 0.6 | <= 0.6 |
+| Turn-3 flow match | JSD = 0.233 | 🔴 | < 0.05 / < 0.15 | >= 0.15 |
+| ambiguous_first flow | JSD = 0.426 | 🔴 | < 0.05 / < 0.15 | >= 0.15 |
+| ambiguous_second flow | JSD = 0.315 | 🔴 | < 0.05 / < 0.15 | >= 0.15 |
 
-## 1. Distribution Analyses
+## 1. Intrinsic Quality
+
+### Dana
+
+#### Flow Diversity
+
+Entropy = 4.870, Unique flows = 38, Uniformity = 0.928
+
+#### Intent Diversity
+
+Entropy = 2.524, Unique intents = 6
+
+#### Tool Diversity
+
+Entropy = 4.842, Unique tools = 53, Mean tools/turn = 1.40
+
+### Model-Specific Effects (Cross-Domain)
+
+| Provider | n | Mean Length | Std Length | TTR |
+|----------|---|------------|-----------|-----|
+| anthropic | 192 | 26.1 | 5.9 | 0.246 |
+| openai | 192 | 23.6 | 6.5 | 0.283 |
+| openrouter | 382 | 15.8 | 5.1 | 0.237 |
+
+![Model Effects](model_effects.png)
+
+## 2. Distribution Match
 
 ### Dana
 
@@ -92,7 +120,7 @@ Eval TTR = 0.260 (878 types), Synth TTR = 0.171 (2665 types), Jaccard = 0.200
 
 **Eval-exclusive words** (freq >= 2, top 20):
 
-`shipping` (7), `oh` (6), `ok` (6), `impressions` (5), `own` (5), `tenure` (4), `inventory` (4), `likes` (4), `repeated` (4), `segments` (4), `shares` (4), `warehouses` (4), `feed` (3), `comments` (3), `link` (3), `mom` (3), `satisfaction_score` (3), `says` (3), `adoption` (3), `web` (2)
+`shipping` (7), `oh` (6), `ok` (6), `own` (5), `impressions` (5), `warehouses` (4), `tenure` (4), `segments` (4), `likes` (4), `repeated` (4), `shares` (4), `inventory` (4), `feed` (3), `mom` (3), `comments` (3), `says` (3), `adoption` (3), `satisfaction_score` (3), `link` (3), `june` (2)
 
 #### Tool Usage
 
@@ -126,7 +154,7 @@ Cosine similarity = 0.568, Pair coverage = 61.5% (104 eval, 174 synth)
 
 #### Embedding Similarity
 
-Within-eval = 0.033, Within-synth = 0.039, Cross-set = 0.020 (NOT well-mixed)
+Within-eval = 0.147, Within-synth = 0.145, Cross-set = 0.130 (NOT well-mixed)
 
 ![Embedding PCA](embedding_pca_dana.png)
 
@@ -138,127 +166,84 @@ Eval null rate = 21.7% (175/806), Synth null rate = 12.7% (483/3801)
 
 Terse turn-3 rate (< 8 words): eval=14.1% (18/128), synth=3.4% (13/383)
 
-### Hugo
+## 3. Transfer Gap Deep-Dives
 
-#### Flow Distribution
+### Dana
 
-JSD = 0.2251, χ² = 624.5 (p = 1.007e-109)
+#### Per-Category Metrics
 
-**Flagged flows** (ratio < 0.5 or > 2.0):
+| Category | Flow JSD | Tool JSD | Length KS | Terse % (eval) | Terse % (synth) |
+|----------|----------|----------|-----------|----------------|-----------------|
+| same_flow | 0.421 | 0.437 | 0.875 | 21.9% | 0.0% |
+| switch_flow | 0.300 | 0.330 | 0.406 | 12.5% | 1.0% |
+| ambiguous_first | 0.426 | 0.289 | 0.474 | 21.9% | 12.6% |
+| ambiguous_second | 0.315 | 0.303 | 0.510 | 0.0% | 0.0% |
 
-- `browse`: 2.21x
-- `check`: 0.47x
-- `compare`: 0.50x
-- `diff`: 0.50x
-- `endorse`: infx
-- `expand`: 0.21x
-- `outline`: 12.94x
-- `preview`: 3.82x
-- `promote`: 0.20x
-- `schedule`: 0.33x
-- `suggest`: 2.16x
+![Per-Category Metrics](per_category_metrics_dana.png)
 
-![Flow Distribution](flow_distribution_hugo.png)
+#### Turn Position Analysis
 
-#### Intent Distribution
+| Turn | Flow JSD | Tool JSD |
+|------|----------|----------|
+| Turn 1 | 0.238 | 0.223 |
+| Turn 3 | 0.233 | 0.320 |
 
-JSD = 0.0681, χ² = 26.6 (p = 6.762e-05)
+![Turn Position](turn_position_dana.png)
 
-| Intent | Eval | Synth |
-|--------|------|-------|
-| Converse | 17 | 69 |
-| Draft | 43 | 169 |
-| Plan | 32 | 96 |
-| Publish | 34 | 83 |
-| Research | 47 | 123 |
-| Revise | 50 | 132 |
+#### Agent Response Comparison
 
-![Intent Distribution](intent_distribution_hugo.png)
+Length KS = 0.227, Vocab Jaccard = 0.213
 
-#### Category Balance
+Mean length: eval = 23.3, synth = 29.1
 
-| Category | Eval | Synth |
-|----------|------|-------|
-| same_flow | 32 | 96 |
-| switch_flow | 32 | 96 |
-| ambiguous_first | 32 | 96 |
-| ambiguous_second | 32 | 96 |
+![Agent Response](agent_response_dana.png)
 
-#### Utterance Length
+#### Conditional Distributions
 
-Turn 1 KS = 0.375 (p = 1.713e-12), Turn 3 KS = 0.510 (p = 2.540e-23)
+Avg P(tool|flow) JSD = 0.245, Avg P(flow|intent) JSD = 0.134
 
-| Stat | Eval T1 | Synth T1 | Eval T3 | Synth T3 |
-|------|---------|----------|---------|----------|
-| mean | 14.0 | 21.6 | 13.1 | 23.2 |
-| median | 14.0 | 20.0 | 13.5 | 22.0 |
-| std | 4.9 | 11.7 | 5.4 | 10.2 |
-| p10 | 7.0 | 11.0 | 6.0 | 12.3 |
-| p90 | 21.0 | 34.0 | 21.0 | 35.0 |
+| Flow | P(tool&#124;flow) JSD |
+|------|---------------------|
+| approve | 0.833 **!** |
+| reject | 0.833 **!** |
+| update | 0.833 **!** |
+| chat | 0.740 **!** |
+| recommend | 0.703 **!** |
+| insert | 0.407 **!** |
+| outline | 0.394 **!** |
+| export | 0.390 **!** |
+| compare | 0.371 **!** |
+| segment | 0.364 **!** |
 
-![Utterance Length](utterance_length_hugo.png)
+| Intent | P(flow&#124;intent) JSD |
+|--------|----------------------|
+| Converse | 0.235 |
+| Analyze | 0.159 |
+| Transform | 0.155 |
+| Clean | 0.136 |
+| Report | 0.121 |
+| Plan | 0.000 |
 
-#### Vocabulary
+Worst conditional gaps: `approve` (0.833), `reject` (0.833), `update` (0.833), `chat` (0.740), `recommend` (0.703)
 
-Eval TTR = 0.231 (801 types), Synth TTR = 0.175 (3005 types), Jaccard = 0.176
+![Conditional Distributions](conditional_dist_dana.png)
 
-**Eval-exclusive words** (freq >= 2, top 20):
+#### Scenario Topic Coverage
 
-`roundup` (13), `essay` (8), `authentication` (6), `thailand` (6), `thursday` (6), `living` (6), `noise` (5), `transformer` (5), `wanna` (5), `how's` (5), `vietnam` (5), `bangkok` (4), `error` (4), `async` (4), `self-attention` (4), `pin` (4), `yesterday` (3), `southeast` (3), `squash` (3), `positional` (3)
+8 clusters: 1 eval-only, 4 synth-only, coverage = 75.0%
 
-#### Tool Usage
+| Cluster | Eval | Synth | Status |
+|---------|------|-------|--------|
+| 0 | 53 | 13 | both |
+| 1 | 11 | 16 | both |
+| 2 | 0 | 29 | synth-only |
+| 3 | 0 | 99 | synth-only |
+| 4 | 52 | 6 | both |
+| 5 | 12 | 0 | eval-only |
+| 6 | 0 | 133 | synth-only |
+| 7 | 0 | 87 | synth-only |
 
-JSD = 0.2593, Coverage = 92.7%
-
-**Missing from synth** (critical): `conversational_response`, `search_sources`, `web_search`
-
-**Synth-only** (noise): `analyze_seo`, `coordinate_context`, `delete_section`, `draft_content`, `heads_or_tails`, `publish_post_promote`, `read_flow_stack`, `read_outline`, `rework`, `suggest_keywords`
-
-Mean tools/turn: eval=1.70, synth=1.68
-
-![Tool Usage](tool_usage_hugo.png)
-
-#### Flow Co-occurrence
-
-Cosine similarity = 0.423, Pair coverage = 60.4% (101 eval, 175 synth)
-
-**Missing transitions** (40 pairs):
-- `add` -> `dismiss`
-- `add` -> `release`
-- `ambiguous` -> `blueprint`
-- `ambiguous` -> `format`
-- `amend` -> `blueprint`
-- `amend` -> `preference`
-- `amend` -> `tone`
-- `browse` -> `explain`
-- `cancel` -> `inspect`
-- `check` -> `compare`
-
-![Flow Co-occurrence](flow_cooccurrence_hugo.png)
-
-#### Embedding Similarity
-
-Within-eval = 0.037, Within-synth = 0.042, Cross-set = 0.022 (NOT well-mixed)
-
-![Embedding PCA](embedding_pca_hugo.png)
-
-#### Parameter Completeness
-
-Eval null rate = 34.3% (228/664), Synth null rate = 17.8% (595/3348)
-
-#### Context Dependence
-
-Terse turn-3 rate (< 8 words): eval=14.1% (18/128), synth=2.3% (9/384)
-
-## 3. Model-Specific Effects
-
-| Provider | n | Mean Length | Std Length | TTR |
-|----------|---|------------|-----------|-----|
-| anthropic | 384 | 26.9 | 7.4 | 0.196 |
-| openai | 384 | 26.4 | 11.6 | 0.247 |
-| openrouter | 766 | 16.1 | 5.3 | 0.201 |
-
-![Model Effects](model_effects.png)
+![Topic Coverage](topic_coverage_dana.png)
 
 ## 4. Recommendations
 
@@ -266,12 +251,5 @@ Terse turn-3 rate (< 8 words): eval=14.1% (18/128), synth=2.3% (9/384)
 
 - **High flow JSD**: Significant flow distribution mismatch. Consider rebalancing generation.
 - **Tool coverage gaps**: 3 eval tools missing from synth: brainstorm_ideas, conversational_response, detect_issues
-- **Low vocabulary overlap**: Synthetic language diverges from eval. Review generation prompts.
-- **Under-represented terse follow-ups**: Synth lacks short context-dependent turn-3 utterances.
-
-### Hugo
-
-- **High flow JSD**: Significant flow distribution mismatch. Consider rebalancing generation.
-- **Tool coverage gaps**: 3 eval tools missing from synth: conversational_response, search_sources, web_search
 - **Low vocabulary overlap**: Synthetic language diverges from eval. Review generation prompts.
 - **Under-represented terse follow-ups**: Synth lacks short context-dependent turn-3 utterances.

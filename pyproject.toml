@@ -12,6 +12,7 @@ dependencies = [
     "matplotlib>=3.8.0",
     "python-dotenv",
     "scipy",
+    "sentence-transformers>=3.0,<4.0",
     "tqdm",
 ]
 

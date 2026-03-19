@@ -229,14 +229,20 @@ def _pick_flows_for_category(
     seq = scenario.get('flow_sequence', [])
     edges = scenario.get('edge_flow_pairs', [])
 
+    # Build a lookup from flow name to its assigned_tools
+    flow_tools_map = {fs['flow']: fs.get('assigned_tools', []) for fs in seq}
+
     if category == 'same_flow':
         # Pick one flow, use for both turns
         flow_obj = rng.choice(seq)
+        tools = flow_obj.get('assigned_tools', [])
         return {
             'turn1_flow': flow_obj['flow'],
             'turn1_intent': flow_obj['intent'],
             'turn3_flow': flow_obj['flow'],
             'turn3_intent': flow_obj['intent'],
+            'turn1_tools': tools[:1],   # first tool for turn 1
+            'turn3_tools': tools[1:2],  # second tool for turn 3 (different)
         }
 
     elif category == 'switch_flow':
@@ -250,6 +256,8 @@ def _pick_flows_for_category(
             'turn1_intent': pair[0]['intent'],
             'turn3_flow': pair[1]['flow'],
             'turn3_intent': pair[1]['intent'],
+            'turn1_tools': pair[0].get('assigned_tools', [])[:1],
+            'turn3_tools': pair[1].get('assigned_tools', [])[:1],
         }
 
     elif category == 'ambiguous_first':
@@ -274,12 +282,20 @@ def _pick_flows_for_category(
         # Decide sub-type: partial or confirmation (50/50)
         sub_type = rng.choice(['partial', 'confirmation'])
 
+        # Tool assignments for candidates
+        cand_a_tools = flow_tools_map.get(cand_a, [])[:1]
+        cand_b_tools = flow_tools_map.get(cand_b, [])[:1]
+        resolved_tools = flow_tools_map.get(resolved, [])[1:2] or flow_tools_map.get(resolved, [])[:1]
+
         return {
             'candidate_flows': [cand_a, cand_b],
             'candidate_intents': list(set([intent_a, intent_b, 'Plan'])),
             'turn3_flow': resolved,
             'turn3_intent': resolved_intent,
             'sub_type': sub_type,
+            'cand_a_tools': cand_a_tools,
+            'cand_b_tools': cand_b_tools,
+            'turn3_tools': resolved_tools,
         }
 
     elif category == 'ambiguous_second':
@@ -300,13 +316,35 @@ def _pick_flows_for_category(
         return {
             'turn1_flow': turn1['flow'],
             'turn1_intent': turn1['intent'],
+            'turn1_tools': turn1.get('assigned_tools', [])[:1],
             'candidate_flows': [m['flow'] for m in multi],
             'candidate_intents': list(set(
                 [m['intent'] for m in multi] + ['Plan']
             )),
+            'turn3_tools': [
+                multi[0].get('assigned_tools', [])[:1],
+                multi[1].get('assigned_tools', [])[:1],
+            ],
         }
 
     return {}
+
+
+# ── Tool constraint helpers ───────────────────────────────────────────
+
+def _required_tools_section(constraints: list[str]) -> str:
+    """Build a ## Required Tools section from a list of constraint lines.
+
+    Returns empty string if no constraints (e.g. all flows are toolless).
+    """
+    if not constraints:
+        return ''
+    lines = '\n'.join(f'- {c}' for c in constraints)
+    return f"""
+## Required Tools
+{lines}
+- You MAY add additional tools from the same flow, but the specified tool(s) MUST appear.
+"""
 
 
 # ── Prompt construction ──────────────────────────────────────────────
@@ -348,6 +386,21 @@ def _build_user_prompt_same_flow(
     convo_id: str,
 ) -> str:
     af = scenario['assigned_flows']
+    t1_tools = af.get('turn1_tools', [])
+    t3_tools = af.get('turn3_tools', [])
+
+    # Build tool constraints
+    constraints = []
+    if t1_tools:
+        constraints.append(f'Turn 1 MUST include `{t1_tools[0]}` in target_tools with realistic parameters.')
+    if t3_tools:
+        constraints.append(f'Turn 3 MUST include `{t3_tools[0]}` in target_tools with realistic parameters.')
+    tool_section = _required_tools_section(constraints)
+
+    # Concrete tool names for schema placeholders
+    t1_tool_name = t1_tools[0] if t1_tools else '<tool_name>'
+    t3_tool_name = t3_tools[0] if t3_tools else '<tool_name>'
+
     return f"""Generate a 3-turn conversation for category "same_flow".
 
 ## Rules for same_flow
@@ -360,7 +413,7 @@ def _build_user_prompt_same_flow(
 
 Example utterances for inspiration (DO NOT copy these verbatim):
 {json.dumps(scenario.get('example_utterances', []))}
-
+{tool_section}
 ## Required JSON Schema
 {{
   "convo_id": "{convo_id}",
@@ -375,7 +428,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "speaker": "user",
       "utterance": "<natural user message>",
       "target_tools": {{
-        "<tool_name>": {{ <realistic params> }}
+        "{t1_tool_name}": {{ <realistic params> }}
       }}
     }},
     {{
@@ -390,7 +443,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "speaker": "user",
       "utterance": "<natural follow-up in the SAME flow>",
       "target_tools": {{
-        "<tool_name>": {{ <realistic params> }}
+        "{t3_tool_name}": {{ <realistic params> }}
       }}
     }}
   ]
@@ -405,6 +458,19 @@ def _build_user_prompt_switch_flow(
     convo_id: str,
 ) -> str:
     af = scenario['assigned_flows']
+    t1_tools = af.get('turn1_tools', [])
+    t3_tools = af.get('turn3_tools', [])
+
+    constraints = []
+    if t1_tools:
+        constraints.append(f'Turn 1 MUST include `{t1_tools[0]}` in target_tools with realistic parameters.')
+    if t3_tools:
+        constraints.append(f'Turn 3 MUST include `{t3_tools[0]}` in target_tools with realistic parameters.')
+    tool_section = _required_tools_section(constraints)
+
+    t1_tool_name = t1_tools[0] if t1_tools else '<tool_name>'
+    t3_tool_name = t3_tools[0] if t3_tools else '<tool_name>'
+
     return f"""Generate a 3-turn conversation for category "switch_flow".
 
 ## Rules for switch_flow
@@ -418,7 +484,7 @@ def _build_user_prompt_switch_flow(
 
 Example utterances for inspiration (DO NOT copy these verbatim):
 {json.dumps(scenario.get('example_utterances', []))}
-
+{tool_section}
 ## Required JSON Schema
 {{
   "convo_id": "{convo_id}",
@@ -433,7 +499,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "speaker": "user",
       "utterance": "<natural user message for {af['turn1_flow']}>",
       "target_tools": {{
-        "<tool_name>": {{ <realistic params> }}
+        "{t1_tool_name}": {{ <realistic params> }}
       }}
     }},
     {{
@@ -448,7 +514,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "speaker": "user",
       "utterance": "<natural user message switching to {af['turn3_flow']}>",
       "target_tools": {{
-        "<tool_name>": {{ <realistic params> }}
+        "{t3_tool_name}": {{ <realistic params> }}
       }}
     }}
   ]
@@ -483,6 +549,23 @@ def _build_user_prompt_ambiguous_first(
             'and ask the user to confirm.'
         )
 
+    cand_a_tools = af.get('cand_a_tools', [])
+    cand_b_tools = af.get('cand_b_tools', [])
+    t3_tools = af.get('turn3_tools', [])
+
+    constraints = []
+    if cand_a_tools:
+        constraints.append(f'Turn 1 MUST include `{cand_a_tools[0]}` (from flow {af["candidate_flows"][0]}) in target_tools.')
+    if cand_b_tools:
+        constraints.append(f'Turn 1 MUST include `{cand_b_tools[0]}` (from flow {af["candidate_flows"][1]}) in target_tools.')
+    if t3_tools:
+        constraints.append(f'Turn 3 MUST include `{t3_tools[0]}` in target_tools with realistic parameters.')
+    tool_section = _required_tools_section(constraints)
+
+    tool_a_name = cand_a_tools[0] if cand_a_tools else '<tool_from_flow_A>'
+    tool_b_name = cand_b_tools[0] if cand_b_tools else '<tool_from_flow_B>'
+    t3_tool_name = t3_tools[0] if t3_tools else '<tool_for_resolved_flow>'
+
     return f"""Generate a 3-turn conversation for category "ambiguous_first".
 
 ## Rules for ambiguous_first
@@ -497,7 +580,7 @@ def _build_user_prompt_ambiguous_first(
 
 Example utterances for inspiration (DO NOT copy these verbatim):
 {json.dumps(scenario.get('example_utterances', []))}
-
+{tool_section}
 ## Required JSON Schema
 {{
   "convo_id": "{convo_id}",
@@ -516,10 +599,10 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "target_tools": {{
         "handle_ambiguity": {{
           "clarification": null,
-          "candidates": ["<tool_from_flow_A>", "<tool_from_flow_B>"]
+          "candidates": ["{tool_a_name}", "{tool_b_name}"]
         }},
-        "<tool_for_flow_A>": {{ <params> }},
-        "<tool_for_flow_B>": {{ <params> }}
+        "{tool_a_name}": {{ <params> }},
+        "{tool_b_name}": {{ <params> }}
       }}
     }},
     {{
@@ -535,7 +618,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "utterance": "<user clarifies, resolving to {af['turn3_flow']}>",
       "candidate_intents": {json.dumps(af['candidate_intents'])},
       "target_tools": {{
-        "<tool_for_resolved_flow>": {{ <params> }}
+        "{t3_tool_name}": {{ <params> }}
       }}
     }}
   ]
@@ -552,6 +635,25 @@ def _build_user_prompt_ambiguous_second(
     af = scenario['assigned_flows']
     plan_flow = PLAN_ORCHESTRATOR[domain]
 
+    t1_tools = af.get('turn1_tools', [])
+    # turn3_tools is [[tool_a], [tool_b]] for multi-request
+    t3_tools_raw = af.get('turn3_tools', [[], []])
+    t3_tool_a = t3_tools_raw[0][0] if t3_tools_raw and t3_tools_raw[0] else None
+    t3_tool_b = t3_tools_raw[1][0] if len(t3_tools_raw) > 1 and t3_tools_raw[1] else None
+
+    constraints = []
+    if t1_tools:
+        constraints.append(f'Turn 1 MUST include `{t1_tools[0]}` in target_tools with realistic parameters.')
+    if t3_tool_a:
+        constraints.append(f'Turn 3 MUST include `{t3_tool_a}` (from flow {af["candidate_flows"][0]}) in target_tools.')
+    if t3_tool_b:
+        constraints.append(f'Turn 3 MUST include `{t3_tool_b}` (from flow {af["candidate_flows"][1]}) in target_tools.')
+    tool_section = _required_tools_section(constraints)
+
+    t1_tool_name = t1_tools[0] if t1_tools else '<tool_name>'
+    t3_tool_a_name = t3_tool_a or '<tool_for_flow_1>'
+    t3_tool_b_name = t3_tool_b or '<tool_for_flow_2>'
+
     return f"""Generate a 3-turn conversation for category "ambiguous_second".
 
 ## Rules for ambiguous_second
@@ -567,7 +669,7 @@ def _build_user_prompt_ambiguous_second(
 
 Example utterances for inspiration (DO NOT copy these verbatim):
 {json.dumps(scenario.get('example_utterances', []))}
-
+{tool_section}
 ## Required JSON Schema
 {{
   "convo_id": "{convo_id}",
@@ -582,7 +684,7 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "speaker": "user",
       "utterance": "<clear user message for {af['turn1_flow']}>",
       "target_tools": {{
-        "<tool_name>": {{ <params> }}
+        "{t1_tool_name}": {{ <params> }}
       }}
     }},
     {{
@@ -600,8 +702,8 @@ Example utterances for inspiration (DO NOT copy these verbatim):
       "utterance": "<natural multi-request combining both flows in one sentence>",
       "rationale": "<1-2 sentences explaining why this is a multi-request>",
       "target_tools": {{
-        "<tool_for_flow_1>": {{ <params> }},
-        "<tool_for_flow_2>": {{ <params> }}
+        "{t3_tool_a_name}": {{ <params> }},
+        "{t3_tool_b_name}": {{ <params> }}
       }}
     }}
   ]
@@ -941,6 +1043,7 @@ def generate_conversations(
             convo['category'] = spec['category']
             convo['_model'] = spec['model_config']['model_id']
             convo['_provider'] = spec['model_config']['provider']
+            convo['_assigned_tools'] = spec['scenario'].get('assigned_flows', {})
 
             wave_new.append(convo)
 
@@ -992,6 +1095,7 @@ def generate_conversations(
                 convo['category'] = spec['category']
                 convo['_model'] = spec['model_config']['model_id']
                 convo['_provider'] = spec['model_config']['provider']
+                convo['_assigned_tools'] = spec['scenario'].get('assigned_flows', {})
 
                 wave_new.append(convo)
 
