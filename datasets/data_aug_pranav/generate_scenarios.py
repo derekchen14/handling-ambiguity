@@ -70,14 +70,22 @@ MODEL_CONFIGS = [
 ]
 
 DIVERSITY_AXES = [
-    'enterprise and corporate contexts',
-    'personal and hobbyist contexts',
-    'academic and research contexts',
-    'startup and small-business contexts',
-    'non-profit and public-sector contexts',
-    'creative and artistic contexts',
-    'technical and engineering contexts',
-    'marketing and growth contexts',
+    'enterprise IT and cloud infrastructure teams',
+    'personal lifestyle and hobby bloggers',
+    'academic researchers and PhD students',
+    'early-stage startup founders (pre-Series A)',
+    'non-profit program managers and grant writers',
+    'freelance artists, musicians, and designers',
+    'backend/DevOps engineers writing internal docs',
+    'growth marketers running content campaigns',
+    'K-12 teachers and school administrators',
+    'healthcare professionals and clinic managers',
+    'e-commerce store owners and product managers',
+    'legal teams and compliance officers',
+    'real estate agents and property managers',
+    'sports coaches and fitness influencers',
+    'food bloggers and restaurant owners',
+    'financial advisors and wealth managers',
 ]
 
 DOMAIN_DESCRIPTIONS = {
@@ -151,7 +159,7 @@ Your job is to generate diverse, realistic scenario descriptions along with exam
 
 Return a JSON array of scenario objects. Each object must have:
 - "scenario": A specific, detailed scenario description (1-2 sentences). Include the domain/topic, the user's goal, and any relevant context.
-- "example_utterances": A list of 3-5 short, realistic user messages (10-30 words each) that someone in this scenario might type on their phone. These should be terse, natural, and varied in style.
+- "example_utterances": A list of 3-5 short, realistic user messages (5-18 words each) that someone in this scenario might type on their phone. These should be terse, natural, and varied in style. At least one should be very short (under 8 words).
 
 ## Rules
 
@@ -160,7 +168,8 @@ Return a JSON array of scenario objects. Each object must have:
 3. NEVER use technical flow names or system terminology in utterances. Use natural language only.
 4. Vary sentence structure, length, and register across utterances. Mix terse commands with casual questions.
 5. Avoid em dashes, fancy Unicode punctuation, and overly polished prose. Use commas, periods, and plain language.
-6. Return valid JSON only. No markdown fences, no explanation outside the JSON array."""
+6. Each scenario MUST be about a genuinely different task/goal. "Writing a blog post about X" and "Writing a blog post about Y" are NOT different enough — vary the USER ACTION (drafting vs. revising vs. comparing vs. scheduling vs. researching), not just the topic.
+7. Return valid JSON only. No markdown fences, no explanation outside the JSON array."""
 
 
 def _build_user_prompt(

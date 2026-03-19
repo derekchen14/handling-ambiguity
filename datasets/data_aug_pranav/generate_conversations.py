@@ -371,12 +371,25 @@ You MUST output ONLY a single valid JSON object (no markdown fencing, no explana
 The JSON must conform exactly to the schema described in the user prompt.
 
 ## Quality Rules
-- Utterances must sound like a real person talking to an AI assistant — casual, varied, natural.
+- Utterances must sound like a real person typing on their phone to an AI assistant — casual, terse, direct.
+- NATURAL LENGTH DISTRIBUTION. Turn 1 and Turn 3: both average around 12-14 words (range 5-22). About 15% of turn-3 utterances should be very short (under 8 words) — terse follow-ups like "Same for the intro." The rest should be normal conversational length (10-20 words). Don't pad utterances or over-explain.
 - NEVER include the flow name, intent name, or tool name in the user utterance.
 - Turn 2 (agent) should be 1-2 sentences, directly responding to turn 1.
 - The context field must be realistic and specific to the scenario.
 - target_tools must use actual tool names and realistic parameter values from the tool reference above.
 - For parameters where the exact value depends on data the user hasn't provided, use null.
+- Vary register: mix terse commands ("fix the intro"), casual questions ("what's the word count?"), and brief follow-ups ("same thing for the conclusion").
+- Avoid em dashes, fancy punctuation, and overly polished prose. Use plain commas and periods.
+
+## Style Examples (for calibration — DO NOT copy verbatim)
+- Turn 1: "The self-attention section feels off. Reorder it from Q/K/V intuition into scaled dot-product."
+- Turn 3: "Same thing for multi-head attention."
+- Turn 1: "Pull up my last two API tutorials and show me how they compare."
+- Turn 3: "Throw in the authentication one too."
+- Turn 1: "The roundup needs to go out Friday at 8am EST."
+- Turn 3: "Actually push it to Thursday evening."
+- Turn 1: "The order_date is showing up as a generic string. That doesn't seem right."
+- Turn 3: "Great, while you're at it, outbound_target_region also looks weird."
 """
 
 
@@ -405,7 +418,7 @@ def _build_user_prompt_same_flow(
 
 ## Rules for same_flow
 - Turn 1 and Turn 3 must BOTH use the flow "{af['turn1_flow']}" (intent: {af['turn1_intent']}).
-- Turn 3 should be a natural follow-up or continuation — NOT a repetition of turn 1.
+- Turn 3 should be a natural follow-up or continuation — NOT a repetition of turn 1. Sometimes very brief ("Same thing for the conclusion"), sometimes a fuller request.
 - The agent (turn 2) responds to turn 1 helpfully, setting up the follow-up.
 
 ## Scenario
@@ -573,7 +586,7 @@ def _build_user_prompt_ambiguous_first(
   candidate_flows: {json.dumps(af['candidate_flows'])}
 - {sub_desc}
 - Turn 2: agent responds. {agent_behavior}
-- Turn 3: user CLARIFIES, resolving to flow "{af['turn3_flow']}" (intent: {af['turn3_intent']}).
+- Turn 3: user CLARIFIES, resolving to flow "{af['turn3_flow']}" (intent: {af['turn3_intent']}). Clarifications can be terse ("The second one") or more detailed.
 
 ## Scenario
 {scenario['scenario']}

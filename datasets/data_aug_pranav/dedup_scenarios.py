@@ -194,15 +194,20 @@ def _build_dedup_system_prompt() -> str:
     """Build the system prompt for deduplication analysis."""
     return """You are a deduplication analyst. Your task is to identify clusters of semantically duplicate scenarios from a list.
 
-Two scenarios are duplicates if they share the SAME domain/topic AND the SAME user goal, even if the wording is different.
+Two scenarios are duplicates ONLY if they would produce essentially the same conversation — same specific topic, same user action, same context. Sharing the same broad industry or user action is NOT enough.
 
 Examples of duplicates:
-- "Corporate cybersecurity newsletter for executives" and "Writing a security newsletter aimed at C-suite readers" (same topic: security newsletter, same audience: executives)
-- "Food blog post about sourdough techniques" and "Baking blog — explaining sourdough starter maintenance" (same topic: sourdough blogging)
+- "Corporate cybersecurity newsletter for executives" and "Writing a security newsletter aimed at C-suite readers" (same specific topic AND same audience)
+- "Food blog post about sourdough techniques" and "Baking blog — explaining sourdough starter maintenance" (same specific topic: sourdough)
 
-Examples of NON-duplicates:
-- "Corporate cybersecurity newsletter for executives" and "Personal blog about home network security" (different audience and context)
+Examples of NON-duplicates (DO NOT flag these as duplicates):
+- "Cloud IT team scheduling a post about AWS migration" and "Cloud IT team scheduling a post about chaos engineering" (different specific topics — scheduling is the action, not the scenario)
+- "Enterprise blogger adjusting tone for CISO audience" and "Enterprise blogger adjusting tone for IT leadership" (different audiences, different posts)
+- "IT team searching past posts on Terraform" and "IT team searching past posts on container security" (different topics despite same action)
 - "Food blog about sourdough" and "Food blog about fermented vegetables" (different topic despite same domain)
+- "Analyzing Q4 sales data" and "Analyzing employee attrition data" (different datasets and goals)
+
+Be CONSERVATIVE — when in doubt, keep both scenarios. Only flag true near-duplicates where the conversations would be interchangeable.
 
 ## Output Format
 
