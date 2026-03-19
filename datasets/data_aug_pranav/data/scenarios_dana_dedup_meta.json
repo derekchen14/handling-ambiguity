@@ -1,0 +1,318 @@
+{
+  "domain": "dana",
+  "original_count": 347,
+  "duplicates_removed": 42,
+  "removed_ids": [
+    "dana_001",
+    "dana_005",
+    "dana_014",
+    "dana_015",
+    "dana_017",
+    "dana_018",
+    "dana_039",
+    "dana_044",
+    "dana_048",
+    "dana_053",
+    "dana_056",
+    "dana_080",
+    "dana_084",
+    "dana_094",
+    "dana_097",
+    "dana_107",
+    "dana_110",
+    "dana_115",
+    "dana_123",
+    "dana_139",
+    "dana_155",
+    "dana_159",
+    "dana_202",
+    "dana_208",
+    "dana_212",
+    "dana_214",
+    "dana_222",
+    "dana_237",
+    "dana_240",
+    "dana_256",
+    "dana_275",
+    "dana_282",
+    "dana_289",
+    "dana_337",
+    "dana_341",
+    "dana_347",
+    "dana_354",
+    "dana_356",
+    "dana_383",
+    "dana_387",
+    "dana_395",
+    "dana_399"
+  ],
+  "survivors_count": 305,
+  "final_count": 305,
+  "phase1_clusters": 35,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "dana_058",
+      "remove": [
+        "dana_015"
+      ],
+      "reason": "Both describe a blogger who performed a bulk find-and-replace/clean action that changed more than intended and wants to undo and redo it more carefully. The core scenario — accidental over-application of a bulk edit and rolling back — is essentially the same conversation."
+    },
+    {
+      "keep": "dana_351",
+      "remove": [
+        "dana_084"
+      ],
+      "reason": "Both involve visualizing resource/login usage data as a heatmap by region to identify hotspots/candidates, presented to security/infrastructure leadership. Dana_351 is about CPU usage by VM and dana_084 is about failed logins by region — but both are heatmap-by-region queries for infrastructure threat/capacity briefings. On reflection these are different specific topics (CPU rightsizing vs. security threat detection), so keeping both."
+    },
+    {
+      "keep": "dana_008",
+      "remove": [
+        "dana_202"
+      ],
+      "reason": "Both involve defining a reusable metric in a semantic/shared layer for consistent team-wide use in reports — dana_008 defines 'deployment_failure_rate' and dana_202 defines 'patch_compliance_rate'. The specific metrics differ but the scenario structure (define reusable metric for consistent formula use across teams) is essentially the same conversation."
+    },
+    {
+      "keep": "dana_151",
+      "remove": [
+        "dana_282"
+      ],
+      "reason": "Both describe a school data professional checking whether a special education status column exists in a student roster dataset before building a compliance/state report. The column names and roles differ slightly but the scenario is essentially identical — checking for a specific column's existence before a compliance submission."
+    },
+    {
+      "keep": "dana_150",
+      "remove": [
+        "dana_289"
+      ],
+      "reason": "Both involve analyzing chronic absenteeism data broken down by subgroup (grade level vs. school site) to identify which groups need the most intervention. The segmentation dimension differs slightly but the core scenario — drilling into absenteeism data by educational subgroup for intervention planning — produces essentially the same conversation."
+    },
+    {
+      "keep": "dana_129",
+      "remove": [
+        "dana_056"
+      ],
+      "reason": "Both involve deduplicating records from two imported sources by a key identifier (order ID vs. race_name/date/finish_time) while keeping the first record. The domains differ (merch sales vs. race results) but the scenario — deduping merged imports by composite key — is essentially the same conversation."
+    },
+    {
+      "keep": "dana_117",
+      "remove": [
+        "dana_383"
+      ],
+      "reason": "Both involve removing duplicate entries from a dataset to avoid double-counting — duplicate participant IDs vs. duplicate email addresses. While the domains differ, the core task is identical deduplication before a downstream use. On reflection the contexts are different enough (case management compliance report vs. investor outreach list) to keep both."
+    },
+    {
+      "keep": "dana_268",
+      "remove": [
+        "dana_139"
+      ],
+      "reason": "Both involve visualizing request/error rates by hour of day and another dimension (day of week vs. region) as a heatmap/grid to identify peak or problem windows for a technical audience. Dana_268 is API request volume heatmap by hour and day; dana_139 is error rates by region and hour. These are different specific topics (scaling strategy vs. post-mortem blast radius) so keeping both."
+    },
+    {
+      "keep": "dana_000",
+      "remove": [
+        "dana_080"
+      ],
+      "reason": "Both describe an enterprise IT team cleaning a cloud asset inventory export with inconsistent column formatting (capitalization, spacing) before syncing to a downstream system. Dana_000 covers instance type and region columns; dana_080 covers owner_email column. These are different specific columns/fields but the same team, same dataset, same action — close enough to be near-duplicates of the same cleaning session."
+    },
+    {
+      "keep": "dana_355",
+      "remove": [
+        "dana_084"
+      ],
+      "reason": "Reconsidering — dana_355 (FinOps heatmap of reserved instance coverage by region) and dana_084 (security heatmap of failed logins by region) are different specific topics. Not duplicates."
+    },
+    {
+      "keep": "dana_253",
+      "remove": [
+        "dana_123"
+      ],
+      "reason": "Both involve a tattoo artist working with their booking/appointment data — dana_253 normalizes phone numbers to dedupe clients, dana_123 queries no-show rate by day of week. These are different specific tasks on the same dataset, not duplicates."
+    },
+    {
+      "keep": "dana_272",
+      "remove": [
+        "dana_337"
+      ],
+      "reason": "Both involve standardizing inconsistent text values in a dataset to a single correct label — misspelled campaign tags vs. variant spellings of 'Gluten Free'. The domains differ but the scenario is essentially the same: find-and-replace inconsistent string variants with a canonical value."
+    },
+    {
+      "keep": "dana_205",
+      "remove": [
+        "dana_208"
+      ],
+      "reason": "Both involve an IT/analytics professional looking up how a specific metric is defined in the team's semantic layer before including it in a report for leadership. Dana_205 looks up 'utilization rate' for a hardware refresh proposal; dana_208 looks up 'mean time to resolve' for SLA results. These are different metrics but the scenario — semantic layer lookup before leadership presentation — is essentially the same conversation structure and would produce interchangeable conversations."
+    },
+    {
+      "keep": "dana_267",
+      "remove": [
+        "dana_222"
+      ],
+      "reason": "Both scenarios are about reshaping a dataset from wide format to long/normalized format (transposing/melting year/attribute columns into rows) for easier analysis/modeling."
+    },
+    {
+      "keep": "dana_043",
+      "remove": [
+        "dana_001"
+      ],
+      "reason": "Both scenarios involve defining a reusable metric in a semantic/metrics layer so it can be referenced consistently across multiple dashboards (ops SLA metric vs cost efficiency metric, but same action/context of reusable metric definition)."
+    },
+    {
+      "keep": "dana_216",
+      "remove": [
+        "dana_014",
+        "dana_275"
+      ],
+      "reason": "All three scenarios are about validating that categorical fields conform to an allowed/controlled set of values (controlled vocabulary) before summarizing/reporting."
+    },
+    {
+      "keep": "dana_339",
+      "remove": [
+        "dana_395"
+      ],
+      "reason": "Both scenarios involve standardizing phone numbers in various formats for mass communication."
+    },
+    {
+      "keep": "dana_361",
+      "remove": [
+        "dana_214"
+      ],
+      "reason": "Both scenarios involve normalizing mixed date formats in a reading log for accurate monthly statistics."
+    },
+    {
+      "keep": "dana_250",
+      "remove": [
+        "dana_212"
+      ],
+      "reason": "Both scenarios involve removing duplicate orders from sales data for accurate monthly revenue reporting."
+    },
+    {
+      "keep": "dana_011",
+      "remove": [
+        "dana_399"
+      ],
+      "reason": "Both scenarios involve removing duplicate transactions before calculating monthly totals."
+    },
+    {
+      "keep": "dana_049",
+      "remove": [
+        "dana_354"
+      ],
+      "reason": "Both scenarios involve creating or updating a line chart showing ticket volume trends."
+    },
+    {
+      "keep": "dana_148",
+      "remove": [
+        "dana_107",
+        "dana_097"
+      ],
+      "reason": "All three involve cleaning/standardizing mixed date formats in a dataset before analysis or scheduling. The core task is identical: normalizing inconsistent date format columns."
+    },
+    {
+      "keep": "dana_206",
+      "remove": [
+        "dana_044",
+        "dana_356"
+      ],
+      "reason": "All three involve casting a timestamp/datetime column that was imported as plain text string to a proper datetime type for filtering and time-based operations. The context (firewall log, cloud security, incident log) differs slightly but the scenario and conversation would be essentially the same."
+    },
+    {
+      "keep": "dana_076",
+      "remove": [
+        "dana_110",
+        "dana_159",
+        "dana_237"
+      ],
+      "reason": "All four involve checking whether a specific column exists in a dataset before using it in a report or analysis. The domains differ (grant writing, federal report, churn dashboard) but the task is identical: column existence check."
+    },
+    {
+      "keep": "dana_071",
+      "remove": [
+        "dana_115",
+        "dana_240"
+      ],
+      "reason": "All three involve validating that values in a dataset column match an approved/fixed list of categories before submitting a report to a funder or program officer. The non-profit/grant context and core validation task are essentially the same."
+    },
+    {
+      "keep": "dana_218",
+      "remove": [
+        "dana_018",
+        "dana_053"
+      ],
+      "reason": "All three involve a photography/fashion blogger cleaning inconsistent text entries (camera models, brand names) in a log — standardizing labels, fixing typos, or bulk-replacing variants. The core task is text normalization of categorical fields in a hobby tracking dataset."
+    },
+    {
+      "keep": "dana_382",
+      "remove": [
+        "dana_387"
+      ],
+      "reason": "Both involve a founder analyzing app/product usage data for strategic decisions (MAU growth for pitch deck vs. feature engagement for prioritization). While the specific metrics differ slightly, these are close enough in context — founder analyzing product data — but on reflection the topics differ enough (MAU growth visualization vs. feature usage analysis). Keeping separate."
+    },
+    {
+      "keep": "dana_178",
+      "remove": [
+        "dana_347"
+      ],
+      "reason": "Both involve interpolating missing values in a dataset — linear interpolation for gaps in a price tracker vs. interpolating missing risk tolerance scores. The specific domain differs but the core task and conversation would be nearly identical: filling missing numeric values via interpolation."
+    },
+    {
+      "keep": "dana_346",
+      "remove": [
+        "dana_341"
+      ],
+      "reason": "Both involve a financial advisor summarizing a chart in plain language for a client presentation — one is asset allocation, one is quarterly performance. The scenario structure (financial advisor + chart summary for client) is essentially the same conversation."
+    },
+    {
+      "keep": "dana_125",
+      "remove": [
+        "dana_256"
+      ],
+      "reason": "Both involve asking Dana to remember a preferred date format and related settings for consistent future exports/reports. The user roles differ (session guitarist vs. motion designer) but the task is identical: configuring persistent default preferences for date formatting."
+    },
+    {
+      "keep": "dana_100",
+      "remove": [
+        "dana_039"
+      ],
+      "reason": "Both scenarios are about combining/joining marketing spend (ad spend) data with conversion/signup data to analyze acquisition efficiency by channel/source (CAC-style analysis)."
+    },
+    {
+      "keep": "dana_209",
+      "remove": [
+        "dana_155"
+      ],
+      "reason": "Both scenarios involve updating an existing line chart’s presentation (cleaner title and axis labels, improved visual styling) before sharing/embedding in a report."
+    },
+    {
+      "keep": "dana_055",
+      "remove": [
+        "dana_017"
+      ],
+      "reason": "Both scenarios ask Dana to remember a preferred date format and timezone so future exports/reports display consistently."
+    },
+    {
+      "keep": "dana_213",
+      "remove": [
+        "dana_094"
+      ],
+      "reason": "Both scenarios involve undoing/reverting an accidental cleanup/find-and-replace change that corrupted values, then redoing the change more safely."
+    },
+    {
+      "keep": "dana_041",
+      "remove": [
+        "dana_048",
+        "dana_005"
+      ],
+      "reason": "All scenarios involve looking up the definition of a specific metric before using it in a report."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}

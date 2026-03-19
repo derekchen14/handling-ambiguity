@@ -1,0 +1,247 @@
+{
+  "domain": "hugo",
+  "original_count": 342,
+  "duplicates_removed": 37,
+  "removed_ids": [
+    "hugo_024",
+    "hugo_040",
+    "hugo_043",
+    "hugo_050",
+    "hugo_052",
+    "hugo_054",
+    "hugo_059",
+    "hugo_091",
+    "hugo_094",
+    "hugo_103",
+    "hugo_113",
+    "hugo_118",
+    "hugo_130",
+    "hugo_155",
+    "hugo_181",
+    "hugo_188",
+    "hugo_198",
+    "hugo_201",
+    "hugo_205",
+    "hugo_211",
+    "hugo_217",
+    "hugo_236",
+    "hugo_240",
+    "hugo_250",
+    "hugo_251",
+    "hugo_254",
+    "hugo_262",
+    "hugo_269",
+    "hugo_271",
+    "hugo_280",
+    "hugo_281",
+    "hugo_363",
+    "hugo_371",
+    "hugo_372",
+    "hugo_375",
+    "hugo_387",
+    "hugo_399"
+  ],
+  "survivors_count": 305,
+  "final_count": 305,
+  "phase1_clusters": 25,
+  "phase2_clusters": 0,
+  "phase1_details": [
+    {
+      "keep": "hugo_150",
+      "remove": [
+        "hugo_271"
+      ],
+      "reason": "Both involve a growth marketer brainstorming blog post topic ideas, though one mentions AI marketing tools and the other SaaS sign-ups. However, the core scenario — growth marketer brainstorming blog topics — is essentially the same action and context, and the conversations would be nearly interchangeable at the brainstorming level."
+    },
+    {
+      "keep": "hugo_080",
+      "remove": [
+        "hugo_040"
+      ],
+      "reason": "Both involve an enterprise IT team searching past posts to find coverage gaps before drafting a new post on a cloud/infrastructure topic. The specific topics (Kubernetes cost optimization/FinOps vs. container security/runtime threat detection) are closely related cloud-native infrastructure subjects, but more importantly the scenario structure — searching past posts to find angles before drafting — is identical. However, the specific topics are distinct enough to keep both. Reconsidering: these are NOT duplicates."
+    },
+    {
+      "keep": "hugo_131",
+      "remove": [
+        "hugo_371"
+      ],
+      "reason": "Both involve comparing an updated draft against an original version of a blog post to ensure consistency and confirm nothing important was removed. The context (freelance animator updating rigging workflow post vs. DIY blogger rewriting painted furniture section) differs but the core scenario — side-by-side draft comparison for consistency — is essentially the same conversation."
+    },
+    {
+      "keep": "hugo_101",
+      "remove": [
+        "hugo_024"
+      ],
+      "reason": "Both involve cross-posting a finished blog post to an external platform (LinkedIn specifically appears in both). hugo_101 is more specific (cross-posting to Medium AND LinkedIn simultaneously) while hugo_024 is just LinkedIn, but the core action and context are nearly identical — publishing a personal blog post to LinkedIn."
+    },
+    {
+      "keep": "hugo_120",
+      "remove": [
+        "hugo_130"
+      ],
+      "reason": "Both involve checking the status/health of connected publishing platforms before publishing a finished post. The scenarios are structurally identical: verify platform connections, then publish. The domain differs (non-profit vs. freelance designer) but the conversation would be essentially the same."
+    },
+    {
+      "keep": "hugo_092",
+      "remove": [
+        "hugo_054",
+        "hugo_251",
+        "hugo_155"
+      ],
+      "reason": "All involve running a quick health check/survey of connected publishing platforms/integrations before publishing or cross-posting a post (platform connectivity/health verification as the core task)."
+    },
+    {
+      "keep": "hugo_063",
+      "remove": [
+        "hugo_240",
+        "hugo_113",
+        "hugo_091",
+        "hugo_052"
+      ],
+      "reason": "All involve browsing saved ideas/research notes and identifying content gaps within a category to pick a strong next blog topic/angle before drafting."
+    },
+    {
+      "keep": "hugo_067",
+      "remove": [
+        "hugo_118"
+      ],
+      "reason": "Both scenarios involve a grant writer expanding notes or bullet points into a full blog post for a foundation audience."
+    },
+    {
+      "keep": "hugo_252",
+      "remove": [
+        "hugo_262"
+      ],
+      "reason": "Both involve comparing two existing posts for tone and consistency before writing new content — hugo_252 compares UX portfolio posts, hugo_262 compares DevOps guides. However, these are different domains and different specific topics, so they are NOT duplicates. Removing this cluster."
+    },
+    {
+      "keep": "hugo_088",
+      "remove": [
+        "hugo_059"
+      ],
+      "reason": "Both involve reviewing the full technical state of a draft/finalized post (tags, featured image, platform status, workflow) before publishing. Hugo_088 is about a hybrid cloud networking post and hugo_059 is about a trail guide, but the conversation would be essentially the same: checking metadata and status fields before routing/sharing. These are near-duplicates in terms of the action and context."
+    },
+    {
+      "keep": "hugo_213",
+      "remove": [
+        "hugo_363",
+        "hugo_372"
+      ],
+      "reason": "All three involve checking which publishing platforms are connected and whether integrations are working before publishing/scheduling a post. Hugo_213 is a travel blogger, hugo_363 is an IT specialist with a hybrid cloud post, hugo_372 is a personal finance blogger. The core conversation — verifying platform connections and integration health — would be essentially the same."
+    },
+    {
+      "keep": "hugo_276",
+      "remove": [
+        "hugo_269"
+      ],
+      "reason": "Both involve a growth marketer comparing two past blog posts to identify patterns. Hugo_276 compares paragraph density and heading patterns; hugo_269 compares engagement metrics and tone of email campaign posts. These are close but the specific comparison dimensions differ enough to keep both. Removing this cluster."
+    },
+    {
+      "keep": "hugo_242",
+      "remove": [
+        "hugo_050",
+        "hugo_217"
+      ],
+      "reason": "All three involve generating multiple outline options with section structure and word counts before committing to writing. Hugo_242 is a year-end impact report, hugo_050 is a morning routine reflective post, hugo_217 is a no-spend month recap. The specific topics differ enough that these are NOT duplicates. Removing this cluster."
+    },
+    {
+      "keep": "hugo_186",
+      "remove": [
+        "hugo_188"
+      ],
+      "reason": "Both involve a compliance officer formatting/tidying a draft blog post about cybersecurity/compliance topics with consistent heading hierarchy and structure. The scenarios are nearly identical — same role, same domain, same action (fixing heading levels and formatting). These would produce essentially the same conversation."
+    },
+    {
+      "keep": "hugo_249",
+      "remove": [
+        "hugo_254"
+      ],
+      "reason": "Both involve a freelance creative professional wanting Hugo to generate multiple outline options for a tutorial/process breakdown post. Hugo_249 is a freelance illustrator doing a behind-the-scenes children's book cover post; hugo_254 is a motion designer doing a looping animation tutorial with outlines for different audiences. These differ enough in specifics to not be true duplicates. Removing this cluster."
+    },
+    {
+      "keep": "hugo_126",
+      "remove": [
+        "hugo_250",
+        "hugo_375"
+      ],
+      "reason": "All three involve previewing how a post's visual/layout elements (images, formatting, tables) will render on a publishing platform before going live. Hugo_126 is a UX designer previewing screenshots on a blog, hugo_250 is a graphic designer previewing a case study on WordPress, hugo_375 is a home baker previewing ingredient lists on WordPress. The core conversation — preview rendering before publishing — is essentially the same."
+    },
+    {
+      "keep": "hugo_057",
+      "remove": [
+        "hugo_094"
+      ],
+      "reason": "Both involve comparing multiple recent posts (three posts each) to check consistency of tone, vocabulary, and style patterns before writing new content. Hugo_057 is a tea blogger checking sentence length and vocabulary; hugo_094 is a capsule wardrobe blogger standardizing heading patterns and vocabulary. Same action, same structure, essentially the same conversation."
+    },
+    {
+      "keep": "hugo_247",
+      "remove": [
+        "hugo_236"
+      ],
+      "reason": "Both involve expanding sparse notes into a full blog post section. Hugo_236 is a founder expanding mission notes; hugo_247 is a grant writer expanding theory-of-change notes. Different domains and audiences, so NOT true duplicates. Removing this cluster."
+    },
+    {
+      "keep": "hugo_107",
+      "remove": [
+        "hugo_387"
+      ],
+      "reason": "Both involve a founder/pre-seed founder drafting a blog post about a SaaS product launch/value proposition aimed at investors, starting from sparse inputs. Hugo_107 starts from bullet points about features; hugo_387 focuses on differentiation from competitors. These are close but differ enough in specific angle. Removing this cluster."
+    },
+    {
+      "keep": "hugo_002",
+      "remove": [
+        "hugo_201"
+      ],
+      "reason": "Both involve searching past blog posts on a specific technical topic to reference in a new related post. Hugo_002 searches for multi-cloud governance posts; hugo_201 searches for CI/CD pipeline posts. Different specific topics — NOT duplicates. Removing this cluster."
+    },
+    {
+      "keep": "hugo_226",
+      "remove": [
+        "hugo_103"
+      ],
+      "reason": "Both involve setting a permanent/default rule for how Hugo formats all future blog posts (spelling conventions, style rules). Hugo_103 sets British English and Oxford commas; hugo_226 sets tone and British spelling. These would produce essentially the same conversation about configuring persistent formatting preferences."
+    },
+    {
+      "keep": "hugo_157",
+      "remove": [
+        "hugo_280",
+        "hugo_198"
+      ],
+      "reason": "All three involve a user pushing back on Hugo's revision because it lost the original tone/warmth of the post, and asking Hugo to restore it. Hugo_157 is a tech coach pushing back on a digital citizenship intro; hugo_280 is an assistant principal pushing back on a staff culture post; hugo_198 is a property manager pushing back on a lease renewal post. The core conversation — user dissatisfied with tone change, requesting restoration — is essentially the same."
+    },
+    {
+      "keep": "hugo_084",
+      "remove": [
+        "hugo_043",
+        "hugo_205"
+      ],
+      "reason": "All three involve scheduling a blog post to publish at a specific coordinated time tied to an external event (maintenance window, product launch, industry conference). Hugo_084 schedules a cloud security post around an all-hands; hugo_043 schedules a chaos engineering post around a product launch; hugo_205 schedules a multi-cloud post around a conference. The core conversation — time-coordinated scheduling — is essentially the same."
+    },
+    {
+      "keep": "hugo_184",
+      "remove": [
+        "hugo_281",
+        "hugo_399"
+      ],
+      "reason": "All are requests to check a draft’s current word count and estimated reading time before sending it for review/approval."
+    },
+    {
+      "keep": "hugo_158",
+      "remove": [
+        "hugo_211",
+        "hugo_181"
+      ],
+      "reason": "All involve comparing a new/recent draft against an older/other post to ensure consistency in vocabulary complexity/tone/structure (brand/style consistency check between two posts)."
+    }
+  ],
+  "phase2_details": [],
+  "backfill": false,
+  "batch_size": 60,
+  "seed": 43,
+  "max_threads": 6,
+  "models": [
+    "anthropic",
+    "openai",
+    "deepseek"
+  ]
+}
