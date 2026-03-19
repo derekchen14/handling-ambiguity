@@ -18,8 +18,8 @@ uv run datasets/data_aug_pranav/generate_scenarios.py \
     --domain hugo --target 12 --models anthropic
 
 # Full run — round-robins across all 4 providers
-uv run datasets/data_aug_pranav/generate_scenarios.py \
-    --domain hugo --target 200 --batch-size 12 --seed 42
+.venv/bin/python3 datasets/data_aug_pranav/generate_scenarios.py \
+    --domain hugo --target 400 --batch-size 10 --seed 42
 ```
 
 **Output:** `scenarios_<domain>.jsonl` — one JSON object per line with scenario description, example utterances, grounding flows/intents, diversity axis, and source model.
@@ -37,9 +37,9 @@ uv run datasets/data_aug_pranav/enrich_scenarios.py \
 uv run datasets/data_aug_pranav/enrich_scenarios.py \
     --domain hugo --models anthropic --batch-size 4
 
-# Full run — splits 384 scenarios across all 4 providers (96 each)
-uv run datasets/data_aug_pranav/enrich_scenarios.py \
-    --domain hugo --max-threads 20
+# Full run — enriches all unenriched scenarios across all 4 providers
+.venv/bin/python3 datasets/data_aug_pranav/enrich_scenarios.py \
+    --domain hugo --batch-size 8 --seed 42 --max-threads 20
 ```
 
 **Input:** `scenarios_<domain>.jsonl` (from Step 1)
@@ -80,7 +80,7 @@ During backfill, deduped IDs are removed from the base and enriched JSONL files,
 
 ### Step 4: Generate Conversations
 
-Convert 384 deduped enriched scenarios into 3-turn conversations (user → agent → user). Scenarios are split into 4 equal categories (96 each): `same_flow`, `switch_flow`, `ambiguous_first`, `ambiguous_second`. Models are assigned round-robin across 4 providers.
+Convert deduped enriched scenarios into 3-turn conversations (user → agent → user). Scenarios are split into 4 equal categories: `same_flow`, `switch_flow`, `ambiguous_first`, `ambiguous_second`. Models are assigned round-robin across 4 providers.
 
 ```bash
 # Dry run — prints prompts, no API calls
@@ -107,8 +107,51 @@ python datasets/data_aug_pranav/generate_conversations.py \
 
 Resumable — rerun the same command to pick up where it left off.
 
+### Step 5: Compute Metrics
+
+Compare synthetic conversations to the eval set across 16+ dimensions.
+
+```bash
+# Fast iteration (skip LLM judges):
+.venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py \
+    --domain both --seed 42 --skip-llm
+
+# Full metrics (includes naturalness + ambiguity LLM judges):
+.venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py \
+    --domain both --seed 42 --concurrency 10
+```
+
+**Output:** `analysis/metrics_<domain>.json` — intrinsic + comparative scorecards with green/yellow/red ratings.
+
+### Step 6: Analysis Plots
+
+```bash
+.venv/bin/python3 datasets/data_aug_pranav/analysis/analyze_synth_vs_eval.py --domain both
+```
+
+**Output:** PNG plots + `analysis/synth_vs_eval_report.md`
+
 ---
 
-**Providers:** Anthropic (Claude), OpenAI (GPT), Google (Gemini via OpenRouter), DeepSeek (via OpenRouter). Step 3 skips Gemini by default.
+## Full Pipeline (one-shot)
+
+```bash
+# Generate for both domains (takes ~30-60 min total):
+for domain in hugo dana; do
+    .venv/bin/python3 datasets/data_aug_pranav/generate_scenarios.py --domain $domain --target 400 --batch-size 10 --seed 42
+    .venv/bin/python3 datasets/data_aug_pranav/enrich_scenarios.py --domain $domain --batch-size 8 --seed 42 --max-threads 20
+    .venv/bin/python3 datasets/data_aug_pranav/dedup_scenarios.py --domain $domain --batch-size 60 --seed 43 --skip-backfill
+    .venv/bin/python3 datasets/data_aug_pranav/generate_conversations.py --domain $domain --seed 42 --max-threads 8
+done
+
+# Compute metrics:
+.venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py --domain both --seed 42 --skip-llm
+```
+
+**Scaling:** To generate more, increase `--target` in Step 1. Pipeline handles resume automatically — outputs are appended to existing files. Typical yield: ~80% enrichment success, ~10-15% dedup removal, giving ~300 conversations from 400 scenarios.
+
+---
+
+**Providers:** Anthropic (Claude Sonnet), OpenAI (GPT-5.2), Google (Gemini via OpenRouter), DeepSeek (via OpenRouter). Step 3 skips Gemini by default.
 
 **Required env vars:** `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPEN_ROUTER_API_KEY` (set in `.env` at project root).

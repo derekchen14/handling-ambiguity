@@ -376,7 +376,7 @@ The JSON must conform exactly to the schema described in the user prompt.
 - NEVER include the flow name, intent name, or tool name in the user utterance.
 - Turn 2 (agent) should be 1-2 sentences, directly responding to turn 1.
 - The context field must be realistic and specific to the scenario.
-- target_tools must use actual tool names and realistic parameter values from the tool reference above.
+- target_tools MUST ONLY include the required tools specified in the Tool Constraints section below. Do NOT add extra tools beyond those listed. Use realistic parameter values from the tool reference.
 - For parameters where the exact value depends on data the user hasn't provided, use null.
 - Vary register: mix terse commands ("fix the intro"), casual questions ("what's the word count?"), and brief follow-ups ("same thing for the conclusion").
 - Avoid em dashes, fancy punctuation, and overly polished prose. Use plain commas and periods.
