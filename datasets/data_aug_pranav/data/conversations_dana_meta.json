@@ -1,16 +1,16 @@
 {
   "domain": "dana",
   "seed": 42,
-  "total_scenarios": 35,
-  "total_generated": 26,
-  "total_failed": -2,
-  "quality_retries_total": 31,
+  "total_scenarios": 64,
+  "total_generated": 44,
+  "total_failed": -10,
+  "quality_retries_total": 74,
   "quality_warnings_count": 0,
   "categories": {
-    "same_flow": 9,
-    "switch_flow": 9,
-    "ambiguous_first": 9,
-    "ambiguous_second": 8
+    "same_flow": 16,
+    "switch_flow": 16,
+    "ambiguous_first": 16,
+    "ambiguous_second": 16
   },
   "models": [
     "anthropic",

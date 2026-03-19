@@ -1,16 +1,16 @@
 {
   "domain": "hugo",
   "seed": 42,
-  "total_scenarios": 26,
-  "total_generated": 15,
-  "total_failed": -3,
-  "quality_retries_total": 36,
+  "total_scenarios": 65,
+  "total_generated": 39,
+  "total_failed": -12,
+  "quality_retries_total": 91,
   "quality_warnings_count": 0,
   "categories": {
-    "same_flow": 7,
-    "switch_flow": 7,
-    "ambiguous_first": 6,
-    "ambiguous_second": 6
+    "same_flow": 17,
+    "switch_flow": 16,
+    "ambiguous_first": 16,
+    "ambiguous_second": 16
   },
   "models": [
     "anthropic",

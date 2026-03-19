@@ -1,24 +1,31 @@
 {
   "domain": "dana",
-  "target": 40,
-  "total_scenarios": 40,
-  "new_scenarios": 40,
+  "target": 100,
+  "total_scenarios": 100,
+  "new_scenarios": 100,
   "resumed_from": 0,
   "model_distribution": {
-    "claude-sonnet-4-6": 10,
-    "gpt-5.2": 10,
-    "google/gemini-3-pro-preview": 10,
-    "deepseek/deepseek-chat": 10
+    "claude-sonnet-4-6": 30,
+    "gpt-5.2": 30,
+    "google/gemini-3-pro-preview": 21,
+    "deepseek/deepseek-chat": 19
   },
   "diversity_distribution": {
     "enterprise IT and cloud infrastructure teams": 10,
     "personal lifestyle and hobby bloggers": 10,
     "academic researchers and PhD students": 10,
-    "early-stage startup founders (pre-Series A)": 10
+    "early-stage startup founders (pre-Series A)": 10,
+    "non-profit program managers and grant writers": 10,
+    "freelance artists, musicians, and designers": 10,
+    "backend/DevOps engineers writing internal docs": 10,
+    "growth marketers running content campaigns": 9,
+    "K-12 teachers and school administrators": 10,
+    "healthcare professionals and clinic managers": 10,
+    "e-commerce store owners and product managers": 1
   },
   "seed": 42,
   "batch_size": 10,
   "max_threads": 4,
-  "waves": 1,
+  "waves": 3,
   "output_file": "/Users/pranavraja/Documents/research/handling-ambiguity/datasets/data_aug_pranav/data/scenarios_dana.jsonl"
 }

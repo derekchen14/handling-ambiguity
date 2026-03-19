@@ -102,3 +102,22 @@
 - tool_entropy_ratio: 0.93 (Hugo GREEN), 0.83 (Dana YELLOW)
 **Issue**: ~50% of conversations rejected by quality gate (mostly leakage). Generation takes ~6 min for 26 scenarios. Acceptable for quality but needs volume increase.
 **Verdict**: BREAKTHROUGH — inline quality gate + LLM leakage judge produces all-green scorecard. Quality gate aggressively filters bad conversations. Next: scale up volume to push Dana tool entropy green.
+
+## Iteration 6 — 2026-03-19 — both domains
+
+**Target**: Push Dana tool_entropy from YELLOW (0.83) to GREEN (>=0.85) via volume increase
+**Change**:
+- Scaled to 100 scenarios per domain (100 → ~76 enriched → ~64 deduped → 39-44 conversations)
+- No prompt changes — same quality gate as iteration 5
+**Result** (Hugo 39 convos, Dana 44 convos):
+- **ALL METRICS GREEN BOTH DOMAINS** — no yellows, no reds
+- Dana tool_entropy: 0.83 YELLOW → 0.86 GREEN (crossed threshold)
+- Hugo tool_entropy: 0.93 GREEN (maintained)
+- flow_entropy: 0.95 (Dana), 0.96 (Hugo) GREEN
+- naturalness: 4.14 (Dana), 3.85 (Hugo) GREEN
+- agent_leak_rate: 2.27% (Dana), 7.69% (Hugo) GREEN
+- turn_dependency: 4.14 (Dana), 4.23 (Hugo) GREEN
+- All heuristics: 0% violations (filler, overack, unicode), 100% (multireq, t3 terse) GREEN
+- quality_retries_total: 74 (Dana), 91 (Hugo) — ~60% first-pass rejection rate
+- quality_warnings_count: 0 (both) — every accepted convo is clean
+**Verdict**: ALL GREEN. Volume increase pushed Dana tool entropy over the threshold. Pipeline is fully converged.

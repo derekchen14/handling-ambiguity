@@ -1,57 +1,125 @@
 [
   {
-    "convo_id": "dana_002",
+    "convo_id": "dana_001",
     "category": "same_flow",
-    "scenario": "Cloud infrastructure capacity planning - server utilization metrics",
+    "scenario": "Federal grant deliverable dataset -- removing temp tracking fields before government submission",
     "context": {
-      "table": "capacity_planning_daily",
+      "table": "grant_deliverable_final",
       "columns": [
-        "snapshot_date",
-        "cluster",
-        "region",
-        "server_id",
-        "used_capacity_gb",
-        "total_capacity_gb",
-        "cpu_used_pct",
-        "cpu_allocated_pct"
+        "recipient_id",
+        "award_number",
+        "project_title",
+        "start_date",
+        "end_date",
+        "budget_total",
+        "expenditures_ytd",
+        "temp_review_flag",
+        "temp_assigned_to",
+        "temp_intake_notes",
+        "region_code",
+        "reporting_period",
+        "status"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "lookup",
-        "intent": "Analyze",
+        "flow": "update",
+        "intent": "Clean",
         "speaker": "user",
-        "utterance": "Utilization efficiency metric - whats the exact formula again?",
+        "utterance": "The header for temp_assigned_to should read internal_reviewer for now",
         "target_tools": {
-          "describe_stats": {
-            "table": "capacity_planning_daily",
-            "column": "used_capacity_gb",
-            "metrics": [
-              "nulls",
-              "min",
-              "max",
-              "mean",
-              "dtype"
-            ]
+          "modify_row": {
+            "table": "grant_deliverable_final",
+            "row": "0",
+            "values": {
+              "temp_assigned_to": "internal_reviewer"
+            },
+            "is_header": true
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I can pull up the saved metric definition, but I need the metric name you want to look up. What is it called in your workspace?"
+        "utterance": "Renamed the column header from 'temp_assigned_to' to 'internal_reviewer' - the underlying data rows are unchanged."
       },
       {
         "turn_num": 3,
-        "flow": "lookup",
+        "flow": "update",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Now push reporting_period to the front",
+        "target_tools": {
+          "modify_table": {
+            "table": "grant_deliverable_final",
+            "operation": "reorder_columns",
+            "column": "reporting_period",
+            "ascending": null
+          }
+        }
+      }
+    ],
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
+    "_assigned_tools": {
+      "turn1_flow": "update",
+      "turn1_intent": "Clean",
+      "turn3_flow": "update",
+      "turn3_intent": "Clean",
+      "turn1_tools": [
+        "modify_row"
+      ],
+      "turn3_tools": [
+        "modify_table"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_002",
+    "category": "same_flow",
+    "scenario": "Capacity planning - CPU utilization logs across servers and time slots",
+    "context": {
+      "table": "cpu_utilization_timeseries",
+      "columns": [
+        "ts_utc",
+        "server_id",
+        "cpu_util_pct",
+        "cluster",
+        "region",
+        "os",
+        "sample_interval_s"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "describe",
         "intent": "Analyze",
         "speaker": "user",
-        "utterance": "utilization_efficiency",
+        "utterance": "How many rows per server, and any gaps in timestamps?",
         "target_tools": {
-          "execute_python": {
-            "table": "capacity_planning_daily",
-            "code": "metric_name = 'utilization_efficiency'\nmetric_name"
+          "execute_sql": {
+            "query": "SELECT server_id,\n       COUNT(*) AS row_count,\n       MIN(ts_utc) AS min_ts,\n       MAX(ts_utc) AS max_ts,\n       COUNT(DISTINCT ts_utc) AS distinct_ts,\n       (COUNT(*) - COUNT(DISTINCT ts_utc)) AS duplicate_ts_rows\nFROM cpu_utilization_timeseries\nGROUP BY server_id\nORDER BY row_count DESC;",
+            "table": "cpu_utilization_timeseries"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I can summarize rows and timestamp coverage per server, but I need the expected sampling interval to flag gaps accurately. What interval should I assume in seconds or minutes?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "describe",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Use 5 minute intervals",
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "cpu_utilization_timeseries"
           }
         }
       }
@@ -59,63 +127,63 @@
     "_model": "gpt-5.2",
     "_provider": "openai",
     "_assigned_tools": {
-      "turn1_flow": "lookup",
+      "turn1_flow": "describe",
       "turn1_intent": "Analyze",
-      "turn3_flow": "lookup",
+      "turn3_flow": "describe",
       "turn3_intent": "Analyze",
       "turn1_tools": [
-        "describe_stats"
+        "execute_sql"
       ],
       "turn3_tools": [
-        "execute_python"
+        "semantic_layer"
       ]
     }
   },
   {
     "convo_id": "dana_003",
     "category": "same_flow",
-    "scenario": "SaaS competitor analysis -- pricing page feature comparison",
+    "scenario": "Cloud infrastructure incident tracking",
     "context": {
-      "table": "competitor_features",
+      "table": "incident_logs",
       "columns": [
-        "competitor",
-        "plan_tier",
-        "feature_name",
-        "limit_value",
-        "monthly_price"
+        "incident_id",
+        "severity",
+        "status",
+        "created_at",
+        "environment"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "pivot",
-        "intent": "Analyze",
+        "flow": "preference",
+        "intent": "Converse",
         "speaker": "user",
-        "utterance": "List out the API request limits for every plan tier.",
+        "utterance": "Set the default chart color for critical incidents to hex code #8B0000.",
         "target_tools": {
-          "execute_sql": {
-            "query": "SELECT competitor, plan_tier, limit_value FROM competitor_features WHERE feature_name LIKE '%API%'",
-            "table": "competitor_features"
+          "manage_memory": {
+            "operation": "write",
+            "key": "color_critical",
+            "value": "#8B0000"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I've extracted the API limits for each competitor and plan tier."
+        "utterance": "I've saved #8B0000 as your preferred color for critical incidents."
       },
       {
         "turn_num": 3,
-        "flow": "pivot",
-        "intent": "Analyze",
+        "flow": "preference",
+        "intent": "Converse",
         "speaker": "user",
-        "utterance": "Pivot that with tiers as columns.",
+        "utterance": "Use orange for high severity.",
         "target_tools": {
-          "pivot_tables": {
-            "table": "competitor_features",
-            "index": "competitor",
-            "columns": "plan_tier",
-            "values": "limit_value"
+          "manage_memory": {
+            "operation": "write",
+            "key": "color_high",
+            "value": "orange"
           }
         }
       }
@@ -123,29 +191,216 @@
     "_model": "google/gemini-3-pro-preview",
     "_provider": "openrouter",
     "_assigned_tools": {
-      "turn1_flow": "pivot",
-      "turn1_intent": "Analyze",
-      "turn3_flow": "pivot",
-      "turn3_intent": "Analyze",
-      "turn1_tools": [
-        "execute_sql"
-      ],
-      "turn3_tools": [
-        "pivot_tables"
-      ]
+      "turn1_flow": "preference",
+      "turn1_intent": "Converse",
+      "turn3_flow": "preference",
+      "turn3_intent": "Converse",
+      "turn1_tools": [],
+      "turn3_tools": []
     }
   },
   {
     "convo_id": "dana_004",
     "category": "same_flow",
-    "scenario": "Home cooking blogger cleaning recipe test results for banana bread post",
+    "scenario": "Grant writer verifying program area codes in a foundation grant submission dataset",
     "context": {
-      "table": "banana_bread_tests",
+      "table": "grant_submissions",
       "columns": [
-        "bake_temp",
-        "bake_time",
-        "rating",
-        "variation"
+        "application_id",
+        "program_area_code",
+        "amount_requested",
+        "organization_name"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "validate",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "What program area codes are in the submission file?",
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "grant_submissions"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "The program_area_code column has these unique values: ED-301, WF-112, HT-204. Were you expecting others?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "validate",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Check for HT-208",
+        "target_tools": {
+          "validate_column": {
+            "table": "grant_submissions",
+            "column": "program_area_code",
+            "check": "enum",
+            "value": "HT-208",
+            "action": "flag"
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "validate",
+      "turn1_intent": "Clean",
+      "turn3_flow": "validate",
+      "turn3_intent": "Clean",
+      "turn1_tools": [
+        "semantic_layer"
+      ],
+      "turn3_tools": [
+        "validate_column"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_005",
+    "category": "same_flow",
+    "scenario": "Psychology study -- participant data with site codes and subject numbers needing unique ID generation",
+    "context": {
+      "table": "participants",
+      "columns": [
+        "site_code",
+        "subject_num",
+        "age",
+        "condition",
+        "session_date",
+        "score"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "recommend",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "any duplicates in site_code + subject_num combos I should know about?",
+        "target_tools": {
+          "describe_stats": {
+            "table": "participants",
+            "column": "subject_num",
+            "metrics": [
+              "unique",
+              "nulls"
+            ]
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "subject_num has 312 unique values out of 318 rows, so there are likely a few collisions - worth checking whether the duplicates span multiple sites or are within the same site."
+      },
+      {
+        "turn_num": 3,
+        "flow": "recommend",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "which site_codes have the overlapping ones?",
+        "target_tools": {
+          "execute_sql": {
+            "query": "SELECT site_code, subject_num, COUNT(*) as cnt FROM participants GROUP BY site_code, subject_num HAVING COUNT(*) > 1 ORDER BY cnt DESC",
+            "table": "participants"
+          }
+        }
+      }
+    ],
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
+    "_assigned_tools": {
+      "turn1_flow": "recommend",
+      "turn1_intent": "Converse",
+      "turn3_flow": "recommend",
+      "turn3_intent": "Converse",
+      "turn1_tools": [
+        "describe_stats"
+      ],
+      "turn3_tools": [
+        "execute_sql"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_007",
+    "category": "same_flow",
+    "scenario": "Vice Principal analyzing student discipline records and reverting accidental changes",
+    "context": {
+      "table": "discipline_log",
+      "columns": [
+        "student_id",
+        "grade_level",
+        "infraction",
+        "referral_count",
+        "classroom_id"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "undo",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Wait, I didn't mean to drop the detention rows.",
+        "target_tools": {
+          "rollback_dataset": {
+            "dataset": "discipline_log",
+            "steps": 1
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I've restored the detention rows to the discipline log."
+      },
+      {
+        "turn_num": 3,
+        "flow": "undo",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Undo the rename also.",
+        "target_tools": {
+          "rollback_dataset": {
+            "dataset": "discipline_log",
+            "steps": 1
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "undo",
+      "turn1_intent": "Converse",
+      "turn3_flow": "undo",
+      "turn3_intent": "Converse",
+      "turn1_tools": [
+        "rollback_dataset"
+      ],
+      "turn3_tools": []
+    }
+  },
+  {
+    "convo_id": "dana_008",
+    "category": "same_flow",
+    "scenario": "Astrophysics student dealing with a CSV where large numerical flux values were interpreted as strings due to scientific notation.",
+    "context": {
+      "table": "observations",
+      "columns": [
+        "flux",
+        "ra",
+        "dec",
+        "magnitude"
       ]
     },
     "turns": [
@@ -154,35 +409,40 @@
         "flow": "datatype",
         "intent": "Clean",
         "speaker": "user",
-        "utterance": "bake_temp is mixing numbers and words like '350F'.",
+        "utterance": "flux column values are scientific notation strings.",
         "target_tools": {
           "cast_column": {
-            "table": "banana_bread_tests",
-            "column": "bake_temp",
+            "table": "observations",
+            "column": "flux",
             "target_type": "float",
             "format": null,
-            "errors": "coerce"
+            "errors": null
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I'll convert bake_temp to numeric values, coercing any invalid entries to null."
+        "utterance": "I'll convert the flux column to float - scientific notation strings should parse correctly."
       },
       {
         "turn_num": 3,
         "flow": "datatype",
         "intent": "Clean",
         "speaker": "user",
-        "utterance": "Same thing for bake_time.",
+        "utterance": "check the stats now.",
         "target_tools": {
           "describe_stats": {
-            "table": "banana_bread_tests",
-            "column": "bake_time",
+            "table": "observations",
+            "column": "flux",
             "metrics": [
+              "min",
+              "max",
+              "mean",
+              "median",
+              "std",
               "nulls",
-              "dtype"
+              "unique"
             ]
           }
         }
@@ -204,53 +464,52 @@
     }
   },
   {
-    "convo_id": "dana_005",
+    "convo_id": "dana_009",
     "category": "same_flow",
-    "scenario": "Sociology PhD student normalizing inconsistent interview timestamps in a longitudinal study dataset",
+    "scenario": "Early-stage founder analyzing weekly user growth metrics to prep for investor meeting",
     "context": {
-      "table": "longitudinal_interviews",
+      "table": "weekly_user_growth",
       "columns": [
-        "respondent_id",
-        "wave",
-        "interview_date",
-        "interviewer_id",
-        "duration_min",
-        "location",
-        "notes"
+        "week_start",
+        "new_users",
+        "total_users",
+        "wow_growth_pct",
+        "activated_users",
+        "churned_users"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "datatype",
-        "intent": "Clean",
+        "flow": "trend",
+        "intent": "Report",
         "speaker": "user",
-        "utterance": "interview_date has like 4 different formats mixed together, what are we working with?",
+        "utterance": "WoW growth rate looks inconsistent - can you calculate the rolling 4-week average?",
         "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "longitudinal_interviews"
+          "execute_python": {
+            "code": "df['rolling_4w_growth'] = df['wow_growth_pct'].rolling(window=4).mean()",
+            "table": "weekly_user_growth"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "The interview_date column is typed as object (string) and has entries in at least three formats - MM/DD/YYYY, YYYY-MM-DD, and DD-Mon-YY - so I'll cast it to datetime using format inference, coercing anything unrecognizable to null."
+        "utterance": "Computed the 4-week rolling average on WoW growth - it smooths out the spikes and shows a clearer underlying trend starting from week 4 onward."
       },
       {
         "turn_num": 3,
-        "flow": "datatype",
-        "intent": "Clean",
+        "flow": "trend",
+        "intent": "Report",
         "speaker": "user",
-        "utterance": "Any nulls after the cast?",
+        "utterance": "Chart both lines together",
         "target_tools": {
-          "validate_column": {
-            "table": "longitudinal_interviews",
-            "column": "interview_date",
-            "check": "not_null",
-            "value": null,
-            "action": "flag"
+          "render_chart": {
+            "table": "weekly_user_growth",
+            "chart_type": "line",
+            "x": "week_start",
+            "y": "wow_growth_pct",
+            "color": "rolling_4w_growth"
           }
         }
       }
@@ -258,76 +517,67 @@
     "_model": "claude-sonnet-4-6",
     "_provider": "anthropic",
     "_assigned_tools": {
-      "turn1_flow": "datatype",
-      "turn1_intent": "Clean",
-      "turn3_flow": "datatype",
-      "turn3_intent": "Clean",
+      "turn1_flow": "trend",
+      "turn1_intent": "Report",
+      "turn3_flow": "trend",
+      "turn3_intent": "Report",
       "turn1_tools": [
-        "semantic_layer"
+        "execute_python"
       ],
       "turn3_tools": [
-        "validate_column"
+        "render_chart"
       ]
     }
   },
   {
-    "convo_id": "dana_006",
+    "convo_id": "dana_010",
     "category": "same_flow",
-    "scenario": "Knitting stash destash prep - normalize brand and fiber labels",
+    "scenario": "Grant compliance closeout - program service log joined to grant periods",
     "context": {
-      "table": "yarn_stash_destash",
+      "table": "program_service_log",
       "columns": [
-        "listing_id",
-        "brand",
-        "base",
-        "fiber_type",
-        "fiber_content",
-        "colorway",
-        "weight",
-        "yardage",
-        "grams",
-        "skeins",
-        "dye_lot",
-        "condition",
-        "notes"
+        "service_id",
+        "client_id",
+        "grant_id",
+        "program_code",
+        "service_delivery_date",
+        "service_type",
+        "site",
+        "staff_id",
+        "units"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "replace",
-        "intent": "Clean",
+        "flow": "join",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Some brands got pasted into notes, can you move them back?",
+        "utterance": "Need the service log joined to the grants table by grant_id.",
         "target_tools": {
-          "cut_n_paste": {
-            "source_table": "yarn_stash_destash",
-            "source_ref": "column:notes",
-            "target_table": "yarn_stash_destash",
-            "target_ref": "column:brand"
+          "merge_tables": {
+            "left": "program_service_log",
+            "right": "grants_master",
+            "key": "grant_id",
+            "how": "left"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I can move the brand text from notes into brand, but I need the rule for which notes values are actually brands. What pattern should I use, like notes starts with a brand name or notes equals the brand exactly?"
+        "utterance": "I can do a left join on grant_id so every service row stays. Which grants table columns should be brought in?"
       },
       {
         "turn_num": 3,
-        "flow": "replace",
-        "intent": "Clean",
+        "flow": "join",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Notes equals brand exactly",
+        "utterance": "grant_start_date and grant_end_date only",
         "target_tools": {
-          "describe_stats": {
-            "table": "yarn_stash_destash",
-            "column": "notes",
-            "metrics": [
-              "unique",
-              "nulls",
-              "dtype"
-            ]
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "grants_master"
           }
         }
       }
@@ -335,30 +585,91 @@
     "_model": "gpt-5.2",
     "_provider": "openai",
     "_assigned_tools": {
-      "turn1_flow": "replace",
-      "turn1_intent": "Clean",
-      "turn3_flow": "replace",
-      "turn3_intent": "Clean",
+      "turn1_flow": "join",
+      "turn1_intent": "Transform",
+      "turn3_flow": "join",
+      "turn3_intent": "Transform",
       "turn1_tools": [
-        "cut_n_paste"
+        "merge_tables"
       ],
       "turn3_tools": [
-        "describe_stats"
+        "semantic_layer"
       ]
     }
   },
   {
-    "convo_id": "dana_007",
+    "convo_id": "dana_011",
     "category": "same_flow",
-    "scenario": "Economics professor cleaning macro data for a correlation matrix",
+    "scenario": "High school attendance report visualization",
     "context": {
-      "table": "macro_indicators",
+      "table": "daily_attendance",
       "columns": [
-        "country_iso",
-        "year",
-        "gdp_growth",
-        "unemployment",
-        "inflation_cpi"
+        "date",
+        "present",
+        "absent",
+        "tardy",
+        "grade_level"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "design",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Label the y-axis on the daily trends chart as Student Count.",
+        "target_tools": {
+          "modify_chart": {
+            "chart_id": "daily_trends",
+            "y_label": "Student Count"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I've updated the axis label. The gridlines seem to clutter the view a bit."
+      },
+      {
+        "turn_num": 3,
+        "flow": "design",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Remove the gridlines too.",
+        "target_tools": {
+          "style_chart": {
+            "chart_id": "daily_trends",
+            "gridlines": false
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "design",
+      "turn1_intent": "Report",
+      "turn3_flow": "design",
+      "turn3_intent": "Report",
+      "turn1_tools": [
+        "modify_chart"
+      ],
+      "turn3_tools": [
+        "style_chart"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_012",
+    "category": "same_flow",
+    "scenario": "School district chronic absenteeism data validation",
+    "context": {
+      "table": "absenteeism_rates",
+      "columns": [
+        "school_year",
+        "school_id",
+        "chronic_absent_rate",
+        "total_enrollment"
       ]
     },
     "turns": [
@@ -367,11 +678,11 @@
         "flow": "validate",
         "intent": "Clean",
         "speaker": "user",
-        "utterance": "Verify unemployment values are strictly between 0 and 100.",
+        "utterance": "Check if chronic_absent_rate is between 0 and 100",
         "target_tools": {
           "validate_column": {
-            "table": "macro_indicators",
-            "column": "unemployment",
+            "table": "absenteeism_rates",
+            "column": "chronic_absent_rate",
             "check": "range",
             "value": "0,100",
             "action": "flag"
@@ -381,91 +692,23 @@
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I'll flag any records where the rate falls outside that percentage range."
+        "utterance": "Found 12 rows outside 0-100 range - mostly nulls. Should I check the enrollment column too?"
       },
       {
         "turn_num": 3,
         "flow": "validate",
         "intent": "Clean",
         "speaker": "user",
-        "utterance": "What is the max value?",
+        "utterance": "Same for total_enrollment",
         "target_tools": {
           "describe_stats": {
-            "table": "macro_indicators",
-            "column": "unemployment",
+            "table": "absenteeism_rates",
+            "column": "total_enrollment",
             "metrics": [
-              "max"
-            ]
-          }
-        }
-      }
-    ],
-    "_model": "google/gemini-3-pro-preview",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "turn1_flow": "validate",
-      "turn1_intent": "Clean",
-      "turn3_flow": "validate",
-      "turn3_intent": "Clean",
-      "turn1_tools": [
-        "validate_column"
-      ],
-      "turn3_tools": [
-        "describe_stats"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_008",
-    "category": "same_flow",
-    "scenario": "IT asset management -- vendor contact dataset with mixed phone formats",
-    "context": {
-      "table": "vendor_contacts",
-      "columns": [
-        "vendor_id",
-        "contact_name",
-        "phone",
-        "email",
-        "country"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "validate",
-        "intent": "Clean",
-        "speaker": "user",
-        "utterance": "Check which phone numbers already match our E.164 standard",
-        "target_tools": {
-          "validate_column": {
-            "table": "vendor_contacts",
-            "column": "phone",
-            "check": "regex",
-            "value": "^\\+[1-9]\\d{1,14}$",
-            "action": "flag"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "I'll flag non-compliant entries - 23% match the E.164 pattern currently."
-      },
-      {
-        "turn_num": 3,
-        "flow": "validate",
-        "intent": "Clean",
-        "speaker": "user",
-        "utterance": "Breakdown by country?",
-        "target_tools": {
-          "describe_stats": {
-            "table": "vendor_contacts",
-            "column": "phone",
-            "metrics": [
-              "unique",
+              "min",
+              "max",
               "nulls"
-            ],
-            "group_by": "country"
+            ]
           }
         }
       }
@@ -486,60 +729,53 @@
     }
   },
   {
-    "convo_id": "dana_009",
+    "convo_id": "dana_013",
     "category": "same_flow",
-    "scenario": "Founder cleaning messy CRM data before investor meeting",
+    "scenario": "History researcher merging archival metadata tables before exporting a clean dataset to a collaborator",
     "context": {
-      "table": "crm_leads",
+      "table": "archival_metadata",
       "columns": [
-        "lead_id",
-        "company_name",
-        "contact_name",
-        "email",
-        "phone",
-        "job_title",
-        "deal_stage",
-        "revenue_estimate",
-        "last_contacted",
-        "owner"
+        "record_id",
+        "collection_name",
+        "repository",
+        "date_created",
+        "document_type",
+        "provenance",
+        "digitized",
+        "location_code"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "exist",
-        "intent": "Analyze",
+        "flow": "join",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Does crm_leads even have a revenue_estimate column or did someone drop it?",
+        "utterance": "merge the finding_aids table into archival_metadata on collection_name",
         "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "crm_leads"
+          "merge_tables": {
+            "left": "archival_metadata",
+            "right": "finding_aids",
+            "key": "collection_name",
+            "how": "left"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "revenue_estimate is present in crm_leads - it's typed as float with about 34% nulls across rows."
+        "utterance": "Done - merged finding_aids into archival_metadata on collection_name, keeping all rows from the left table and filling nulls where no match was found."
       },
       {
         "turn_num": 3,
-        "flow": "exist",
-        "intent": "Analyze",
+        "flow": "join",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "How bad are the nulls?",
+        "utterance": "what columns came in from finding_aids?",
         "target_tools": {
-          "describe_stats": {
-            "table": "crm_leads",
-            "column": "revenue_estimate",
-            "metrics": [
-              "nulls",
-              "unique",
-              "mean",
-              "min",
-              "max"
-            ]
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "finding_aids"
           }
         }
       }
@@ -547,12 +783,146 @@
     "_model": "claude-sonnet-4-6",
     "_provider": "anthropic",
     "_assigned_tools": {
-      "turn1_flow": "exist",
-      "turn1_intent": "Analyze",
-      "turn3_flow": "exist",
-      "turn3_intent": "Analyze",
+      "turn1_flow": "join",
+      "turn1_intent": "Transform",
+      "turn3_flow": "join",
+      "turn3_intent": "Transform",
       "turn1_tools": [
+        "merge_tables"
+      ],
+      "turn3_tools": [
         "semantic_layer"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_014",
+    "category": "same_flow",
+    "scenario": "Gardening blog plant catalog - accidental bulk replace in plant names",
+    "context": {
+      "table": "garden_inventory_2026",
+      "columns": [
+        "plant_id",
+        "plant_name",
+        "variety",
+        "bed",
+        "planted_date",
+        "harvest_date",
+        "yield_grams",
+        "notes"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "undo",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "That last replace scrambled a bunch of plant names, undo it.",
+        "target_tools": {
+          "rollback_dataset": {
+            "dataset": "garden_inventory_2026",
+            "steps": 1
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I can roll back the most recent change to restore the previous values. If there were multiple edits in a row, tell me how many steps to undo."
+      },
+      {
+        "turn_num": 3,
+        "flow": "undo",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Make it 2 steps back.",
+        "target_tools": {
+          "rollback_dataset": {
+            "dataset": "garden_inventory_2026",
+            "steps": 2
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "turn1_flow": "undo",
+      "turn1_intent": "Converse",
+      "turn3_flow": "undo",
+      "turn3_intent": "Converse",
+      "turn1_tools": [
+        "rollback_dataset"
+      ],
+      "turn3_tools": []
+    }
+  },
+  {
+    "convo_id": "dana_015",
+    "category": "same_flow",
+    "scenario": "Chemistry post-doc analyzing reaction yields across different experimental conditions",
+    "context": {
+      "table": "experiment_logs",
+      "columns": [
+        "run_id",
+        "date",
+        "time",
+        "reagent_ph",
+        "temperature_c",
+        "yield_percent"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "trend",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Is the yield trend significantly different for the high temperature runs?",
+        "target_tools": {
+          "compare_metrics": {
+            "table": "experiment_logs",
+            "column_a": "yield_percent",
+            "column_b": "temperature_c",
+            "method": "t_test"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I'll compare the yield distributions between temperature groups to test for statistical significance."
+      },
+      {
+        "turn_num": 3,
+        "flow": "trend",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Get the stats for those too.",
+        "target_tools": {
+          "describe_stats": {
+            "table": "experiment_logs",
+            "column": "yield_percent",
+            "metrics": [
+              "mean",
+              "std",
+              "min",
+              "max"
+            ]
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "trend",
+      "turn1_intent": "Report",
+      "turn3_flow": "trend",
+      "turn3_intent": "Report",
+      "turn1_tools": [
+        "compare_metrics"
       ],
       "turn3_tools": [
         "describe_stats"
@@ -560,36 +930,32 @@
     }
   },
   {
-    "convo_id": "dana_010",
-    "category": "switch_flow",
-    "scenario": "Personal finance blogger defines a monthly_spend metric before pivoting to profile the dataset",
+    "convo_id": "dana_016",
+    "category": "same_flow",
+    "scenario": "Grant writer cleaning program participant dataset for compliance reporting",
     "context": {
-      "table": "budget_2024",
+      "table": "participants",
       "columns": [
-        "date",
-        "category",
-        "merchant",
-        "amount",
-        "is_subscription",
-        "notes"
+        "id",
+        "name",
+        "age",
+        "gender",
+        "ethnicity",
+        "disability_status"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "define",
-        "intent": "Transform",
+        "flow": "lookup",
+        "intent": "Analyze",
         "speaker": "user",
-        "utterance": "Save total monthly spend as a reusable metric - sum of amount grouped by month",
+        "utterance": "Which demographic fields have the most nulls?",
         "target_tools": {
           "describe_stats": {
-            "table": "budget_2024",
-            "column": "amount",
+            "table": "participants",
+            "column": null,
             "metrics": [
-              "sum",
-              "min",
-              "max",
-              "mean",
               "nulls"
             ]
           }
@@ -598,21 +964,320 @@
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I'll save 'monthly_spend' to the semantic layer using sum(amount) partitioned by month - available for queries and formulas going forward."
+        "utterance": "Ethnicity is the worst - 32% nulls. Disability status is also incomplete at 18%."
       },
       {
         "turn_num": 3,
-        "flow": "describe",
+        "flow": "lookup",
         "intent": "Analyze",
         "speaker": "user",
-        "utterance": "How does the category column look overall?",
+        "utterance": "Drop rows with nulls?",
+        "target_tools": {
+          "execute_python": {
+            "code": "df.dropna(subset=['ethnicity', 'disability_status'], inplace=True)",
+            "table": "participants"
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "lookup",
+      "turn1_intent": "Analyze",
+      "turn3_flow": "lookup",
+      "turn3_intent": "Analyze",
+      "turn1_tools": [
+        "describe_stats"
+      ],
+      "turn3_tools": [
+        "execute_python"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_017",
+    "category": "switch_flow",
+    "scenario": "Founder analyzing early adopter demographics for marketing strategy",
+    "context": {
+      "table": "early_adopter_demographics",
+      "columns": [
+        "user_id",
+        "age_group",
+        "income_bracket",
+        "region_type",
+        "signup_date",
+        "acquisition_channel",
+        "product_tier",
+        "churn_flag"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "explain",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "How did you pick age_group as the top demographic segment?",
+        "target_tools": {
+          "explain_content": {
+            "topic": "methodology for selecting age_group as the top demographic segment",
+            "scope": "decision"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "age_group had the highest variance in adoption rate across its buckets - more signal than income_bracket or region_type, so it ranked first."
+      },
+      {
+        "turn_num": 3,
+        "flow": "segment",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "What's driving the drop in the 35-44 bucket?",
+        "target_tools": {
+          "root_cause_analysis": {
+            "table": "early_adopter_demographics",
+            "metric": "churn_flag",
+            "dimensions": [
+              "acquisition_channel",
+              "product_tier",
+              "region_type"
+            ],
+            "baseline": "age_group == '25-34'",
+            "current": "age_group == '35-44'"
+          }
+        }
+      }
+    ],
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
+    "_assigned_tools": {
+      "turn1_flow": "explain",
+      "turn1_intent": "Converse",
+      "turn3_flow": "segment",
+      "turn3_intent": "Analyze",
+      "turn1_tools": [
+        "explain_content"
+      ],
+      "turn3_tools": [
+        "root_cause_analysis"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_018",
+    "category": "switch_flow",
+    "scenario": "Add a few missing service-type rows, then style an existing pie chart to match district branding.",
+    "context": {
+      "table": "sped_service_counts",
+      "columns": [
+        "school_year",
+        "school_id",
+        "service_type",
+        "student_count"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "insert",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Need to add three missing service type rows for 2024-25.",
+        "target_tools": {
+          "insert_rows": {
+            "table": "sped_service_counts",
+            "values": [
+              {
+                "school_year": "2024-25",
+                "school_id": "D001",
+                "service_type": "Speech",
+                "student_count": 42
+              },
+              {
+                "school_year": "2024-25",
+                "school_id": "D001",
+                "service_type": "OT",
+                "student_count": 18
+              },
+              {
+                "school_year": "2024-25",
+                "school_id": "D001",
+                "service_type": "PT",
+                "student_count": 9
+              }
+            ],
+            "position": null
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I will append those three 2024-25 rows so they show up in the table. Appending avoids shifting any existing row positions."
+      },
+      {
+        "turn_num": 3,
+        "flow": "style",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Also make the pie chart match district colors.",
+        "target_tools": {
+          "apply_style": {
+            "table": "sped_service_counts",
+            "column": "service_type",
+            "condition": "value IS NOT NULL",
+            "format": "highlight",
+            "color": "#003A70"
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "turn1_flow": "insert",
+      "turn1_intent": "Transform",
+      "turn3_flow": "style",
+      "turn3_intent": "Report",
+      "turn1_tools": [
+        "insert_rows"
+      ],
+      "turn3_tools": [
+        "apply_style"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_019",
+    "category": "switch_flow",
+    "scenario": "A book blogger visualizes reading habits but needs to enrich the data with genre details.",
+    "context": {
+      "table": "reading_log_2024",
+      "columns": [
+        "title",
+        "author",
+        "pages",
+        "rating",
+        "finished_date",
+        "genre_id"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "plot",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Profile the finished dates then plot the monthly counts.",
         "target_tools": {
           "describe_stats": {
-            "table": "budget_2024",
-            "column": "category",
+            "table": "reading_log_2024",
+            "column": "finished_date",
             "metrics": [
-              "unique",
               "nulls",
+              "min",
+              "max",
+              "dtype"
+            ]
+          },
+          "render_chart": {
+            "table": "reading_log_2024",
+            "chart_type": "bar",
+            "x": "finished_date",
+            "y": "title"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "The dates look clean with zero nulls. Here is the bar chart showing your activity by month."
+      },
+      {
+        "turn_num": 3,
+        "flow": "join",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Merge in the genre lookup.",
+        "target_tools": {
+          "merge_tables": {
+            "left": "reading_log_2024",
+            "right": "genre_lookup",
+            "key": "genre_id",
+            "how": "left"
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "plot",
+      "turn1_intent": "Report",
+      "turn3_flow": "join",
+      "turn3_intent": "Transform",
+      "turn1_tools": [
+        "describe_stats"
+      ],
+      "turn3_tools": [
+        "merge_tables"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_021",
+    "category": "switch_flow",
+    "scenario": "Skincare blogger standardizes product_type column casing, then checks severity nulls before validating scale.",
+    "context": {
+      "table": "skincare_reactions",
+      "columns": [
+        "entry_id",
+        "product_name",
+        "product_type",
+        "reaction_severity",
+        "reaction_notes",
+        "date_logged"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "format",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "product_type is a mess - cleanser, Cleanser, CLEANSER all over the place",
+        "target_tools": {
+          "format_custom": {
+            "table": "skincare_reactions",
+            "column": "product_type",
+            "pattern": "{value.lower().strip()}",
+            "preview": true,
+            "validation": "^[a-z]+$"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I'll normalize product_type to lowercase and strip whitespace - previewing first so you can confirm before it applies."
+      },
+      {
+        "turn_num": 3,
+        "flow": "fill",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "how many reaction_severity values are missing?",
+        "target_tools": {
+          "describe_stats": {
+            "table": "skincare_reactions",
+            "column": "reaction_severity",
+            "metrics": [
+              "nulls",
+              "unique",
               "dtype"
             ]
           }
@@ -622,12 +1287,12 @@
     "_model": "claude-sonnet-4-6",
     "_provider": "anthropic",
     "_assigned_tools": {
-      "turn1_flow": "define",
-      "turn1_intent": "Transform",
-      "turn3_flow": "describe",
-      "turn3_intent": "Analyze",
+      "turn1_flow": "format",
+      "turn1_intent": "Clean",
+      "turn3_flow": "fill",
+      "turn3_intent": "Clean",
       "turn1_tools": [
-        "describe_stats"
+        "format_custom"
       ],
       "turn3_tools": [
         "describe_stats"
@@ -635,33 +1300,304 @@
     }
   },
   {
-    "convo_id": "dana_011",
+    "convo_id": "dana_023",
     "category": "switch_flow",
-    "scenario": "Helpdesk ticket analysis with a combined assignee field that needs splitting for routing analysis.",
+    "scenario": "Growth marketer analyzing video content performance relative to duration",
     "context": {
-      "table": "helpdesk_tickets",
+      "table": "video_performance",
       "columns": [
-        "ticket_id",
-        "created_at",
-        "priority",
-        "status",
-        "category",
-        "assigned_to",
-        "team",
-        "resolution_hours"
+        "video_id",
+        "title",
+        "duration_seconds",
+        "platform",
+        "views",
+        "engagement_rate",
+        "completion_rate"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "plot",
+        "flow": "describe",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "See how engagement compares between short and long videos.",
+        "target_tools": {
+          "execute_sql": {
+            "query": "SELECT CASE WHEN duration_seconds < 60 THEN 'Short' ELSE 'Long' END as duration_type, AVG(engagement_rate) as avg_engagement FROM video_performance GROUP BY 1",
+            "table": "video_performance"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Short videos hold 8.2% engagement, significantly higher than the 3.1% for long-form content."
+      },
+      {
+        "turn_num": 3,
+        "flow": "dashboard",
         "intent": "Report",
         "speaker": "user",
-        "utterance": "Workload looks uneven. Can you chart ticket counts by assigned_to?",
+        "utterance": "Turn that into a dashboard.",
+        "target_tools": {
+          "compose_dashboard": {
+            "table": "video_performance",
+            "panels": [
+              {
+                "type": "chart",
+                "chart_type": "bar",
+                "x": "duration_type",
+                "y": "avg_engagement",
+                "title": "Engagement by Duration"
+              }
+            ],
+            "title": "Video Performance Overview"
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "describe",
+      "turn1_intent": "Analyze",
+      "turn3_flow": "dashboard",
+      "turn3_intent": "Report",
+      "turn1_tools": [
+        "execute_sql"
+      ],
+      "turn3_tools": [
+        "compose_dashboard"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_024",
+    "category": "switch_flow",
+    "scenario": "Startup CEO merging CRM data with payment records to track customer LTV",
+    "context": {
+      "table": "customer_data",
+      "columns": [
+        "email",
+        "name",
+        "company",
+        "payment_amount",
+        "payment_date"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "dedupe",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Are there duplicate emails in the customer data?",
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "customer_data"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Yes, there are duplicates in the email column - I'll remove them to keep each record unique."
+      },
+      {
+        "turn_num": 3,
+        "flow": "split",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Now split the payment_date into year and month.",
+        "target_tools": {
+          "split_column": {
+            "table": "customer_data",
+            "column": "payment_date",
+            "delimiter": "-",
+            "names": [
+              "payment_year",
+              "payment_month"
+            ]
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "dedupe",
+      "turn1_intent": "Clean",
+      "turn3_flow": "split",
+      "turn3_intent": "Transform",
+      "turn1_tools": [
+        "semantic_layer"
+      ],
+      "turn3_tools": [
+        "split_column"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_026",
+    "category": "switch_flow",
+    "scenario": "Fitness blogger cleaning a daily run log before sharing a weekly recap",
+    "context": {
+      "table": "daily_runs_log",
+      "columns": [
+        "run_date",
+        "distance_mi",
+        "shoe",
+        "duration_min",
+        "avg_pace_min_per_mi",
+        "notes"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "replace",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "In shoe, swap NB1080 to 1080, and Saucony Endorphin Speed 3 to ES3.",
+        "target_tools": {
+          "execute_python": {
+            "code": "df['shoe'] = (df['shoe']\n  .astype(str)\n  .str.replace(r'^NB1080$', '1080', regex=True)\n  .str.replace(r'^Saucony Endorphin Speed 3$', 'ES3', regex=True)\n)\ndf",
+            "table": "daily_runs_log"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I will standardize the shoe names by replacing those two exact values so the column is consistent."
+      },
+      {
+        "turn_num": 3,
+        "flow": "undo",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Undo that last shoe change.",
+        "target_tools": {
+          "rollback_dataset": {
+            "dataset": "daily_runs_log",
+            "steps": 1
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "turn1_flow": "replace",
+      "turn1_intent": "Clean",
+      "turn3_flow": "undo",
+      "turn3_intent": "Converse",
+      "turn1_tools": [
+        "execute_python"
+      ],
+      "turn3_tools": [
+        "rollback_dataset"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_027",
+    "category": "switch_flow",
+    "scenario": "Growth marketer standardizing product names in a content calendar by merging columns",
+    "context": {
+      "table": "q3_content",
+      "columns": [
+        "post_date",
+        "category",
+        "variant",
+        "status",
+        "channel"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "merge",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Merge category and variant with a hyphen to create the product_name field.",
+        "target_tools": {
+          "merge_columns": {
+            "table": "q3_content",
+            "columns": [
+              "category",
+              "variant"
+            ],
+            "name": "product_name",
+            "separator": "-"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I'll combine those columns into product_name using a hyphen separator."
+      },
+      {
+        "turn_num": 3,
+        "flow": "export",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Download it as a CSV.",
+        "target_tools": {
+          "export_dataset": {
+            "dataset": "q3_content",
+            "format": "csv"
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "merge",
+      "turn1_intent": "Transform",
+      "turn3_flow": "export",
+      "turn3_intent": "Report",
+      "turn1_tools": [
+        "merge_columns"
+      ],
+      "turn3_tools": [
+        "export_dataset"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_029",
+    "category": "switch_flow",
+    "scenario": "Standardize mixed date formats in AWS billing period columns before dashboard load, then split a combined billing period column into start and end date columns.",
+    "context": {
+      "table": "aws_cost_export",
+      "columns": [
+        "account_id",
+        "billing_period",
+        "billing_start",
+        "billing_end",
+        "service",
+        "region",
+        "usage_type",
+        "cost_usd",
+        "currency"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "format",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "billing_period column has mixed date formats, need them all normalized to ISO 8601",
         "target_tools": {
           "describe_stats": {
-            "table": "helpdesk_tickets",
-            "column": "assigned_to",
+            "table": "aws_cost_export",
+            "column": "billing_period",
             "metrics": [
               "dtype",
               "nulls",
@@ -673,33 +1609,34 @@
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I will profile assigned_to first to see how many unique assignees and any blanks, then plot ticket counts by assignee."
+        "utterance": "I'll profile billing_period first to confirm the format variants, then apply ISO 8601 normalization across all rows."
       },
       {
         "turn_num": 3,
-        "flow": "query",
-        "intent": "Analyze",
+        "flow": "split",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Top 10 assignees by ticket count?",
+        "utterance": "billing_start and billing_end look like a single slash-delimited field",
         "target_tools": {
           "describe_stats": {
-            "table": "helpdesk_tickets",
-            "column": "ticket_id",
+            "table": "aws_cost_export",
+            "column": "billing_start",
             "metrics": [
-              "nulls",
-              "unique"
+              "dtype",
+              "unique",
+              "nulls"
             ]
           }
         }
       }
     ],
-    "_model": "gpt-5.2",
-    "_provider": "openai",
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
     "_assigned_tools": {
-      "turn1_flow": "plot",
-      "turn1_intent": "Report",
-      "turn3_flow": "query",
-      "turn3_intent": "Analyze",
+      "turn1_flow": "format",
+      "turn1_intent": "Clean",
+      "turn3_flow": "split",
+      "turn3_intent": "Transform",
       "turn1_tools": [
         "describe_stats"
       ],
@@ -709,18 +1646,18 @@
     }
   },
   {
-    "convo_id": "dana_012",
+    "convo_id": "dana_030",
     "category": "switch_flow",
-    "scenario": "Building hiring plan spreadsheet for engineering team growth",
+    "scenario": "Founder checking data completeness before board meeting",
     "context": {
-      "table": "hiring_plan",
+      "table": "board_kpi_snapshot",
       "columns": [
-        "role",
-        "department",
-        "start_date",
-        "salary",
-        "equity",
-        "status"
+        "as_of_date",
+        "metric_name",
+        "metric_value",
+        "unit",
+        "source_system",
+        "notes"
       ]
     },
     "turns": [
@@ -729,171 +1666,37 @@
         "flow": "insert",
         "intent": "Transform",
         "speaker": "user",
-        "utterance": "Add a Staff Engineer role starting in Q4.",
+        "utterance": "Need a quick flag column for missing metric_value rows.",
         "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "hiring_plan"
-          },
-          "insert_rows": {
-            "table": "hiring_plan",
-            "values": {
-              "role": "Staff Engineer",
-              "start_date": "2024-10-01",
-              "status": "Open"
-            }
+          "insert_columns": {
+            "table": "board_kpi_snapshot",
+            "column": "is_missing_value",
+            "expression": "metric_value.isna() | (metric_value.astype(str).str.strip() == '')",
+            "default": null,
+            "position": 3
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I've inserted that row with a October 1st start date. I left the salary field blank since it wasn't specified."
+        "utterance": "I will add is_missing_value and set it true when metric_value is blank or null, since that makes gaps easy to filter."
       },
       {
         "turn_num": 3,
-        "flow": "style",
-        "intent": "Report",
+        "flow": "delete",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Color the open roles green.",
+        "utterance": "Which rows are blank now?",
         "target_tools": {
-          "apply_style": {
-            "table": "hiring_plan",
-            "condition": "status == 'Open'",
-            "format": "highlight",
-            "color": "#00FF00"
-          }
-        }
-      }
-    ],
-    "_model": "google/gemini-3-pro-preview",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "turn1_flow": "insert",
-      "turn1_intent": "Transform",
-      "turn3_flow": "style",
-      "turn3_intent": "Report",
-      "turn1_tools": [
-        "semantic_layer"
-      ],
-      "turn3_tools": [
-        "apply_style"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_014",
-    "category": "switch_flow",
-    "scenario": "Physics student correcting sensor data where numerical readings were imported as text strings.",
-    "context": {
-      "table": "sensor_readings",
-      "columns": [
-        "timestamp",
-        "voltage_raw",
-        "current_raw",
-        "temperature_raw",
-        "trial_id",
-        "sensor_id"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "plot",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "Plot voltage over time after casting voltage_raw to float.",
-        "target_tools": {
-          "execute_sql": {
-            "query": "SELECT timestamp, CAST(voltage_raw AS FLOAT) AS voltage FROM sensor_readings ORDER BY timestamp",
-            "table": "sensor_readings"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "Casting voltage_raw to float and plotting against timestamp as a line chart - nulls from failed conversions will appear as gaps."
-      },
-      {
-        "turn_num": 3,
-        "flow": "exist",
-        "intent": "Analyze",
-        "speaker": "user",
-        "utterance": "Any non-numeric strings still in current_raw?",
-        "target_tools": {
-          "execute_python": {
-            "code": "df[~df['current_raw'].str.match(r'^-?\\d+(\\.\\d+)?$', na=False)]",
-            "table": "sensor_readings"
-          }
-        }
-      }
-    ],
-    "_model": "claude-sonnet-4-6",
-    "_provider": "anthropic",
-    "_assigned_tools": {
-      "turn1_flow": "plot",
-      "turn1_intent": "Report",
-      "turn3_flow": "exist",
-      "turn3_intent": "Analyze",
-      "turn1_tools": [
-        "execute_sql"
-      ],
-      "turn3_tools": [
-        "execute_python"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_015",
-    "category": "switch_flow",
-    "scenario": "Auditing failed credit card charges to reduce churn",
-    "context": {
-      "table": "billing_charge_attempts",
-      "columns": [
-        "attempt_id",
-        "customer_id",
-        "attempt_ts",
-        "amount_usd",
-        "currency",
-        "status",
-        "failure_reason",
-        "payment_method_type",
-        "card_brand",
-        "issuer_country",
-        "retry_count",
-        "subscription_id"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "trend",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "Failed charges spiked last week, what changed day to day?",
-        "target_tools": {
-          "execute_python": {
-            "code": "import pandas as pd\n\ndf['attempt_ts'] = pd.to_datetime(df['attempt_ts'], errors='coerce')\ndf['date'] = df['attempt_ts'].dt.date\nout = (df[df['status'].astype(str).str.lower().eq('failed')]\n       .groupby('date', dropna=False)\n       .size()\n       .reset_index(name='failed_attempts')\n       .sort_values('date'))\n\nout['failed_attempts_7d_avg'] = out['failed_attempts'].rolling(7, min_periods=1).mean()\nout",
-            "table": "billing_charge_attempts"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "I will group failed attempts by day and compute a 7 day rolling average, since that makes day to day shifts easier to see."
-      },
-      {
-        "turn_num": 3,
-        "flow": "lookup",
-        "intent": "Analyze",
-        "speaker": "user",
-        "utterance": "Whats the retry success rate metric?",
-        "target_tools": {
-          "lookup_metric": {
-            "term": "retry_success_rate",
-            "source": "billing_charge_attempts"
+          "describe_stats": {
+            "table": "board_kpi_snapshot",
+            "column": "metric_value",
+            "metrics": [
+              "nulls",
+              "unique",
+              "dtype"
+            ]
           }
         }
       }
@@ -901,137 +1704,12 @@
     "_model": "gpt-5.2",
     "_provider": "openai",
     "_assigned_tools": {
-      "turn1_flow": "trend",
-      "turn1_intent": "Report",
-      "turn3_flow": "lookup",
-      "turn3_intent": "Analyze",
-      "turn1_tools": [
-        "execute_python"
-      ],
-      "turn3_tools": [
-        "lookup_metric"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_016",
-    "category": "switch_flow",
-    "scenario": "A DevOps team analyzes deployment failure rates to identify high-risk windows.",
-    "context": {
-      "table": "deployments",
-      "columns": [
-        "deploy_id",
-        "timestamp",
-        "status",
-        "environment",
-        "duration_ms"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "trend",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "Calculate the rolling 7-day failure rate for prod.",
-        "target_tools": {
-          "execute_python": {
-            "code": "df[df['environment']=='prod'].set_index('timestamp').resample('D')['status'].apply(lambda x: (x=='failed').mean()).rolling(7).mean()",
-            "table": "deployments"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "I'll compute the rolling average failure percentage for the production environment."
-      },
-      {
-        "turn_num": 3,
-        "flow": "reshape",
-        "intent": "Transform",
-        "speaker": "user",
-        "utterance": "Sort by highest rate first.",
-        "target_tools": {
-          "modify_table": {
-            "table": "deployments",
-            "operation": "sort",
-            "column": "failure_rate",
-            "ascending": false
-          }
-        }
-      }
-    ],
-    "_model": "google/gemini-3-pro-preview",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "turn1_flow": "trend",
-      "turn1_intent": "Report",
-      "turn3_flow": "reshape",
+      "turn1_flow": "insert",
+      "turn1_intent": "Transform",
+      "turn3_flow": "delete",
       "turn3_intent": "Transform",
       "turn1_tools": [
-        "execute_python"
-      ],
-      "turn3_tools": [
-        "modify_table"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_017",
-    "category": "switch_flow",
-    "scenario": "Lab manager configuring default settings for a shared research account",
-    "context": {
-      "table": "experiment_results",
-      "columns": [
-        "sample_id",
-        "concentration",
-        "measurement_date",
-        "technician"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "summarize",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "What's the current schema for the shared dataset?",
-        "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "experiment_results"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "The experiment_results table has 4 columns: sample_id (string), concentration (float), measurement_date (object), and technician (string)."
-      },
-      {
-        "turn_num": 3,
-        "flow": "format",
-        "intent": "Clean",
-        "speaker": "user",
-        "utterance": "Dates should be YYYY-MM-DD.",
-        "target_tools": {
-          "describe_stats": {
-            "table": "experiment_results",
-            "column": "measurement_date"
-          }
-        }
-      }
-    ],
-    "_model": "deepseek/deepseek-chat",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "turn1_flow": "summarize",
-      "turn1_intent": "Report",
-      "turn3_flow": "format",
-      "turn3_intent": "Clean",
-      "turn1_tools": [
-        "semantic_layer"
+        "insert_columns"
       ],
       "turn3_tools": [
         "describe_stats"
@@ -1039,19 +1717,153 @@
     }
   },
   {
-    "convo_id": "dana_019",
-    "category": "ambiguous_first",
-    "scenario": "Photography blogger wants missing daily metrics filled before running monthly analytics reports in local time.",
+    "convo_id": "dana_031",
+    "category": "switch_flow",
+    "scenario": "Economics grad student formatting charts and analyzing GDP dips",
     "context": {
-      "table": "daily_blog_metrics",
+      "table": "economic_indicators",
       "columns": [
-        "date",
-        "page_views",
-        "unique_visitors",
-        "avg_session_duration",
-        "bounce_rate",
-        "photo_downloads",
-        "local_time"
+        "country",
+        "region",
+        "year",
+        "quarter",
+        "gdp_growth",
+        "inflation_rate"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "design",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "Change the chart title to 'Real GDP Growth' and label the Y-axis 'Percentage Change'.",
+        "target_tools": {
+          "modify_chart": {
+            "chart_id": "chart_latest",
+            "title": "Real GDP Growth",
+            "y_label": "Percentage Change"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I've updated the title and axis text on the current chart."
+      },
+      {
+        "turn_num": 3,
+        "flow": "segment",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Why did it drop in Q3?",
+        "target_tools": {
+          "root_cause_analysis": {
+            "table": "economic_indicators",
+            "metric": "gdp_growth",
+            "dimensions": [
+              "region",
+              "country"
+            ],
+            "current": "quarter == 'Q3'",
+            "baseline": "quarter == 'Q2'"
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "design",
+      "turn1_intent": "Report",
+      "turn3_flow": "segment",
+      "turn3_intent": "Analyze",
+      "turn1_tools": [
+        "modify_chart"
+      ],
+      "turn3_tools": [
+        "root_cause_analysis"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_032",
+    "category": "switch_flow",
+    "scenario": "A care coordinator merges a patient registry with a call log to see which high-risk patients have been reached, joining by MRN and keeping all registry patients.",
+    "context": {
+      "table": "patient_registry",
+      "columns": [
+        "MRN",
+        "patient_name",
+        "risk_level",
+        "last_call_date",
+        "call_outcome"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "preference",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Default to left join for patient merges.",
+        "target_tools": {
+          "manage_memory": {
+            "operation": "store",
+            "key": "merge_preference",
+            "value": "left"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Noted - I'll use left join as the default for patient merges going forward."
+      },
+      {
+        "turn_num": 3,
+        "flow": "plot",
+        "intent": "Report",
+        "speaker": "user",
+        "utterance": "What's the call outcome breakdown?",
+        "target_tools": {
+          "describe_stats": {
+            "table": "patient_registry",
+            "column": "call_outcome",
+            "metrics": [
+              "unique",
+              "nulls"
+            ]
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "preference",
+      "turn1_intent": "Converse",
+      "turn3_flow": "plot",
+      "turn3_intent": "Report",
+      "turn1_tools": [],
+      "turn3_tools": [
+        "describe_stats"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_033",
+    "category": "ambiguous_first",
+    "scenario": "Apparel store owner wants to visualize stock levels after splitting a combined Color-Size column in their inventory sheet.",
+    "context": {
+      "table": "inventory_master",
+      "columns": [
+        "sku",
+        "product_name",
+        "color_size",
+        "quantity_on_hand",
+        "reorder_level",
+        "warehouse_location"
       ]
     },
     "turns": [
@@ -1059,58 +1871,59 @@
         "turn_num": 1,
         "flow": "ambiguous",
         "candidate_flows": [
-          "interpolate",
-          "fill"
+          "design",
+          "plot"
         ],
         "candidate_intents": [
-          "Plan",
-          "Clean"
+          "Report",
+          "Plan"
         ],
         "speaker": "user",
-        "utterance": "There are gaps in my daily page_views and bounce_rate - want them handled before the monthly report.",
-        "rationale": "Handling gaps in numeric time-series columns could mean model-based interpolation (run_interpolation) or a simpler fill strategy like forward-fill (flash_fill) - the user has not indicated which approach they want.",
+        "utterance": "Can we update the color-size breakdown to show quantity by size?",
+        "rationale": "The phrase 'update the breakdown' could mean modifying an existing chart (design flow) or creating a new chart/query showing quantity by size (plot flow). Both interpretations are equally valid without more context.",
         "target_tools": {
           "handle_ambiguity": {
             "clarification": null,
             "candidates": [
-              "run_interpolation",
-              "flash_fill"
+              "modify_chart",
+              "execute_sql"
             ]
           },
-          "run_interpolation": {
-            "table": "daily_blog_metrics",
-            "column": "page_views",
-            "method": null,
-            "order": null,
-            "limit": null
+          "modify_chart": {
+            "chart_id": null,
+            "title": "Quantity by Size",
+            "x_label": "Size",
+            "y_label": "Quantity on Hand",
+            "chart_type": null
           },
-          "flash_fill": {
-            "table": "daily_blog_metrics",
-            "column": "page_views",
-            "strategy": null,
-            "value": null
+          "execute_sql": {
+            "query": "SELECT color_size, SUM(quantity_on_hand) FROM inventory_master GROUP BY color_size",
+            "table": "inventory_master"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "Should I carry the nearest known values forward/backward, or estimate the gaps using a model that fits the trend in the surrounding data?"
+        "utterance": "Are you looking to update an existing chart, or create a new one showing quantity by size?"
       },
       {
         "turn_num": 3,
-        "flow": "fill",
-        "intent": "Clean",
+        "flow": "plot",
+        "intent": "Report",
         "speaker": "user",
-        "utterance": "Just carry values forward, no modeling.",
+        "utterance": "New chart - bar chart by size",
         "candidate_intents": [
-          "Plan",
-          "Clean"
+          "Report",
+          "Plan"
         ],
         "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "daily_blog_metrics"
+          "render_chart": {
+            "table": "inventory_master",
+            "chart_type": "bar",
+            "x": "color_size",
+            "y": "quantity_on_hand",
+            "color": null
           }
         }
       }
@@ -1119,42 +1932,45 @@
     "_provider": "anthropic",
     "_assigned_tools": {
       "candidate_flows": [
-        "interpolate",
-        "fill"
+        "design",
+        "plot"
       ],
       "candidate_intents": [
-        "Plan",
-        "Clean"
+        "Report",
+        "Plan"
       ],
-      "turn3_flow": "fill",
-      "turn3_intent": "Clean",
+      "turn3_flow": "plot",
+      "turn3_intent": "Report",
       "sub_type": "partial",
       "cand_a_tools": [
-        "run_interpolation"
+        "modify_chart"
       ],
       "cand_b_tools": [
-        "flash_fill"
+        "execute_sql"
       ],
       "turn3_tools": [
-        "semantic_layer"
+        "render_chart"
       ]
     }
   },
   {
-    "convo_id": "dana_020",
+    "convo_id": "dana_034",
     "category": "ambiguous_first",
-    "scenario": "Post-doc parsing experimental condition tags into analyzable variables",
+    "scenario": "Billing manager reconciling claims by combining claims export with payer responses on claim ID",
     "context": {
-      "table": "ephys_trial_log",
+      "table": "claims_recon_workbench",
       "columns": [
-        "trial_id",
-        "subject_id",
-        "session_date",
-        "condition_tag",
-        "stim_protocol",
-        "drug",
-        "timepoint_min",
-        "response_amp_uv"
+        "claim_id",
+        "patient_id",
+        "service_date",
+        "billed_amount",
+        "allowed_amount",
+        "paid_amount",
+        "payer_name",
+        "status",
+        "denial_code",
+        "denial_reason",
+        "response_date"
       ]
     },
     "turns": [
@@ -1162,17 +1978,316 @@
         "turn_num": 1,
         "flow": "ambiguous",
         "candidate_flows": [
-          "split",
-          "update"
+          "approve",
+          "reject"
         ],
         "candidate_intents": [
           "Plan",
-          "Transform",
-          "Clean"
+          "Converse"
         ],
         "speaker": "user",
-        "utterance": "condition_tag looks messy, can we break it out?",
-        "rationale": "Break it out could mean splitting the condition_tag into multiple columns, or updating/cleaning the existing values to a consistent format.",
+        "utterance": "That merge suggestion is not what I wanted.",
+        "rationale": "This could mean the user wants to reject the suggested step, or they might be asking to proceed differently by approving an alternative suggestion. The message expresses dissatisfaction but does not specify whether to discard the suggestion or accept a different option.",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "read_flow_stack",
+              "coordinate_context"
+            ]
+          },
+          "read_flow_stack": {
+            "detail": null,
+            "scope": null
+          },
+          "coordinate_context": {
+            "dataset": null,
+            "table": "claims_recon_workbench"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want to reject that suggestion, or keep it and adjust it?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "reject",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Reject it.",
+        "candidate_intents": [
+          "Plan",
+          "Converse"
+        ],
+        "target_tools": {
+          "coordinate_context": {
+            "dataset": null,
+            "table": "claims_recon_workbench"
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "approve",
+        "reject"
+      ],
+      "candidate_intents": [
+        "Plan",
+        "Converse"
+      ],
+      "turn3_flow": "reject",
+      "turn3_intent": "Converse",
+      "sub_type": "partial",
+      "cand_a_tools": [],
+      "cand_b_tools": [],
+      "turn3_tools": []
+    }
+  },
+  {
+    "convo_id": "dana_036",
+    "category": "ambiguous_first",
+    "scenario": "A travel blogger is merging two spreadsheets of trip expenses and wants to remove duplicate charges caused by syncing issues before calculating the total spend per city.",
+    "context": {
+      "table": "expenses",
+      "columns": [
+        "date",
+        "vendor",
+        "amount",
+        "city",
+        "category"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "dedupe",
+          "update"
+        ],
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "There are duplicates where date, vendor, and amount match",
+        "rationale": "The user mentions duplicates matching multiple columns, which could either be a dedupe operation or a request to update those records.",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "dedupe_columns",
+              "semantic_layer"
+            ]
+          },
+          "dedupe_columns": {
+            "table": "expenses",
+            "columns": [
+              "date",
+              "vendor",
+              "amount"
+            ],
+            "keep": "last"
+          },
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "expenses"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Should I remove the duplicates entirely or update the matching records?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "update",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "Update the matches",
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "target_tools": {
+          "describe_stats": {
+            "table": "expenses",
+            "column": null,
+            "metrics": [
+              "nulls",
+              "unique"
+            ]
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "dedupe",
+        "update"
+      ],
+      "candidate_intents": [
+        "Clean",
+        "Plan"
+      ],
+      "turn3_flow": "update",
+      "turn3_intent": "Clean",
+      "sub_type": "partial",
+      "cand_a_tools": [
+        "dedupe_columns"
+      ],
+      "cand_b_tools": [
+        "semantic_layer"
+      ],
+      "turn3_tools": [
+        "describe_stats"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_037",
+    "category": "ambiguous_first",
+    "scenario": "Linguistics student normalizing participant contact info from a messy handwritten sign-up sheet",
+    "context": {
+      "table": "participant_contacts",
+      "columns": [
+        "participant_id",
+        "full_name",
+        "phone_number",
+        "email_address",
+        "signup_date"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "format",
+          "validate"
+        ],
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "the phone numbers and emails are all over the place - need them cleaned up",
+        "rationale": "Cleaning up inconsistent contact fields could mean applying a standard format pattern (format flow) or checking that values conform to valid rules and flagging bad ones (validate flow) - both are plausible interpretations.",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "format_custom",
+              "describe_stats"
+            ]
+          },
+          "format_custom": {
+            "table": "participant_contacts",
+            "column": "phone_number",
+            "pattern": null,
+            "preview": true,
+            "validation": null
+          },
+          "describe_stats": {
+            "table": "participant_contacts",
+            "column": "phone_number",
+            "metrics": [
+              "nulls",
+              "unique",
+              "dtype"
+            ]
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I see mixed formats across both columns - should I rewrite them into a standard pattern, or flag the ones that don't match a valid phone/email structure?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "validate",
+        "intent": "Clean",
+        "speaker": "user",
+        "utterance": "flag the bad ones first",
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "participant_contacts"
+          }
+        }
+      }
+    ],
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "format",
+        "validate"
+      ],
+      "candidate_intents": [
+        "Clean",
+        "Plan"
+      ],
+      "turn3_flow": "validate",
+      "turn3_intent": "Clean",
+      "sub_type": "confirmation",
+      "cand_a_tools": [
+        "format_custom"
+      ],
+      "cand_b_tools": [
+        "describe_stats"
+      ],
+      "turn3_tools": [
+        "semantic_layer"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_038",
+    "category": "ambiguous_first",
+    "scenario": "IT reporting team reviewing vendor contact phone numbers before standardizing formats for ITSM import.",
+    "context": {
+      "table": "vendor_contacts_master",
+      "columns": [
+        "vendor_id",
+        "vendor_name",
+        "contact_name",
+        "email",
+        "phone",
+        "phone_ext",
+        "country",
+        "source_system",
+        "last_updated"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "describe",
+          "query"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "How bad is the phone column right now, like missing and weird values?",
+        "rationale": "This could mean a quick profile of the phone column (nulls, uniques, patterns) or a custom query to count specific problem cases. The user did not specify whether they want general stats or a specific breakdown.",
         "target_tools": {
           "handle_ambiguity": {
             "clarification": null,
@@ -1182,8 +2297,8 @@
             ]
           },
           "describe_stats": {
-            "table": "ephys_trial_log",
-            "column": "condition_tag",
+            "table": "vendor_contacts_master",
+            "column": "phone",
             "metrics": [
               "dtype",
               "nulls",
@@ -1195,23 +2310,22 @@
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "condition_tag has lots of unique strings with a consistent delimiter pattern, so I can split it into separate columns; should I split on underscores, or do you want me to standardize the tag text in-place instead?"
+        "utterance": "Do you want a quick profile of the phone column, or a SQL breakdown of specific issues like missing, too short, or non-digit characters?"
       },
       {
         "turn_num": 3,
-        "flow": "split",
-        "intent": "Transform",
+        "flow": "describe",
+        "intent": "Analyze",
         "speaker": "user",
-        "utterance": "Split it on underscores into separate columns",
+        "utterance": "Quick profile, plus a few example bad ones",
         "candidate_intents": [
-          "Plan",
-          "Transform",
-          "Clean"
+          "Analyze",
+          "Plan"
         ],
         "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "ephys_trial_log"
+          "execute_python": {
+            "table": "vendor_contacts_master",
+            "code": "import pandas as pd\nimport numpy as np\n\ns = df['phone'].astype('string')\n\n# Basic profiling\nnull_count = s.isna().sum()\nempty_count = s.fillna('').str.strip().eq('').sum()\nnon_empty = s.fillna('').str.strip().ne('')\n\ndigits = s.fillna('').str.replace(r'\\D+', '', regex=True)\ndigit_len = digits.str.len()\n\nprofile = {\n    'rows': int(len(df)),\n    'nulls': int(null_count),\n    'empty_strings': int(empty_count),\n    'non_empty': int(non_empty.sum()),\n    'unique_non_empty': int(s[non_empty].nunique(dropna=True)),\n    'min_digit_len_non_empty': int(digit_len[non_empty].min()) if non_empty.any() else None,\n    'max_digit_len_non_empty': int(digit_len[non_empty].max()) if non_empty.any() else None,\n}\n\n# Heuristic \"bad\" examples: non-empty but too short/too long or has no digits\nbad_mask = non_empty & ((digit_len < 7) | (digit_len > 15) | (digit_len == 0))\nexamples = df.loc[bad_mask, ['vendor_id','vendor_name','contact_name','phone','country','source_system']].head(10)\n\nprofile, examples"
           }
         }
       }
@@ -1220,19 +2334,301 @@
     "_provider": "openai",
     "_assigned_tools": {
       "candidate_flows": [
-        "split",
-        "update"
+        "describe",
+        "query"
+      ],
+      "candidate_intents": [
+        "Analyze",
+        "Plan"
+      ],
+      "turn3_flow": "describe",
+      "turn3_intent": "Analyze",
+      "sub_type": "partial",
+      "cand_a_tools": [
+        "describe_stats"
+      ],
+      "cand_b_tools": [
+        "describe_stats"
+      ],
+      "turn3_tools": [
+        "execute_python"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_039",
+    "category": "ambiguous_first",
+    "scenario": "A release engineer audits legacy build logs with mixed duration formats (seconds/minutes) and pauses to reconsider standardizing them.",
+    "context": {
+      "table": "build_logs",
+      "columns": [
+        "build_id",
+        "duration",
+        "status",
+        "timestamp"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "undo",
+          "chat"
+        ],
+        "candidate_intents": [
+          "Converse",
+          "Converse"
+        ],
+        "speaker": "user",
+        "utterance": "Actually, back up.",
+        "rationale": "The phrase \"back up\" could refer to the action of undoing the last dataset mutation or the conversational act of returning to a previous topic.",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "rollback_dataset",
+              "coordinate_context"
+            ]
+          },
+          "rollback_dataset": {
+            "dataset": "build_logs",
+            "steps": 1
+          },
+          "coordinate_context": {}
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want me to undo the last change to the table, or are we just pausing the discussion?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "chat",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "Just pausing the discussion.",
+        "candidate_intents": [
+          "Converse"
+        ],
+        "target_tools": {
+          "coordinate_context": {}
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "undo",
+        "chat"
       ],
       "candidate_intents": [
         "Plan",
-        "Transform",
-        "Clean"
+        "Converse"
       ],
-      "turn3_flow": "split",
+      "turn3_flow": "chat",
+      "turn3_intent": "Converse",
+      "sub_type": "partial",
+      "cand_a_tools": [
+        "rollback_dataset"
+      ],
+      "cand_b_tools": [],
+      "turn3_tools": []
+    }
+  },
+  {
+    "convo_id": "dana_040",
+    "category": "ambiguous_first",
+    "scenario": "Photography blogger needs to analyze shoot frequency by month from inconsistent log data",
+    "context": {
+      "table": "shoot_log",
+      "columns": [
+        "date",
+        "camera_model",
+        "location",
+        "lens",
+        "notes"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "query",
+          "segment"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "Break down my shoots by month",
+        "rationale": "The user could mean either a simple query to count shoots per month (query) or a deeper analysis of patterns across months (segment).",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "describe_stats",
+              "root_cause_analysis"
+            ]
+          },
+          "describe_stats": {
+            "table": "shoot_log",
+            "column": "date"
+          },
+          "root_cause_analysis": {
+            "table": "shoot_log",
+            "metric": "count",
+            "dimensions": [
+              "date"
+            ]
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Do you want a simple count per month or to analyze seasonal patterns in shoot frequency?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "segment",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Seasonal patterns",
+        "candidate_intents": [
+          "Analyze",
+          "Plan"
+        ],
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "shoot_log"
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "query",
+        "segment"
+      ],
+      "candidate_intents": [
+        "Analyze",
+        "Plan"
+      ],
+      "turn3_flow": "segment",
+      "turn3_intent": "Analyze",
+      "sub_type": "partial",
+      "cand_a_tools": [
+        "describe_stats"
+      ],
+      "cand_b_tools": [
+        "root_cause_analysis"
+      ],
+      "turn3_tools": [
+        "semantic_layer"
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_041",
+    "category": "ambiguous_first",
+    "scenario": "CEO preparing employee headcount projection for next funding round",
+    "context": {
+      "table": "headcount_projection",
+      "columns": [
+        "month",
+        "engineering_hires",
+        "sales_hires",
+        "ops_hires",
+        "total_headcount",
+        "cumulative_cost"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "ambiguous",
+        "candidate_flows": [
+          "insert",
+          "merge"
+        ],
+        "candidate_intents": [
+          "Transform",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "need an engineering_hires column with 18 months of projected data",
+        "rationale": "The request could mean adding a brand-new column to the table (insert flow) or combining existing department hire columns into a unified engineering_hires column (merge flow). Both interpretations are plausible without knowing whether engineering_hires already exists or needs to be computed from other columns.",
+        "target_tools": {
+          "handle_ambiguity": {
+            "clarification": null,
+            "candidates": [
+              "load_dataset",
+              "describe_stats"
+            ]
+          },
+          "load_dataset": {
+            "source_id": "headcount_projection",
+            "name": "headcount_projection",
+            "format": null
+          },
+          "describe_stats": {
+            "table": "headcount_projection",
+            "column": null,
+            "metrics": [
+              "unique",
+              "nulls",
+              "dtype"
+            ]
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "The table already has engineering_hires, sales_hires, and ops_hires columns - did you want to add 18 new monthly rows with projected values, or combine those hire columns into a single column?"
+      },
+      {
+        "turn_num": 3,
+        "flow": "insert",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "add the rows, 20% growth each month",
+        "candidate_intents": [
+          "Transform",
+          "Plan"
+        ],
+        "target_tools": {
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "headcount_projection"
+          }
+        }
+      }
+    ],
+    "_model": "claude-sonnet-4-6",
+    "_provider": "anthropic",
+    "_assigned_tools": {
+      "candidate_flows": [
+        "insert",
+        "merge"
+      ],
+      "candidate_intents": [
+        "Transform",
+        "Plan"
+      ],
+      "turn3_flow": "insert",
       "turn3_intent": "Transform",
       "sub_type": "confirmation",
       "cand_a_tools": [
-        "describe_stats"
+        "load_dataset"
       ],
       "cand_b_tools": [
         "describe_stats"
@@ -1243,120 +2639,16 @@
     }
   },
   {
-    "convo_id": "dana_021",
+    "convo_id": "dana_044",
     "category": "ambiguous_first",
-    "scenario": "Conference organizer creating a clean list of attendees for badge printing",
+    "scenario": "DIY crafts blogger summarizing project costs",
     "context": {
-      "table": "attendees",
+      "table": "project_costs",
       "columns": [
-        "attendee_id",
-        "first_name",
-        "last_name",
-        "ticket_type",
-        "reg_date",
-        "payment_status"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "ambiguous",
-        "candidate_flows": [
-          "plot",
-          "dashboard"
-        ],
-        "candidate_intents": [
-          "Plan",
-          "Report"
-        ],
-        "speaker": "user",
-        "utterance": "Visualize the registration trends by ticket type",
-        "rationale": "The user wants a visualization, which could be a one-off analysis (plot/query) or a persistent interactive view (dashboard).",
-        "target_tools": {
-          "handle_ambiguity": {
-            "clarification": null,
-            "candidates": [
-              "execute_sql",
-              "compose_dashboard"
-            ]
-          },
-          "execute_sql": {
-            "query": "SELECT ticket_type, reg_date, COUNT(*) FROM attendees GROUP BY ticket_type, reg_date",
-            "table": "attendees"
-          },
-          "compose_dashboard": {
-            "table": "attendees",
-            "title": "Registration Trends",
-            "panels": [
-              {
-                "type": "chart",
-                "x": "reg_date",
-                "y": "count",
-                "color": "ticket_type"
-              }
-            ]
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "Do you want a single chart for this analysis or a new dashboard?"
-      },
-      {
-        "turn_num": 3,
-        "flow": "dashboard",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "Dashboard, change title to Daily Stats",
-        "candidate_intents": [
-          "Plan",
-          "Report"
-        ],
-        "target_tools": {
-          "modify_chart": {
-            "chart_id": "reg_trends",
-            "title": "Daily Stats"
-          }
-        }
-      }
-    ],
-    "_model": "google/gemini-3-pro-preview",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "candidate_flows": [
-        "plot",
-        "dashboard"
-      ],
-      "candidate_intents": [
-        "Plan",
-        "Report"
-      ],
-      "turn3_flow": "dashboard",
-      "turn3_intent": "Report",
-      "sub_type": "confirmation",
-      "cand_a_tools": [
-        "execute_sql"
-      ],
-      "cand_b_tools": [
-        "compose_dashboard"
-      ],
-      "turn3_tools": [
-        "modify_chart"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_022",
-    "category": "ambiguous_first",
-    "scenario": "Visualizing monthly AWS spend by business unit for quarterly review",
-    "context": {
-      "table": "aws_spend",
-      "columns": [
-        "month",
-        "business_unit",
-        "spend_usd",
-        "service"
+        "project_type",
+        "cost",
+        "time_spent",
+        "materials"
       ]
     },
     "turns": [
@@ -1368,50 +2660,51 @@
           "plot"
         ],
         "candidate_intents": [
-          "Plan",
           "Analyze",
+          "Plan",
           "Report"
         ],
         "speaker": "user",
-        "utterance": "Show last 12 months spend by business unit",
-        "rationale": "The request could mean either querying the raw data (query) or visualizing it (plot), as both would show the spend breakdown.",
+        "utterance": "Show me cost by project type",
+        "rationale": "The request could mean either querying the data to summarize costs or plotting a chart of costs",
         "target_tools": {
           "handle_ambiguity": {
             "clarification": null,
             "candidates": [
-              "execute_sql",
-              "execute_sql"
+              "describe_stats",
+              "describe_stats"
             ]
           },
-          "execute_sql": {
-            "query": "SELECT month, business_unit, SUM(spend_usd) FROM aws_spend WHERE month >= DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH) GROUP BY month, business_unit",
-            "table": "aws_spend"
+          "describe_stats": {
+            "table": "project_costs",
+            "column": "cost",
+            "metrics": [
+              "min",
+              "max"
+            ]
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I can show the raw data table or create a bar chart - which would you prefer?"
+        "utterance": "I can summarize the costs by project type or create a bar chart showing the distribution. Which would you prefer?"
       },
       {
         "turn_num": 3,
-        "flow": "plot",
-        "intent": "Report",
+        "flow": "query",
+        "intent": "Analyze",
         "speaker": "user",
-        "utterance": "Bar chart with months on x-axis",
+        "utterance": "Summarize it",
         "candidate_intents": [
-          "Plan",
           "Analyze",
+          "Plan",
           "Report"
         ],
         "target_tools": {
-          "render_chart": {
-            "table": "aws_spend",
-            "chart_type": "bar",
-            "x": "month",
-            "y": "spend_usd",
-            "color": "business_unit"
+          "execute_python": {
+            "code": "df.groupby('project_type')['cost'].sum()",
+            "table": "project_costs"
           }
         }
       }
@@ -1424,132 +2717,41 @@
         "plot"
       ],
       "candidate_intents": [
-        "Plan",
         "Analyze",
+        "Plan",
         "Report"
       ],
-      "turn3_flow": "plot",
-      "turn3_intent": "Report",
+      "turn3_flow": "query",
+      "turn3_intent": "Analyze",
       "sub_type": "confirmation",
       "cand_a_tools": [
-        "execute_sql"
+        "describe_stats"
       ],
       "cand_b_tools": [
-        "execute_sql"
+        "describe_stats"
       ],
       "turn3_tools": [
-        "render_chart"
+        "execute_python"
       ]
     }
   },
   {
-    "convo_id": "dana_023",
+    "convo_id": "dana_046",
     "category": "ambiguous_first",
-    "scenario": "Preparing customer support ticket data for investor due diligence",
+    "scenario": "Personal finance blogger aligning income and spending summaries with preferred date and timezone conventions.",
     "context": {
-      "table": "support_tickets_q2",
+      "table": "blog_finance_transactions",
       "columns": [
-        "ticket_id",
-        "created_at",
-        "resolved_at",
+        "transaction_id",
+        "transaction_date",
+        "posted_at",
+        "timezone",
+        "account",
         "category",
-        "priority",
-        "sla_breach",
-        "agent_id",
-        "customer_tier",
-        "resolution_status",
-        "csat_score"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "ambiguous",
-        "candidate_flows": [
-          "reject",
-          "approve"
-        ],
-        "candidate_intents": [
-          "Plan",
-          "Converse"
-        ],
-        "speaker": "user",
-        "utterance": "The SLA breach grouping looks off - not sure it's right for the deck",
-        "rationale": "The user could be flagging the grouping to dismiss/reject a suggested approach, or they could be acknowledging a suggestion they want to approve with modifications. It is unclear whether they want to discard the current SLA grouping or proceed with it.",
-        "target_tools": {
-          "handle_ambiguity": {
-            "clarification": null,
-            "candidates": [
-              "rollback_dataset",
-              "execute_sql"
-            ]
-          },
-          "rollback_dataset": {
-            "dataset": "support_tickets_q2",
-            "steps": 1
-          },
-          "execute_sql": {
-            "query": "SELECT sla_breach, COUNT(*) as ticket_count FROM support_tickets_q2 GROUP BY sla_breach",
-            "table": "support_tickets_q2"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "Do you want to scrap the current SLA grouping and try a different approach, or go ahead with it as-is?"
-      },
-      {
-        "turn_num": 3,
-        "flow": "approve",
-        "intent": "Converse",
-        "speaker": "user",
-        "utterance": "Go ahead with it",
-        "candidate_intents": [
-          "Plan",
-          "Converse"
-        ],
-        "target_tools": {
-          "execute_sql": {
-            "query": "SELECT sla_breach, COUNT(*) as ticket_count FROM support_tickets_q2 GROUP BY sla_breach",
-            "table": "support_tickets_q2"
-          }
-        }
-      }
-    ],
-    "_model": "claude-sonnet-4-6",
-    "_provider": "anthropic",
-    "_assigned_tools": {
-      "candidate_flows": [
-        "reject",
-        "approve"
-      ],
-      "candidate_intents": [
-        "Plan",
-        "Converse"
-      ],
-      "turn3_flow": "approve",
-      "turn3_intent": "Converse",
-      "sub_type": "partial",
-      "cand_a_tools": [],
-      "cand_b_tools": [],
-      "turn3_tools": []
-    }
-  },
-  {
-    "convo_id": "dana_024",
-    "category": "ambiguous_first",
-    "scenario": "Skincare product testing notes with inconsistent shade and finish labels",
-    "context": {
-      "table": "product_test_notes",
-      "columns": [
-        "product_name",
-        "brand",
-        "shade_name",
-        "finish_type",
-        "test_date",
-        "wear_hours",
-        "rating",
+        "merchant",
+        "amount",
+        "currency",
+        "type",
         "notes"
       ]
     },
@@ -1558,27 +2760,27 @@
         "turn_num": 1,
         "flow": "ambiguous",
         "candidate_flows": [
-          "pivot",
-          "reshape"
+          "define",
+          "query"
         ],
         "candidate_intents": [
-          "Plan",
+          "Transform",
           "Analyze",
-          "Transform"
+          "Plan"
         ],
         "speaker": "user",
-        "utterance": "This sheet needs to be turned into a cleaner comparison layout.",
-        "rationale": "Comparison layout could mean pivoting into a summary table, or reshaping the sheet by moving blocks of cells or columns into a new arrangement.",
+        "utterance": "Can you set up net income and show it by month?",
+        "rationale": "This could mean defining a reusable net income metric, or running a query that calculates net income and returns a monthly breakdown.",
         "target_tools": {
           "handle_ambiguity": {
             "clarification": null,
             "candidates": [
               "describe_stats",
-              "cut_n_paste"
+              "execute_sql"
             ]
           },
           "describe_stats": {
-            "table": "product_test_notes",
+            "table": "blog_finance_transactions",
             "column": null,
             "metrics": [
               "dtype",
@@ -1586,34 +2788,32 @@
               "unique"
             ]
           },
-          "cut_n_paste": {
-            "source_table": "product_test_notes",
-            "source_ref": "column:finish_type",
-            "target_table": "product_test_notes",
-            "target_ref": "column:finish_type"
+          "execute_sql": {
+            "query": "SELECT date_trunc('month', transaction_date) AS month, SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) - SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS net_income\nFROM blog_finance_transactions\nGROUP BY 1\nORDER BY 1;",
+            "table": "blog_finance_transactions"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "Do you mean a pivoted summary table, or rearranging the sheet by moving columns/blocks around?"
+        "utterance": "Do you want a saved metric definition, or a one-off monthly query?"
       },
       {
         "turn_num": 3,
-        "flow": "pivot",
+        "flow": "query",
         "intent": "Analyze",
         "speaker": "user",
-        "utterance": "Pivot it into a comparison table.",
+        "utterance": "One off monthly query",
         "candidate_intents": [
-          "Plan",
+          "Transform",
           "Analyze",
-          "Transform"
+          "Plan"
         ],
         "target_tools": {
-          "execute_python": {
-            "table": "product_test_notes",
-            "code": "import pandas as pd\n\n# Create a comparison-ready pivot: average wear_hours by finish_type and shade_name\npt = (df.pivot_table(index='finish_type', columns='shade_name', values='wear_hours', aggfunc='mean')\n        .reset_index())\n\npt.columns = [str(c) for c in pt.columns]\npt"
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "blog_finance_transactions"
           }
         }
       }
@@ -1622,120 +2822,19 @@
     "_provider": "openai",
     "_assigned_tools": {
       "candidate_flows": [
-        "pivot",
-        "reshape"
+        "define",
+        "query"
       ],
       "candidate_intents": [
-        "Plan",
+        "Transform",
         "Analyze",
-        "Transform"
+        "Plan"
       ],
-      "turn3_flow": "pivot",
+      "turn3_flow": "query",
       "turn3_intent": "Analyze",
       "sub_type": "partial",
       "cand_a_tools": [
         "describe_stats"
-      ],
-      "cand_b_tools": [
-        "cut_n_paste"
-      ],
-      "turn3_tools": [
-        "execute_python"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_025",
-    "category": "ambiguous_first",
-    "scenario": "Biology researcher preparing wide-format assay data for statistical analysis in R",
-    "context": {
-      "table": "assay_data",
-      "columns": [
-        "sample_id",
-        "treatment",
-        "conc_t0",
-        "conc_t1",
-        "conc_t2",
-        "viability"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "ambiguous",
-        "candidate_flows": [
-          "reshape",
-          "describe"
-        ],
-        "candidate_intents": [
-          "Plan",
-          "Analyze",
-          "Transform"
-        ],
-        "speaker": "user",
-        "utterance": "Break down the concentration columns by treatment.",
-        "rationale": "The phrase 'break down' is ambiguous; it could mean structurally reshaping the wide data into a long format (reshape/pivot) or analytically summarizing the existing columns (describe/query).",
-        "target_tools": {
-          "handle_ambiguity": {
-            "clarification": null,
-            "candidates": [
-              "pivot_tables",
-              "execute_sql"
-            ]
-          },
-          "pivot_tables": {
-            "table": "assay_data",
-            "index": "treatment",
-            "columns": "time_point",
-            "values": "concentration"
-          },
-          "execute_sql": {
-            "query": "SELECT treatment, AVG(conc_t0), AVG(conc_t1), AVG(conc_t2) FROM assay_data GROUP BY treatment",
-            "table": "assay_data"
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "Do you want to reshape the table layout or just query the summary statistics?"
-      },
-      {
-        "turn_num": 3,
-        "flow": "describe",
-        "intent": "Analyze",
-        "speaker": "user",
-        "utterance": "Just the column definitions for now.",
-        "candidate_intents": [
-          "Plan",
-          "Analyze",
-          "Transform"
-        ],
-        "target_tools": {
-          "semantic_layer": {
-            "scope": "columns",
-            "name": "assay_data"
-          }
-        }
-      }
-    ],
-    "_model": "google/gemini-3-pro-preview",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "candidate_flows": [
-        "reshape",
-        "describe"
-      ],
-      "candidate_intents": [
-        "Plan",
-        "Analyze",
-        "Transform"
-      ],
-      "turn3_flow": "describe",
-      "turn3_intent": "Analyze",
-      "sub_type": "confirmation",
-      "cand_a_tools": [
-        "pivot_tables"
       ],
       "cand_b_tools": [
         "execute_sql"
@@ -1746,16 +2845,17 @@
     }
   },
   {
-    "convo_id": "dana_026",
+    "convo_id": "dana_047",
     "category": "ambiguous_first",
-    "scenario": "Literature review assistant cleaning up a database of citations and DOIs.",
+    "scenario": "An engineering manager analyzes incident ticket volume for a quarterly reliability review.",
     "context": {
-      "table": "bibliography",
+      "table": "incident_logs",
       "columns": [
-        "title",
-        "author",
-        "year",
-        "doi"
+        "ticket_id",
+        "created_at",
+        "priority",
+        "service",
+        "resolution_time"
       ]
     },
     "turns": [
@@ -1763,119 +2863,16 @@
         "turn_num": 1,
         "flow": "ambiguous",
         "candidate_flows": [
-          "export",
-          "plot"
+          "compare",
+          "trend"
         ],
         "candidate_intents": [
-          "Plan",
+          "Analyze",
           "Report"
         ],
         "speaker": "user",
-        "utterance": "What's the full breakdown of citations?",
-        "rationale": "The user could be asking for a visual representation of citation data or an export of the full dataset.",
-        "target_tools": {
-          "handle_ambiguity": {
-            "clarification": null,
-            "candidates": [
-              "export_dataset",
-              "describe_stats"
-            ]
-          },
-          "export_dataset": {
-            "dataset": "bibliography",
-            "format": "csv",
-            "path": null
-          },
-          "describe_stats": {
-            "table": "bibliography",
-            "column": null,
-            "metrics": [
-              "unique",
-              "count"
-            ]
-          }
-        }
-      },
-      {
-        "turn_num": 2,
-        "speaker": "agent",
-        "utterance": "Should I chart the citation trends or export the full data?"
-      },
-      {
-        "turn_num": 3,
-        "flow": "plot",
-        "intent": "Report",
-        "speaker": "user",
-        "utterance": "Chart the trends",
-        "candidate_intents": [
-          "Plan",
-          "Report"
-        ],
-        "target_tools": {
-          "execute_python": {
-            "code": "df['year'] = pd.to_datetime(df['year'], format='%Y')",
-            "table": "bibliography"
-          }
-        }
-      }
-    ],
-    "_model": "deepseek/deepseek-chat",
-    "_provider": "openrouter",
-    "_assigned_tools": {
-      "candidate_flows": [
-        "export",
-        "plot"
-      ],
-      "candidate_intents": [
-        "Plan",
-        "Report"
-      ],
-      "turn3_flow": "plot",
-      "turn3_intent": "Report",
-      "sub_type": "partial",
-      "cand_a_tools": [
-        "export_dataset"
-      ],
-      "cand_b_tools": [
-        "describe_stats"
-      ],
-      "turn3_tools": [
-        "execute_python"
-      ]
-    }
-  },
-  {
-    "convo_id": "dana_027",
-    "category": "ambiguous_first",
-    "scenario": "Travel blogger wants to clean duplicate expense entries imported from two apps before calculating year-end totals by country.",
-    "context": {
-      "table": "trip_expenses_2024",
-      "columns": [
-        "expense_id",
-        "date",
-        "vendor",
-        "category",
-        "amount",
-        "currency",
-        "country",
-        "source_app"
-      ]
-    },
-    "turns": [
-      {
-        "turn_num": 1,
-        "flow": "ambiguous",
-        "candidate_flows": [
-          "dedupe",
-          "update"
-        ],
-        "candidate_intents": [
-          "Plan",
-          "Clean"
-        ],
-        "speaker": "user",
-        "utterance": "The expenses table has a bunch of repeated rows from both apps - same date, vendor, and amount.",
-        "rationale": "The user identifies repeated rows, which could mean they want duplicates removed (dedupe) or they want to update/overwrite the duplicate values to consolidate them (update). Both flows are plausible responses to spotting repeated data.",
+        "utterance": "Calculate the ticket volume growth",
+        "rationale": "The user asks for 'growth' but doesn't specify if they want a trend line over time or a comparison between two specific periods.",
         "target_tools": {
           "handle_ambiguity": {
             "clarification": null,
@@ -1885,48 +2882,52 @@
             ]
           },
           "execute_python": {
-            "code": "df[df.duplicated(subset=['date', 'vendor', 'amount'], keep=False)].sort_values(['date', 'vendor', 'amount'])",
-            "table": "trip_expenses_2024"
+            "code": "# Calculate growth between two specific periods\n...",
+            "table": "incident_logs"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "I see 47 rows duplicated on date, vendor, and amount - should I drop the extras and keep one row per entry, or do you want to merge fields from both source_app records instead?"
+        "utterance": "Do you want to see the trend over time or compare specific periods?"
       },
       {
         "turn_num": 3,
-        "flow": "dedupe",
-        "intent": "Clean",
+        "flow": "compare",
+        "intent": "Analyze",
         "speaker": "user",
-        "utterance": "Drop the extras, keep one.",
+        "utterance": "Compare Q2 versus Q3",
         "candidate_intents": [
-          "Plan",
-          "Clean"
+          "Analyze"
         ],
         "target_tools": {
           "semantic_layer": {
             "scope": "columns",
-            "name": "trip_expenses_2024"
+            "name": "incident_logs"
+          },
+          "execute_python": {
+            "code": "df['quarter'] = df['created_at'].dt.to_period('Q')\nq2 = df[df['quarter'] == '2023Q2'].shape[0]\nq3 = df[df['quarter'] == '2023Q3'].shape[0]\nprint((q3 - q2) / q2)",
+            "table": "incident_logs"
           }
         }
       }
     ],
-    "_model": "claude-sonnet-4-6",
-    "_provider": "anthropic",
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
     "_assigned_tools": {
       "candidate_flows": [
-        "dedupe",
-        "update"
+        "compare",
+        "trend"
       ],
       "candidate_intents": [
+        "Analyze",
         "Plan",
-        "Clean"
+        "Report"
       ],
-      "turn3_flow": "dedupe",
-      "turn3_intent": "Clean",
-      "sub_type": "confirmation",
+      "turn3_flow": "compare",
+      "turn3_intent": "Analyze",
+      "sub_type": "partial",
       "cand_a_tools": [
         "execute_python"
       ],
@@ -1939,62 +2940,66 @@
     }
   },
   {
-    "convo_id": "dana_030",
+    "convo_id": "dana_051",
     "category": "ambiguous_second",
-    "scenario": "Early-stage founder analyzing monthly burn rate to extend runway before Series A",
+    "scenario": "Technical co-founder analyzing infrastructure costs per user",
     "context": {
-      "table": "monthly_expenses",
+      "table": "monthly_infrastructure",
       "columns": [
         "month",
-        "category",
-        "amount",
-        "vendor",
-        "department"
+        "total_aws_cost",
+        "mau",
+        "storage_gb",
+        "compute_hours"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "lookup",
-        "intent": "Analyze",
+        "flow": "insert",
+        "intent": "Transform",
         "speaker": "user",
-        "utterance": "Check stats on the monthly burn column.",
+        "utterance": "Add a cost_per_user column dividing total_aws_cost by mau.",
         "target_tools": {
+          "insert_columns": {
+            "table": "monthly_infrastructure",
+            "column": "cost_per_user",
+            "expression": "total_aws_cost / mau"
+          },
           "describe_stats": {
-            "table": "monthly_expenses",
-            "column": "amount"
+            "table": "monthly_infrastructure",
+            "column": "cost_per_user"
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "Mean burn is $45k, heavily influenced by the server costs in May."
+        "utterance": "I've added the computed column to the table."
       },
       {
         "turn_num": 3,
         "flow": "outline",
         "intent": "Plan",
         "candidate_flows": [
-          "export",
-          "undo"
+          "trend",
+          "plot"
         ],
         "candidate_intents": [
-          "Plan",
           "Report",
-          "Converse"
+          "Plan"
         ],
         "speaker": "user",
-        "utterance": "Undo that filter before exporting the CSV.",
-        "rationale": "The user combines a request to revert a previous state (undo) with a request to save the file (export) using a temporal connector.",
+        "utterance": "Trend the cost and plot it.",
+        "rationale": "User requests a trend analysis and a visualization in a single command.",
         "target_tools": {
-          "rollback_dataset": {
-            "dataset": "monthly_expenses",
-            "steps": 1
+          "execute_python": {
+            "code": "df['cost_per_user'].pct_change()",
+            "table": "monthly_infrastructure"
           },
-          "export_dataset": {
-            "dataset": "monthly_expenses",
-            "format": "csv"
+          "execute_sql": {
+            "query": "SELECT month, cost_per_user FROM monthly_infrastructure ORDER BY month",
+            "table": "monthly_infrastructure"
           }
         }
       }
@@ -2002,95 +3007,275 @@
     "_model": "google/gemini-3-pro-preview",
     "_provider": "openrouter",
     "_assigned_tools": {
-      "turn1_flow": "lookup",
-      "turn1_intent": "Analyze",
+      "turn1_flow": "insert",
+      "turn1_intent": "Transform",
       "turn1_tools": [
         "describe_stats"
       ],
       "candidate_flows": [
-        "export",
-        "undo"
+        "trend",
+        "plot"
       ],
       "candidate_intents": [
-        "Plan",
         "Report",
-        "Converse"
+        "Plan"
       ],
       "turn3_tools": [
         [
-          "export_dataset"
+          "execute_python"
         ],
         [
-          "rollback_dataset"
+          "execute_sql"
         ]
       ]
     }
   },
   {
-    "convo_id": "dana_034",
+    "convo_id": "dana_056",
     "category": "ambiguous_second",
-    "scenario": "Public health researcher combining location fields to generate a file for GIS mapping software.",
+    "scenario": "A DevOps engineer is analyzing server uptime logs and wants to split a combined hostname-region column into separate fields for easier filtering and grouping.",
     "context": {
-      "table": "county_locations",
+      "table": "uptime_logs",
       "columns": [
-        "county",
-        "state",
-        "zip_code",
-        "case_rate",
-        "latitude",
-        "longitude"
+        "host_region",
+        "uptime_pct",
+        "downtime_min"
       ]
     },
     "turns": [
       {
         "turn_num": 1,
-        "flow": "append",
+        "flow": "split",
         "intent": "Transform",
         "speaker": "user",
-        "utterance": "Stack the rural_data onto the main county table.",
+        "utterance": "split host_region on the hyphen into hostname and region columns",
         "target_tools": {
-          "append_tables": {
-            "source": "rural_data",
-            "target": "county_locations",
-            "align_by": "columns"
+          "split_column": {
+            "table": "uptime_logs",
+            "column": "host_region",
+            "delimiter": "-",
+            "names": [
+              "hostname",
+              "region"
+            ]
           }
         }
       },
       {
         "turn_num": 2,
         "speaker": "agent",
-        "utterance": "Done. The rural records are now at the bottom of the dataset."
+        "utterance": "I'll split host_region into hostname and region columns using hyphen as the delimiter."
       },
       {
         "turn_num": 3,
         "flow": "outline",
         "intent": "Plan",
         "candidate_flows": [
-          "merge",
-          "update"
+          "reject",
+          "validate"
         ],
         "candidate_intents": [
+          "Clean",
           "Plan",
-          "Transform",
-          "Clean"
+          "Converse"
         ],
         "speaker": "user",
-        "utterance": "Fix the first zip, then merge location cols.",
-        "rationale": "The user combines a specific cell correction ('fix the first zip') with a structural column operation ('merge location cols'), requiring the outline flow to orchestrate update and merge tools.",
+        "utterance": "Check that the region codes are valid before proceeding.",
+        "rationale": "The user asks to validate the region column after splitting it, which requires a separate flow.",
         "target_tools": {
-          "modify_cell": {
-            "table": "county_locations",
-            "row": "0",
-            "column": "zip_code",
-            "value": "null"
-          },
+          "validate_column": {
+            "table": "uptime_logs",
+            "column": "region",
+            "check": "enum",
+            "value": "us-east,us-west,eu-central,ap-southeast",
+            "action": null
+          }
+        }
+      }
+    ],
+    "_model": "deepseek/deepseek-chat",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "split",
+      "turn1_intent": "Transform",
+      "turn1_tools": [
+        "split_column"
+      ],
+      "candidate_flows": [
+        "reject",
+        "validate"
+      ],
+      "candidate_intents": [
+        "Clean",
+        "Plan",
+        "Converse"
+      ],
+      "turn3_tools": [
+        [],
+        [
+          "validate_column"
+        ]
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_058",
+    "category": "ambiguous_second",
+    "scenario": "Cleaning an exported CMDB asset list where numeric and boolean fields were imported as text.",
+    "context": {
+      "table": "cmdb_assets_export",
+      "columns": [
+        "asset_id",
+        "asset_name",
+        "asset_type",
+        "cpu_count",
+        "memory_gb",
+        "is_active",
+        "last_seen",
+        "location",
+        "owner_team"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "define",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "New column total_ram_mb from memory_gb * 1024.",
+        "target_tools": {
           "describe_stats": {
-            "table": "county_locations",
-            "columns": [
-              "county",
-              "state",
-              "zip_code"
+            "table": "cmdb_assets_export",
+            "column": "memory_gb",
+            "metrics": [
+              "dtype",
+              "nulls",
+              "min",
+              "max",
+              "mean"
             ]
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I will profile memory_gb first to confirm it is numeric, since the formula depends on valid numbers."
+      },
+      {
+        "turn_num": 3,
+        "flow": "outline",
+        "intent": "Plan",
+        "candidate_flows": [
+          "datatype",
+          "validate"
+        ],
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "Cast cpu_count to int, then check is_active values?",
+        "rationale": "The user requests a type conversion for cpu_count plus a separate validation task for allowed values in is_active. These map to datatype and validate flows, so it needs an outline plan.",
+        "target_tools": {
+          "cast_column": {
+            "table": "cmdb_assets_export",
+            "column": "cpu_count",
+            "target_type": "int",
+            "format": null,
+            "errors": "coerce"
+          },
+          "semantic_layer": {
+            "scope": "columns",
+            "name": "cmdb_assets_export"
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "turn1_flow": "define",
+      "turn1_intent": "Transform",
+      "turn1_tools": [
+        "describe_stats"
+      ],
+      "candidate_flows": [
+        "datatype",
+        "validate"
+      ],
+      "candidate_intents": [
+        "Clean",
+        "Plan"
+      ],
+      "turn3_tools": [
+        [
+          "cast_column"
+        ],
+        [
+          "semantic_layer"
+        ]
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_059",
+    "category": "ambiguous_second",
+    "scenario": "A network engineer analyzes firewall rule usage and brings in access logs to visualize traffic volume trends.",
+    "context": {
+      "table": "firewall_rules",
+      "columns": [
+        "rule_id",
+        "source_ip",
+        "dest_ip",
+        "port",
+        "action",
+        "last_triggered"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "describe",
+        "intent": "Analyze",
+        "speaker": "user",
+        "utterance": "Check the date spread on the rules.",
+        "target_tools": {
+          "execute_sql": {
+            "query": "SELECT MIN(last_triggered), MAX(last_triggered) FROM firewall_rules",
+            "table": "firewall_rules"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "The dates range from late 2021 to yesterday, with most activity in the last three months."
+      },
+      {
+        "turn_num": 3,
+        "flow": "outline",
+        "intent": "Plan",
+        "candidate_flows": [
+          "insert",
+          "trend"
+        ],
+        "candidate_intents": [
+          "Transform",
+          "Plan",
+          "Report"
+        ],
+        "speaker": "user",
+        "utterance": "Load access logs, then trend the volume.",
+        "rationale": "The user combines data ingestion ('Load access logs') with analysis ('trend the volume') in a sequential request.",
+        "target_tools": {
+          "load_dataset": {
+            "source_id": "access_logs",
+            "name": "access_logs"
+          },
+          "execute_python": {
+            "code": "df.groupby('date')['volume'].sum()",
+            "table": "access_logs"
           }
         }
       }
@@ -2098,26 +3283,206 @@
     "_model": "google/gemini-3-pro-preview",
     "_provider": "openrouter",
     "_assigned_tools": {
-      "turn1_flow": "append",
-      "turn1_intent": "Transform",
+      "turn1_flow": "describe",
+      "turn1_intent": "Analyze",
       "turn1_tools": [
-        "append_tables"
+        "execute_sql"
       ],
       "candidate_flows": [
-        "merge",
-        "update"
+        "insert",
+        "trend"
       ],
       "candidate_intents": [
-        "Plan",
         "Transform",
-        "Clean"
+        "Plan",
+        "Report"
       ],
       "turn3_tools": [
         [
-          "describe_stats"
+          "load_dataset"
         ],
         [
-          "modify_cell"
+          "execute_python"
+        ]
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_062",
+    "category": "ambiguous_second",
+    "scenario": "Founder cleaning messy customer feedback data before running sentiment analysis",
+    "context": {
+      "table": "customer_feedback_raw",
+      "columns": [
+        "feedback_id",
+        "created_at",
+        "customer_id",
+        "channel",
+        "rating",
+        "feedback_text",
+        "language",
+        "product_area",
+        "country"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "chat",
+        "intent": "Converse",
+        "speaker": "user",
+        "utterance": "What is the quickest way to spot messy text?",
+        "target_tools": {
+          "coordinate_context": {
+            "table": "customer_feedback_raw",
+            "columns": "feedback_text"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "Scan for unusually short or long entries, lots of symbols, and repeated boilerplate. Sorting by text length and sampling extremes is usually the fastest."
+      },
+      {
+        "turn_num": 3,
+        "flow": "outline",
+        "intent": "Plan",
+        "candidate_flows": [
+          "update",
+          "exist"
+        ],
+        "candidate_intents": [
+          "Analyze",
+          "Clean",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "Sort by feedback_text length, then any missing ratings?",
+        "rationale": "Sorting is a table update to reorder rows, while checking for missing ratings is an existence check that needs a query.",
+        "target_tools": {
+          "modify_table": {
+            "table": "customer_feedback_raw",
+            "operation": "sort",
+            "column": "feedback_text",
+            "ascending": true
+          },
+          "execute_sql": {
+            "query": "SELECT COUNT(*) AS missing_ratings FROM customer_feedback_raw WHERE rating IS NULL OR TRIM(CAST(rating AS TEXT)) = ''",
+            "table": "customer_feedback_raw"
+          }
+        }
+      }
+    ],
+    "_model": "gpt-5.2",
+    "_provider": "openai",
+    "_assigned_tools": {
+      "turn1_flow": "chat",
+      "turn1_intent": "Converse",
+      "turn1_tools": [],
+      "candidate_flows": [
+        "update",
+        "exist"
+      ],
+      "candidate_intents": [
+        "Analyze",
+        "Clean",
+        "Plan"
+      ],
+      "turn3_tools": [
+        [
+          "modify_table"
+        ],
+        [
+          "execute_sql"
+        ]
+      ]
+    }
+  },
+  {
+    "convo_id": "dana_063",
+    "category": "ambiguous_second",
+    "scenario": "A medical director defines a standardized readmission metric and then cleans up date formats to validate the reporting period.",
+    "context": {
+      "table": "hospital_discharges",
+      "columns": [
+        "patient_id",
+        "discharge_date",
+        "readmission_date",
+        "days_to_readmit",
+        "disposition"
+      ]
+    },
+    "turns": [
+      {
+        "turn_num": 1,
+        "flow": "define",
+        "intent": "Transform",
+        "speaker": "user",
+        "utterance": "Compute a 30-day readmit flag using the days column.",
+        "target_tools": {
+          "apply_formula": {
+            "table": "hospital_discharges",
+            "column": "is_readmit_30d",
+            "formula": "days_to_readmit <= 30"
+          }
+        }
+      },
+      {
+        "turn_num": 2,
+        "speaker": "agent",
+        "utterance": "I'll add that flag logic to the table."
+      },
+      {
+        "turn_num": 3,
+        "flow": "outline",
+        "intent": "Plan",
+        "candidate_flows": [
+          "datatype",
+          "validate"
+        ],
+        "candidate_intents": [
+          "Clean",
+          "Plan"
+        ],
+        "speaker": "user",
+        "utterance": "Cast to date so we can check range.",
+        "rationale": "User combines a datatype conversion with a request to check the data range (validation/profiling), linked by 'so we can'.",
+        "target_tools": {
+          "cast_column": {
+            "table": "hospital_discharges",
+            "column": "discharge_date",
+            "target_type": "datetime"
+          },
+          "describe_stats": {
+            "table": "hospital_discharges",
+            "column": "discharge_date"
+          }
+        }
+      }
+    ],
+    "_model": "google/gemini-3-pro-preview",
+    "_provider": "openrouter",
+    "_assigned_tools": {
+      "turn1_flow": "define",
+      "turn1_intent": "Transform",
+      "turn1_tools": [
+        "apply_formula"
+      ],
+      "candidate_flows": [
+        "datatype",
+        "validate"
+      ],
+      "candidate_intents": [
+        "Clean",
+        "Plan"
+      ],
+      "turn3_tools": [
+        [
+          "cast_column"
+        ],
+        [
+          "describe_stats"
         ]
       ]
     }
