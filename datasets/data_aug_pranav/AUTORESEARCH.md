@@ -149,12 +149,16 @@ for each iteration:
     1. Run pipeline steps 1-4 for {domain}
     2. Run metrics (--skip-llm for fast, full every 3rd iteration)
     3. Read the scorecard JSON
-    4. Identify the worst 2-3 signals
-    5. Hypothesize a fix (prompt change, filtering step, pipeline modification)
-    6. Implement the fix
-    7. Re-run pipeline and compare scorecards
-    8. Log result in notes.md
-    9. If breakthrough: commit + push
+    4. Read a sample of the actual generated conversations — don't just trust aggregate numbers.
+       Look at real examples to spot issues metrics miss (awkward phrasing, repetitive patterns,
+       unrealistic tool usage, etc.). Use what you see to motivate next steps, new metrics, and
+       hypotheses.
+    5. Identify the worst 2-3 signals (from scorecard AND manual inspection)
+    6. Hypothesize a fix (prompt change, filtering step, pipeline modification, new metric)
+    7. Implement the fix
+    8. Re-run pipeline and compare scorecards
+    9. Log result in notes.md
+   10. If breakthrough: commit + push
 ```
 
 ### Reading the Scorecard
@@ -186,6 +190,7 @@ Focus on:
 
 ### With Care
 - **Scorecards** (`compute_metrics.py` thresholds/logic): Only to fix bugs or genuinely improve measurement. NEVER to inflate scores. If you change thresholds or scoring logic, document exactly what changed and why in `notes.md`.
+- **Adding intrinsic metrics**: You can add new intrinsic metrics to `compute_metrics.py` if they capture something genuinely useful that existing metrics miss (e.g., something you noticed by reading examples). The bar: the metric must be hard to game — it should only go green when the data is actually better, not because the pipeline learned to exploit a shortcut. Document new metrics in `notes.md` and add them to the scorecard tables in this file.
 - **Pipeline file I/O paths**: Only if you're restructuring the pipeline and updating all downstream consumers.
 
 ### Do Not Change
