@@ -77,17 +77,13 @@ Generate 3-turn conversations (user -> agent -> user) from enriched scenarios, o
 
 ### Metrics — Compute Scorecard
 ```bash
-# Fast iteration (skip LLM-based naturalness/agreement checks):
-.venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py \
-    --domain {domain} --seed 42 --skip-llm
-
-# Full metrics (includes LLM judges — slower, use for checkpoints):
+# Full metrics (always run full — no --skip-llm):
 .venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py \
     --domain {domain} --seed 42 --concurrency 10
 
 # Both domains:
 .venv/bin/python3 datasets/data_aug_pranav/compute_metrics.py \
-    --domain both --seed 42 --skip-llm
+    --domain both --seed 42 --concurrency 10
 ```
 
 - Output: `datasets/data_aug_pranav/analysis/metrics_{domain}.json`
@@ -104,35 +100,32 @@ Generate 3-turn conversations (user -> agent -> user) from enriched scenarios, o
 
 ## 2. What to Optimize
 
-### Primary: Intrinsic Scorecard
+### Primary Scorecard: Section I Quality Heuristics + Diversity
 
-These measure the synthetic data's absolute quality and diversity. **These are the main optimization targets.**
+These are the **only** optimization targets. No comparative metrics — we do not optimize synth-vs-eval distribution similarity.
 
 | Metric | What it measures | Green | Red | Direction |
 |--------|-----------------|-------|-----|-----------|
+| **Diversity** | | | | |
 | `flow_entropy_ratio` | Flow uniformity (entropy / max_entropy) | >= 0.85 | < 0.70 | Higher = better |
 | `tool_entropy_ratio` | Tool uniformity | >= 0.85 | < 0.70 | Higher = better |
+| **Quality — Regex Heuristics** | | | | |
+| `heuristic_filler_rate` | Filler phrases in user turns (I.2) | <= 0.05 | > 0.15 | Lower = better |
+| `heuristic_overack_rate` | Agent over-acknowledgment (I.2) | <= 0.05 | > 0.15 | Lower = better |
+| `heuristic_unicode_rate` | Curly quotes, em-dashes, etc. (I.7) | <= 0.02 | > 0.10 | Lower = better |
+| `heuristic_leakage_rate` | Flow/intent/tool names in user utterances (I.8) | <= 0.02 | > 0.10 | Lower = better |
+| `heuristic_multireq_rate` | ambiguous_second turn-3 has multi-req connector (I.6) | >= 0.90 | < 0.70 | Higher = better |
+| `heuristic_t3_terse_rate` | Turn-3 user utterances ≤9 words (I.2) | >= 0.70 | < 0.50 | Higher = better |
+| **Quality — LLM Judges** | | | | |
+| `turn_dependency_mean` | Turn-3 depends on prior context (I.1) | >= 3.5 | < 2.5 | Higher = better |
+| `agent_leak_rate` | Agent turn leaks labels/metadata (I.2) | <= 0.10 | > 0.25 | Lower = better |
 | `naturalness_mean` | Mean naturalness score (LLM judge) | >= 3.5 | < 2.5 | Higher = better |
+| **Label Quality** | | | | |
 | `label_agreement_intent` | Multi-model intent label agreement | >= 0.95 | < 0.85 | Higher = better |
 | `label_agreement_flow` | Multi-model flow label agreement | >= 0.85 | < 0.70 | Higher = better |
 | `label_agreement_tool` | Multi-model tool label agreement | >= 0.85 | < 0.70 | Higher = better |
 
-**ALL of these metrics must be actively measured and optimized — not just entropy.** Run label agreement checks (`--check-labels`) and naturalness scoring (no `--skip-llm`) as part of the core iteration loop, not just at checkpoints. If label agreement is low, run the disagreement handling protocol (section 5). If naturalness is low, use naturalness-gated filtering. If embedding diversity shows tight clusters, reject and regenerate.
-
-### Secondary Compass: Comparative Scorecard
-
-These compare synth vs eval distributions. Use as directional guidance, but remember: **synth should have HIGHER diversity than eval, not match it**. Don't optimize these to parity — a low `flow_jsd` (close distribution match) is good only if the synth data is also diverse on its own.
-
-| Metric | What it measures | Green | Red | Direction |
-|--------|-----------------|-------|-----|-----------|
-| `flow_jsd` | Jensen-Shannon divergence of flow distributions | <= 0.05 | > 0.15 | Lower = closer |
-| `intent_jsd` | JSD of intent distributions | <= 0.05 | > 0.15 | Lower = closer |
-| `length_ks` | KS statistic on utterance lengths | <= 0.1 | > 0.3 | Lower = closer |
-| `vocab_jaccard` | Vocabulary overlap (Jaccard) | >= 0.6 | < 0.3 | Higher = more overlap |
-| `tool_coverage` | Fraction of eval tools present in synth | >= 0.95 | < 0.80 | Higher = better |
-| `flow_pair_coverage` | Fraction of eval flow-pairs in synth | >= 0.80 | < 0.60 | Higher = better |
-| `naturalness_gap` | abs(synth_naturalness - eval_naturalness) | <= 0.3 | > 0.7 | Lower = closer |
-| `ambiguity_gap` | abs(synth_ambiguity - eval_ambiguity) | <= 0.5 | > 1.0 | Lower = closer |
+**ALL metrics must be measured every iteration.** Always run `compute_metrics.py` without `--skip-llm`. The LLM-based metrics (turn dependency, agent leak, naturalness, label agreement) are primary targets, not optional checkpoints.
 
 ---
 
@@ -147,9 +140,7 @@ These compare synth vs eval distributions. Use as directional guidance, but reme
 ```
 for each iteration:
     1. Run pipeline steps 1-4 for {domain}
-    2. Run metrics (--skip-llm for fast, full every 3rd iteration)
-    2b. Run label agreement check (--check-labels) — identify disagreements, flip or quarantine per section 5
-    2c. Compute embedding diversity — flag and remove tight clusters (pairwise cosine > 0.85)
+    2. Run full metrics (compute_metrics.py without --skip-llm, always)
     3. Read the scorecard JSON
     4. Read a sample of the actual generated conversations — don't just trust aggregate numbers.
        Look at real examples to spot issues metrics miss (awkward phrasing, repetitive patterns,
@@ -172,16 +163,16 @@ cat datasets/data_aug_pranav/analysis/metrics_{domain}.json
 
 Focus on:
 - `intrinsic_scorecard` → the color-coded pass/warn/fail for each metric
-- `comparative_scorecard` → directional reference only
 - Look at individual metric values, not just pass/fail
+- Pay special attention to LLM judge metrics — they catch issues regex can't
 
 ### What Counts as Progress
-- Any intrinsic metric moving from red -> yellow or yellow -> green
+- Any metric moving from red -> yellow or yellow -> green
 - Multiple metrics improving without any regressing
 - Consistency across both domains (hugo AND dana)
 - Label agreement improving (intent toward 0.95, flow/tool toward 0.85)
-- Contrived conversation count decreasing
-- Embedding diversity: no tight clusters remaining after filtering
+- Heuristic violation rates decreasing
+- LLM judge scores improving (turn dependency, naturalness up; agent leak down)
 
 ---
 
@@ -252,8 +243,8 @@ These are starting points. You are expected to invent new optimization strategie
 **Target**: {which metric(s) you're trying to improve}
 **Change**: {what you modified — which prompt, which step, what filtering}
 **Result**:
-- flow_entropy_ratio: 0.72 -> 0.81
-- naturalness_mean: 3.2 -> 3.4
+- heuristic_filler_rate: 0.12 -> 0.04
+- turn_dependency_mean: 2.8 -> 3.6
 - (list all changed metrics)
 **Verdict**: {worked / partially worked / didn't work / made things worse}
 ```
@@ -272,7 +263,7 @@ Include the scorecard delta in the commit message body.
 
 ### Checkpoints
 
-Every 3 iterations, run full metrics (without `--skip-llm`) for both domains and log the complete scorecard in `notes.md`.
+Every 3 iterations, run full metrics for both domains and log the complete scorecard in `notes.md`.
 
 ---
 
@@ -295,8 +286,8 @@ If one domain has fewer flows or less natural diversity, it needs MORE iteration
 
 Stop when ALL of the following are true:
 
-1. **Convergence**: 5 consecutive iterations (for each domain) show < 5% relative improvement in BOTH diversity metrics (entropy ratios) AND quality metrics (naturalness, label agreement). Only for instrinsic metrics not comparative metrics.
-2. **All intrinsic metrics are green or yellow** — no reds remaining.
+1. **Convergence**: 5 consecutive iterations (for each domain) show < 5% relative improvement across ALL scorecard metrics (diversity, heuristic, and LLM judge metrics).
+2. **All metrics are green or yellow** — no reds remaining in the intrinsic scorecard.
 3. **Both domains** have reached convergence independently.
 
 When you stop:
@@ -320,3 +311,4 @@ When you stop:
 - **Always run from project root** — all paths are relative to project root
 - **Use `.venv/bin/python3`** for running pipeline scripts (not `python` or `uv run` for the data aug scripts)
 - **Seed consistency**: use `--seed 42` for all pipeline steps unless you have a specific reason to vary it (e.g., `--seed 43` for dedup is fine as established)
+- **Always run full metrics** — never use `--skip-llm`. LLM judge metrics are primary targets, not optional.
