@@ -1,13 +1,13 @@
 # Autonomous Research Agent — Synthetic Data Optimization
 
-You are an expert autonomous researcher. Your mission is to iteratively optimize the quality and diversity of synthetic training data for two NLU domains (Hugo and Dana). You will run the pipeline, measure quality, identify weaknesses, modify prompts and pipeline code, re-run, and repeat until convergence.
+You are an expert autonomous researcher. Your mission is to iteratively optimize the quality and diversity of synthetic training data for two NLU domains (Hugo and Dana). You will run the pipeline, measure quality, identify weaknesses, modify prompts and pipeline code, re-run, and repeat until convergence. The end goal is a fully documented, production-ready pipeline that can be run independently to generate millions of high-quality, extremely diverse training examples.
 
 ## 0. Bootstrap
 
 Before doing anything else:
 
 1. Read `CLAUDE.md` at the project root — it describes the full project architecture.
-2. Read every `.py` file in `datasets/data_aug_pranav/` to understand the pipeline code.
+2. Read `datasets/data_aug_pranav/README.md` and every `.py` file in that directory to understand the pipeline.
 3. Read `datasets/data_aug_pranav/notes.md` for prior experiment history.
 4. Ensure `.env` exists at the project root with: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPEN_ROUTER_API_KEY`.
 
@@ -139,8 +139,8 @@ These compare synth vs eval distributions. Use as directional guidance, but reme
 ## 3. Iteration Protocol
 
 ### Batch Size
-- **Max 40 scenarios per domain per iteration** (fewer when diagnosing specific issues)
-- This keeps cost manageable and lets you see signal quickly
+- **Prefer the smallest batch that gives signal** — go lower for speed, only up to 40 if necessary
+- Optimize for iteration speed, not throughput
 
 ### Loop
 
@@ -179,8 +179,8 @@ Focus on:
 ## 4. What You Can Change
 
 ### Full Freedom
-- **Prompts**: Any prompt in any pipeline step (system prompts, user prompts, diversity axes, grounding flow selection, etc.)
-- **Pipeline structure**: Add new steps, remove steps, modify control flow. If you change pipeline structure, update this file's Pipeline Reference section.
+- **Prompts**: Full freedom to modify any prompt in any pipeline step. Add context, few-shot examples, chain-of-thought, constraints, richer instructions — whatever improves output quality and diversity. This is encouraged and expected.
+- **Pipeline structure**: Add new steps, remove steps, modify control flow. If you change pipeline structure, update BOTH this file's Pipeline Reference section AND `datasets/data_aug_pranav/README.md` so the pipeline can be run independently.
 - **Filtering**: Add filtering between steps (e.g., reject scenarios by embedding distance, naturalness score, or other quality signals)
 - **Packages**: `uv add {package}` — log what you added and why in `notes.md`
 
@@ -212,7 +212,7 @@ When flipping labels, modify the conversation JSON file directly. When quarantin
 
 ## 6. Advanced Optimization Ideas
 
-Try these when basic prompt tuning plateaus:
+Incorporate these into the process as soon as they're useful — don't wait for prompt tuning to plateau. These are expected tools in your toolkit, not last resorts:
 
 - **Embedding diversity filtering**: After Step 4, compute pairwise cosine similarities of generated utterances. Reject conversations whose utterances are all within a tight cluster (e.g., mean pairwise similarity > 0.85). This directly boosts `flow_entropy_ratio` and `tool_entropy_ratio`.
 
@@ -225,6 +225,8 @@ Try these when basic prompt tuning plateaus:
 - **Utterance style transfer**: If naturalness is low because utterances sound robotic, add few-shot examples of natural, terse, phone-typed messages to the system prompt. Pull examples from the eval set (but paraphrase, don't copy verbatim).
 
 - **Category-aware quality**: Break down metrics by category. If `ambiguous_first` has worse naturalness than `same_flow`, the ambiguity generation prompts need work specifically.
+
+These are starting points. You are expected to invent new optimization strategies beyond this list — any technique that meaningfully improves the scorecard is fair game.
 
 ---
 
@@ -302,7 +304,7 @@ When you stop:
 
 ## 10. Constraints
 
-- **No cost cap** — use as many API calls as needed
+- **No cost cap** — optimize for quality and speed of iteration, not cost
 - **No time cap** — run as many iterations as needed to converge
 - **Batch size <= 40** per domain per iteration
 - **Always run from project root** — all paths are relative to project root
